@@ -66,14 +66,18 @@ export function layout(count, event = DEFAULT_EVENT, options = {}) {
   const width = !fixed && options.width || dimensions.width, height = !fixed && options.height || dimensions.height;
   const pad = fixed ? 48 : Math.round(Math.min(width,height) * Math.max(.02, options.padding || 0)), gap = fixed ? 24 : Math.round(Math.min(width,height) * .015), cols = landscape ? ({2:2,4:2,6:3,8:4}[count]) : count === 2 ? 1 : 2, rows = count / cols;
   const branding = brandingModel(event);
-  const brandH = Math.round(height * (fixed ? .14 : branding.height));
+  // Always start with the teacher's canvas, even when the student changes orientation.
+  const brandReference = !fixed && options.brandReference !== false && (options.width || options.height || options.padding || orientation !== (event.orientation || 'portrait'))
+    ? layout(count,event,{...options,orientation:event.orientation || 'portrait',width:undefined,height:undefined,padding:undefined,brandReference:false}) : null;
   const footerH = options.caption || options.captureDate ? 100 : 0;
+  const bandCount = Number(branding.hasTop) + Number(branding.hasBottom);
+  const brandScale = brandReference ? Math.min((width-2*pad)/(brandReference.width-2*brandReference.pad), bandCount ? (height-2*pad-footerH)*.45/(bandCount*brandReference.brandH) : Infinity) : 1;
+  const brandH = brandReference ? brandReference.brandH*brandScale : Math.round(height * (fixed ? .14 : branding.height));
   const topH = fixed || branding.hasTop ? brandH : 0, bottomH = fixed || branding.hasBottom ? brandH : 0;
   const bottomSpace = fixed ? brandH : bottomH + footerH;
   const photoW = (width - pad * 2 - gap * (cols - 1)) / cols, photoH = (height - pad * 2 - topH - bottomSpace - gap * (rows - 1)) / rows;
   const top = pad + topH, bottomY = height - pad - bottomSpace;
-  const brandReference = !fixed && options.brandReference !== false && (options.width || options.height || options.padding) ? layout(count,event,{...options,width:undefined,height:undefined,padding:undefined,brandReference:false}) : null;
-  return { brandReference, width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:topH},bottom:{y:bottomY,h:bottomH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoSlots,count)?.map(s=>({x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
+  return { brandReference, brandScale, width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:topH},bottom:{y:bottomY,h:bottomH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoSlots,count)?.map(s=>({x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
 }
 export function templateGeometry(count, orientation = 'portrait', frameFormat='print-4x6') { return layout(count, DEFAULT_EVENT, { frame: { layoutCount: count, orientation,frameFormat }, orientation }); }
 export function compatibleFrame(frame, count, orientation) { return !frame.layoutCount || (frame.layoutCount === count && (!orientation || (frame.orientation || 'portrait') === orientation)); }

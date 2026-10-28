@@ -4,12 +4,20 @@ import { brandingModel, BRAND_KEYS, DEFAULT_EVENT, clamp } from './core.js';
 export function brandItems(ctx, event, geometry, images) {
   const g = geometry, model = brandingModel(event), items = [];
   if (!g.brandH) return items;
-  // 교사가 편집한 정보 영역을 하나의 그룹으로 맞춥니다. 요소별 재배치는 하지 않습니다.
+  // Free-positioned text placed in a header/footer belongs to that physical group.
+  // Use the same transform for its neighbours instead of scaling it by canvas height.
   if(g.brandReference){
     const reference=g.brandReference;
     return brandItems(ctx,event,reference,images).map(item=>{
-      const position=item.settings.position,sourceArea=reference.brandAreas[position],targetArea=g.brandAreas[position];
-      const scale=Math.min((g.width-2*g.pad)/(reference.width-2*reference.pad),targetArea.h/Math.max(1,sourceArea.h));
+      let position=item.settings.position;
+      if(position==='free'){
+        for(const band of ['top','bottom']){
+          const area=reference.brandAreas[band];
+          if(area.h && item.y>=area.y && item.y<=area.y+area.h){position=band;break;}
+        }
+      }
+      const sourceArea=reference.brandAreas[position],targetArea=g.brandAreas[position];
+      const scale=position==='free' ? Math.min((g.width-2*g.pad)/(reference.width-2*reference.pad),g.height/reference.height) : g.brandScale;
       return {...item,x:g.width/2+(item.x-reference.width/2)*scale,y:targetArea.y+targetArea.h/2+(item.y-sourceArea.y-sourceArea.h/2)*scale,w:item.w*scale,h:item.h*scale,size:item.size*scale};
     });
   }
