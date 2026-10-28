@@ -102,10 +102,13 @@ function renderSteps() {
   $('preview-hint').textContent = state.step === 3 ? '사진 선택 · 드래그 이동 · 모서리 / 두 손가락으로 확대' : state.step === 4 ? '오늘의 우리, 오래 간직해요' : '나만의 한 장이 만들어지는 중';
   updateButtons();
 }
+function updateCameraGeometry(){const slot=currentGeometry().slots[state.selectedPhoto]||currentGeometry().slots[0],shell=$('camera-shell'),parent=$('web-capture-area');if(!slot||parent.hidden)return;const ratio=slot.w/slot.h,maxH=Math.max(130,Math.min(innerHeight*.34,420)),width=Math.min(parent.clientWidth,maxH*ratio);shell.style.width=width+'px';shell.style.height=width/ratio+'px';$('web-capture-guide').textContent=(state.selectedPhoto+1)+'번 컷 · 사진 칸과 같은 비율·구도로 저장돼요.';}
+window.addEventListener('resize',updateCameraGeometry);
 function updateButtons() {
   $('next').disabled = blocked || busy || (state.step === 2 && !state.photos.every(Boolean)); $('back').disabled = busy;
   $('capture').disabled = !stream || busy; $('auto-capture').disabled = !stream || busy;
-  $('camera-flip').disabled = busy || starting; $('photo-upload').disabled = busy; $('native-capture').disabled=busy; $('native-facing').disabled=busy; $('native-photo').disabled=busy; $('demo').disabled = busy;
+  $('camera-flip').disabled = busy || starting; $('photo-upload').disabled = busy; $('native-capture').disabled=busy; $('native-photo').disabled=busy; $('demo').disabled = busy;
+  updateCameraGeometry();
   $('native-capture-status').textContent=(state.selectedPhoto+1)+'번 컷 '+(state.photos[state.selectedPhoto]?'다시 찍기':'촬영 준비')+' · '+state.photos.filter(Boolean).length+'/'+state.count+'장 등록';
   $('cancel-capture').hidden = !busy; $('capture-progress').textContent = `${state.photos.filter(Boolean).length} / ${state.count}`;
 }
@@ -190,8 +193,8 @@ async function captureOne(index, epoch) {
   for (let n = Number($('timer').value); n > 0; n--) { if (epoch !== captureEpoch || !stream) return false; $('countdown').textContent = String(n); await wait(1000); }
   $('countdown').textContent = ''; if (epoch !== captureEpoch || !stream) return false;
   const video = $('video'); if (!video.videoWidth) throw new Error('카메라 준비 중이에요. 잠시 후 다시 촬영해 주세요.');
-  const c = document.createElement('canvas'); const max = 1800, scale = Math.min(1, max / Math.max(video.videoWidth, video.videoHeight)); c.width = Math.round(video.videoWidth * scale); c.height = Math.round(video.videoHeight * scale);
-  const cc = c.getContext('2d'); if (facing === 'user') { cc.translate(c.width, 0); cc.scale(-1, 1); } cc.drawImage(video, 0, 0, c.width, c.height);
+  const slot=currentGeometry().slots[index],source=crop(video.videoWidth,video.videoHeight,slot.w,slot.h); const c=document.createElement('canvas'),scale=Math.min(1,1800/Math.max(source.w,source.h));c.width=Math.max(1,Math.round(source.w*scale));c.height=Math.max(1,Math.round(source.h*scale));
+  const cc = c.getContext('2d'); if (facing === 'user') { cc.translate(c.width, 0); cc.scale(-1, 1); } cc.drawImage(video,source.x,source.y,source.w,source.h,0,0,c.width,c.height);
   const image = await imageFromURL(c.toDataURL('image/jpeg', .93)); if (epoch !== captureEpoch) return false;
   savePhoto(image, index); $('camera-flash').classList.remove('flash'); void $('camera-flash').offsetWidth; $('camera-flash').classList.add('flash'); return true;
 }
@@ -329,9 +332,9 @@ async function importPhotoFiles(e) {
   } finally { busy = false; e.target.value = ''; renderThumbnails(); updateButtons(); }
 }
 $('photo-upload').addEventListener('change',importPhotoFiles); $('native-photo').addEventListener('change',importPhotoFiles);
-function selectCaptureMethod(native){if(busy)return;if(native)stopCamera();$('native-capture-area').hidden=!native;$('web-capture-area').hidden=native;$('native-mode').setAttribute('aria-pressed',String(native));$('web-mode').setAttribute('aria-pressed',String(!native));}
+function selectCaptureMethod(native){if(busy)return;if(native)stopCamera();$('native-capture-area').hidden=!native;$('web-capture-area').hidden=native;$('native-mode').setAttribute('aria-pressed',String(native));$('web-mode').setAttribute('aria-pressed',String(!native));updateCameraGeometry();}
 $('native-mode').addEventListener('click',()=>selectCaptureMethod(true));$('web-mode').addEventListener('click',()=>selectCaptureMethod(false));
-$('native-capture').addEventListener('click',()=>{if(busy)return;stopCamera();$('native-photo').setAttribute('capture',$('native-facing').value);$('native-photo').click();});
+$('native-capture').addEventListener('click',()=>{if(busy)return;stopCamera();$('native-photo').click();});
 $('demo').addEventListener('click', async () => {
   if (state.photos.some(Boolean) && !confirm('현재 사진을 샘플 이미지로 바꿀까요?')) return;
   busy = true; updateButtons();
