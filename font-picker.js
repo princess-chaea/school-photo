@@ -36,7 +36,7 @@ function createPicker(){
  find('[data-close]').onclick=close;dialog.addEventListener('cancel',e=>{e.preventDefault();e.stopPropagation();close();});
  dialog.addEventListener('close',()=>{if(!dialog.open&&active)restoreFocus(clearOwner());});
  list.onkeydown=e=>{const index=[...list.children].indexOf(document.activeElement);if(index<0)return;const cols=getComputedStyle(list).gridTemplateColumns.split(' ').length;const move={ArrowRight:1,ArrowLeft:-1,ArrowDown:cols,ArrowUp:-cols}[e.key];let target;if(move)target=Math.max(0,Math.min(list.children.length-1,index+move));else if(e.key==='Home')target=0;else if(e.key==='End')target=list.children.length-1;else return;e.preventDefault();list.children[index].tabIndex=-1;list.children[target].tabIndex=0;list.children[target].focus();};
- return{open(owner){if(dialog.open||owner.select.disabled)return;active=owner;find('[data-search]').value='';find('[data-group]').value='all';owner.trigger.setAttribute('aria-expanded','true');dialog.showModal();render({reveal:true});find('[data-search]').focus({preventScroll:true});}};
+ return{open(owner){if(dialog.open||owner.select.disabled)return;active=owner;find('[data-search]').value='';find('[data-group]').value='all';owner.trigger.setAttribute('aria-expanded','true');dialog.showModal();render({reveal:true});if(!matchMedia('(pointer: coarse)').matches)find('[data-search]').focus({preventScroll:true});}};
 }
 export function enhanceFontSelect(select,options){
  const previous=controls.get(select);if(previous){previous.options=options;previous.sync();return;}
