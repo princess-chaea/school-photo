@@ -1,0 +1,7 @@
+찰칵! 포토 기본 일러스트 스티커
+
+preset-*.svg 96종은 이 프로젝트를 위해 작성한 원본 벡터 디자인입니다.
+외부 스티커·캐릭터 이미지를 가져오거나 브랜드 캐릭터를 복제하지 않았습니다.
+생성 소스: scripts/generate-stickers.mjs
+투명 배경, 고정 색상, 확장 가능한 SVG로 제공됩니다.
+기존 camera.webp, friendship.webp, school.webp, flower.webp 마스코트는 이번 변경 대상에 포함되지 않습니다.

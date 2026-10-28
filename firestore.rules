@@ -51,7 +51,7 @@ service cloud.firestore {
             && (!('orientation' in d) || d.orientation in ['portrait','landscape'])
         && d.logoPosition in ['top', 'bottom']
         && d.frames is list && d.frames.size() > 0 && d.frames.size() <= 32
-        && d.stickers is list && d.stickers.size() <= 64
+        && d.stickers is list && d.stickers.size() <= 256
         && d.updatedAt == request.time;
     }
     function mayPublish(data) {

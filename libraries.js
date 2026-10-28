@@ -10,6 +10,8 @@ const $ = id => document.getElementById(id);
 const LABELS = { frame: '프레임', palette: '단색 프레임', sticker: '꾸미기 이미지', logo: '학교 로고' };
 export function createLibraries({ getAssets, getShared, getUser, demo, run, added, sharedAdded, sharedChanged, removePrivate, toast }) {
   const frameUpload=createFrameUpload(), drafts=new WeakMap();
+  const designFilters=document.createElement('div');designFilters.className='sticker-library-filters';designFilters.innerHTML='<label>디자인 검색<input type="search" placeholder="이름으로 찾기" data-design-search></label><label>테마<select data-design-category><option>전체</option></select></label>';$('asset-library').before(designFilters);
+  const designSearch=designFilters.querySelector('input'),designCategory=designFilters.querySelector('select');designSearch.oninput=render;designCategory.onchange=render;
   function element(tag, value, className = '') { const el = document.createElement(tag); el.textContent = value; el.className = className; return el; }
   function isAdmin() { return cloud.isSiteAdmin(getUser()); }
   function showAsset(asset) {
@@ -19,7 +21,7 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
   }
   function assetCard(asset, manage = false) {
     const card = element('article', '', 'asset-card'), image = element('button', '', 'asset-image library-image'); image.type = 'button'; image.setAttribute('aria-label', `${asset.name} 크게 보기`);
-    if (asset.url) { const img = new Image(); img.src = asset.url; img.alt = asset.name; image.append(img); image.addEventListener('click', () => showAsset(asset)); }
+    if (asset.url) { const img = new Image(); img.src = asset.url; img.alt = asset.name; img.loading='lazy';image.append(img); image.addEventListener('click', () => showAsset(asset)); }
     else { const sample=document.createElement('canvas'); sample.className='palette-preview'; sample.setAttribute('aria-label',asset.name+' 4컷 예시'); image.append(sample); paintFramePreview(sample,{title:'',school:'',logo:'',schedule:'',frames:[asset]}); image.disabled=true; }
     const info = element('div', '', 'asset-info'); info.append(element('span', asset.base ? '기본' : asset.shared ? (asset.active ? '공용' : '공용 · 노출 중지') : '내 자료', `library-source ${asset.shared ? 'public' : ''}`), element('strong', asset.name), element('p', `${LABELS[asset.kind]}${asset.layoutCount ? ` · ${asset.layoutCount}컷 전용` : asset.preserveAspect ? ' · 모든 컷·배치' : ''}`));
     if (asset.layoutCount || asset.preserveAspect) { const g = templateGeometry(asset.layoutCount || 4, asset.orientation,asset.frameFormat); info.append(element('p', `제작 규격 ${g.width} × ${g.height}px`)); }
@@ -33,7 +35,8 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
     const frames = [...DEFAULT_FRAMES.map(f => ({ ...f, kind: 'palette', base: true })), ...shared.filter(a => a.kind === 'frame'), ...own.filter(a => ['frame','palette'].includes(a.kind))];
     const designs = [...DEFAULT_STICKERS.filter(s => s.url).map(s => ({ ...s, kind: 'sticker', base: true })), ...shared.filter(a => a.kind === 'sticker'), ...own.filter(a => a.kind === 'sticker')];
     $('frame-count').textContent = frames.length; $('asset-count').textContent = designs.length;
-    $('frame-library').replaceChildren(...frames.map(a => assetCard(a))); $('asset-library').replaceChildren(...designs.filter(a=>a.kind===$('asset-kind').value).map(a => assetCard(a)));
+    $('frame-library').replaceChildren(...frames.map(a => assetCard(a))); const category=a=>a.category||'내 자료',previous=designCategory.value;designCategory.replaceChildren(...['전체',...new Set(designs.map(category))].map(value=>Object.assign(document.createElement('option'),{value,textContent:value})));designCategory.value=[...designCategory.options].some(o=>o.value===previous)?previous:'전체';
+    const matchingDesigns=designs.filter(a=>a.kind===$('asset-kind').value&&(designCategory.value==='전체'||category(a)===designCategory.value)&&a.name.includes(designSearch.value.trim()));$('asset-library').replaceChildren(...matchingDesigns.map(a=>assetCard(a)));if(!matchingDesigns.length)$('asset-library').append(element('p','검색 결과가 없어요.','empty-state'));
     $('shared-library').replaceChildren(...getShared().filter(a=>a.kind===$('shared-kind').value).map(a => assetCard(a, true)));
     if (!getShared().length) $('shared-library').append(element('div', '첫 번째 공용 스티커나 프레임을 등록해 보세요.', 'empty-state'));
     $('shared-tab').hidden = !isAdmin(); if (!isAdmin()) $('shared-view').hidden = true;

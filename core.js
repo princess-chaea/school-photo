@@ -14,7 +14,7 @@ export const DEFAULT_FRAMES = [
   { id: 'lime', name: '프레시 라임', bg: '#c5f564', ink: '#354822' },
 ];
 export const DEFAULT_STICKERS = [
-  ...[['camera', '찰칵 카메라'], ['friendship', '선생님과 우리'], ['school', '우리 학교'], ['flower', '웃음꽃']].map(([id, name]) => ({ id: `image-${id}`, name, url: `/stickers/${id}.webp` })),
+  ...[['camera', '찰칵 카메라'], ['friendship', '선생님과 우리'], ['school', '우리 학교'], ['flower', '웃음꽃']].map(([id, name]) => ({ id: `image-${id}`, name, category: '마스코트', url: `/stickers/${id}.webp` })),
   ...STICKER_PRESETS,
 ];
 export const DEFAULT_EVENT = { title: '사제동행 찰칵! 포토', school: '', schedule: '', logo: '', logoPosition: 'top', frames: DEFAULT_FRAMES, stickers: DEFAULT_STICKERS };
@@ -112,7 +112,7 @@ export function normalizeEvent(value) {
   const color = (v, fallback) => /^#[0-9a-f]{6}$/i.test(v || '') ? v : fallback;
   const safeURL = v => typeof v === 'string' && (/^https:\/\//.test(v) || /^data:image\/(png|jpeg|webp);base64,/.test(v) || /^\/stickers\/[a-z-]+\.(?:webp|svg)$/.test(v)) ? v : '';
   const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', frameFormat:normalizeFrameFormat(f.frameFormat), ...(f.preserveAspect === true ? {preserveAspect:true,clearPhotoSlots:f.clearPhotoSlots === true} : {}), ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
-  const stickers = Array.isArray(value.stickers) ? value.stickers.slice(0, 64).map((s, i) => ({ id: text(s.id, 100) || `sticker-${i}`, name: text(s.name, 40), text: text(s.text, 8), url: safeURL(s.url) })).filter(s => s.url) : [];
+  const stickers = Array.isArray(value.stickers) ? value.stickers.slice(0, 256).map((s, i) => ({ id: text(s.id, 100) || `sticker-${i}`, name: text(s.name, 40), category: text(s.category,16), text: text(s.text, 8), url: safeURL(s.url) })).filter(s => s.url) : [];
   const event = { title: text(value.title, 80) || DEFAULT_EVENT.title, school: text(value.school, 60), schedule: text(value.schedule, 100), logo: safeURL(value.logo), logoPosition: value.logoPosition === 'bottom' ? 'bottom' : 'top', orientation: value.orientation === 'landscape' ? 'landscape' : 'portrait', frames: frames.length ? frames : DEFAULT_FRAMES, stickers };
   const { hasContent, hasTop, hasBottom, ...branding } = brandingModel({ ...event, branding: value.branding });
   return { ...event, branding, sharing:normalizeSharing(value.sharing) };

@@ -13,3 +13,11 @@ test('새 이미지 프레임은 미리보기 컷·방향과 무관하게 등록
   }
  }
 });
+
+test('100개 기본 스티커와 보관함 디자인은 저장 정규화에서 잘리지 않고 전체 해제도 유지한다',()=>{
+ assert.equal(DEFAULT_EVENT.stickers.length,100);
+ const stickers=[...DEFAULT_EVENT.stickers,...Array.from({length:156},(_,i)=>({id:'own-'+i,name:'내 스티커',url:'/stickers/preset-heart.svg'}))];
+ const event=normalizeEvent({...DEFAULT_EVENT,stickers});assert.equal(event.stickers.length,256);assert.equal(event.stickers[0].category,'마스코트');
+ assert.equal(normalizeEvent({...event,stickers:[]}).stickers.length,0);
+ assert.equal(normalizeEvent({...event,stickers:[...stickers,stickers[0]]}).stickers.length,256);
+});

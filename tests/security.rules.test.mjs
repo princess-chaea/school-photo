@@ -179,3 +179,12 @@ test('컷 제한 없는 프레임은 보존 모드만 허용하고 임의 모드
  await assertSucceeds(setDoc(doc(admin,'sharedAssets/universal'),shared));
  await assertFails(setDoc(doc(a,'sharedAssets/universal'),shared));
 });
+
+test('100개 기본 스티커의 행사 저장·전체 해제와 256개 상한을 동일하게 적용한다',async()=>{
+ const db=env.authenticatedContext('teacher-a').firestore(),event={...config(),stickers:normalizeEvent(DEFAULT_EVENT).stickers};
+ assert.equal(event.stickers.length,100);
+ await assertSucceeds(setDoc(doc(db,'events','stickers'),event));
+ const sticker=event.stickers[0];await assertSucceeds(setDoc(doc(db,'events','stickers'),{...event,stickers:Array.from({length:256},()=>sticker)}));
+ await assertFails(setDoc(doc(db,'events','stickers'),{...event,stickers:Array.from({length:257},()=>sticker)}));
+ await assertSucceeds(setDoc(doc(db,'events','stickers'),{...event,stickers:[]}));
+});

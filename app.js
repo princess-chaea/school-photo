@@ -3,7 +3,6 @@ import {createUsageTracker} from './usage-data.js';
 import {createTextStyleControls} from './text-style-controls.js';
 import {textColorSettings,paintColoredText,measureStyledText} from './text-colors.js';
 import {confirmAction} from './app-dialog.js';
-import {STICKER_PRESETS} from './sticker-presets.js';
 import {fontFamily,fillFontSelect,loadFont} from './fonts.js';
 import { decorationHit, rotatedPoint, radians, degrees, rotationDelta } from './decoration-geometry.js';
 import { normalizeSharing, callCollectionRelay, httpsURL, collectionName } from './sharing.js';
@@ -85,8 +84,14 @@ function renderChoices() {
   $('frame-name').textContent = state.event.frames[state.frame].name;
   $('chosen-purpose').textContent = $('export-format').selectedOptions[0].textContent+' · '+state.count+'컷 · '+(state.orientation==='landscape'?'가로 배치':'세로 배치');
   renderFilterChoices();
+  renderStickerChoices();
+}
+function renderStickerChoices(){
+  const picker=$('sticker-category'),previous=picker.value;const category=s=>s.category||'기타';
+  picker.replaceChildren(...['전체',...new Set(state.event.stickers.map(category))].map(value=>Object.assign(document.createElement('option'),{value,textContent:value})));picker.value=[...picker.options].some(o=>o.value===previous)?previous:'전체';
+  $('no-stickers').hidden=state.event.stickers.length>0;picker.parentElement.hidden=state.event.stickers.length===0;
   $('sticker-options').replaceChildren();
-  [...STICKER_PRESETS,...state.event.stickers.filter(s=>!STICKER_PRESETS.some(p=>p.id===s.id))].forEach(sticker => {
+  state.event.stickers.filter(s=>picker.value==='전체'||category(s)===picker.value).forEach(sticker => {
     const button = createButton('sticker-button', sticker.text || '', () => {
       if (sticker.url && !assetImages.has(sticker.url)) { toast(failedAssets.has(sticker.url) ? '이 이미지를 불러오지 못했어요. 다른 스티커를 골라 주세요.' : '스티커를 불러오는 중이에요. 잠시 후 다시 선택해 주세요.'); return; }
       addDecoration({ type: sticker.url ? 'image' : 'symbol', text: sticker.text || '', url: sticker.url || '', color: '#ffffff' });
@@ -96,6 +101,7 @@ function renderChoices() {
     $('sticker-options').append(button);
   });
 }
+$('sticker-category').addEventListener('change',renderStickerChoices);
 function renderFilterChoices(){
   const list=$('filter-options');list.replaceChildren();const photo=state.photos[state.selectedPhoto]||state.photos.find(Boolean);
   for(const group of [...new Set(FILTERS.map(f=>f.group))]){
@@ -351,7 +357,7 @@ async function exportImage() {
 }
 async function loadAssets() {
   await Promise.all(brandEntries(state.event).filter(item=>item.key!=='logo').map(item=>loadFont(item.settings.font)));
-  const urls = [...STICKER_PRESETS.map(s=>s.url),state.event.logo, ...state.event.frames.map(f => f.overlay), ...state.event.stickers.map(s => s.url)].filter(Boolean);
+  const urls = [state.event.logo, ...state.event.frames.map(f => f.overlay), ...state.event.stickers.map(s => s.url)].filter(Boolean);
   await Promise.all([...new Set(urls)].map(async url => { try { assetImages.set(url, await imageFromURL(url)); } catch { failedAssets.add(url); } }));
   if (failedAssets.size) toast('일부 행사 디자인을 불러오지 못했어요. 다른 디자인을 선택할 수 있어요.');
   render();
