@@ -3,11 +3,11 @@ import { layout, imageFromURL, brandingModel, brandEntries } from './core.js';
 import { drawBranding } from './branding.js';
 const images = new Map(), loading = new Map(), versions = new WeakMap();
 async function load(url) { if (!url || images.has(url)) return; if (!loading.has(url)) loading.set(url, imageFromURL(url).then(img => images.set(url, img)).catch(() => {}).finally(() => loading.delete(url))); await loading.get(url); }
-export async function paintFramePreview(canvas, event, { count = 4, frameIndex = 0, selected = null, guides = false } = {}) {
+export async function paintFramePreview(canvas, event, { count = 4, frameIndex = 0, selected = null, guides = false, orientation, preset = {} } = {}) {
   const version = (versions.get(canvas) || 0) + 1; versions.set(canvas, version);
   const frame = event.frames[Math.min(frameIndex, event.frames.length - 1)];
   if (frame.layoutCount) count = frame.layoutCount;
-  const g = layout(count, event, { frame, captureDate: brandingModel(event).captureDate });
+  const g = layout(count, event, { frame, orientation, width:preset.width, height:preset.height, padding:preset.padding, captureDate: brandingModel(event).captureDate });
   await Promise.all([load(event.logo), load(frame.overlay),...brandEntries(event).filter(item=>item.key!=='logo').map(item=>loadFont(item.settings.font))]); if (versions.get(canvas) !== version) return null;
   canvas.width = g.width; canvas.height = g.height; const ctx = canvas.getContext('2d');
   ctx.fillStyle = frame.bg; ctx.fillRect(0, 0, canvas.width, canvas.height);

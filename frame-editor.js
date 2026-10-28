@@ -1,3 +1,4 @@
+import {createFrameComparison} from './frame-comparison.js';
 import {createTextStyleControls} from './text-style-controls.js';
 import {confirmAction} from './app-dialog.js';
 import {fillFontSelect,loadFont} from './fonts.js';
@@ -9,6 +10,7 @@ export function createFrameEditor({ getEvent, onChange, onSave }) {
   const dialog = $('frame-editor'), canvas = $('frame-editor-canvas'), stage = $('frame-editor-stage');
   let fontRequest=0;let focusSelection = true; const pointers=new Map();
   let count = 4, frameIndex = 0, selected = 'school', zoom = 1, last = null, gesture = null, version = 0;
+  createFrameComparison({getEvent,getSelection:()=>({count,frameIndex})});
   function cleanModel(model) { const { hasContent, hasTop, hasBottom, ...clean } = model; return clean; }
   const textStyles=createTextStyleControls($('frame-text-style'),{getState:()=>{const event=getEvent();return event&&selected&&brandPart(event,selected)?{key:selected,label:brandPart(event,selected).label,text:brandPart(event,selected).content||'',settings:brandPart(event,selected).settings,ink:event.frames[frameIndex]?.ink}:null;},onChange:part=>{if(selected)changePart(selected,part);}});
   function changePart(key, part) { const event = getEvent(); if (!event) return; onChange(changeBrandPart(event,key,part)); }
