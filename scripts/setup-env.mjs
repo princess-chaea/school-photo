@@ -1,4 +1,9 @@
 import { access, writeFile } from 'node:fs/promises';
+import * as tls from 'node:tls';
+// 최신 Node에서는 OS의 신뢰된 인증서도 사용합니다. TLS 검증은 유지합니다.
+if (typeof tls.getCACertificates==='function' && typeof tls.setDefaultCACertificates==='function') {
+  tls.setDefaultCACertificates([...tls.getCACertificates('default'), ...tls.getCACertificates('system')]);
+}
 const destination=new URL('../.env.local',import.meta.url);
 try { await access(destination); console.log('.env.local이 이미 있어 유지합니다. npm run dev로 실행하세요.'); process.exit(0); } catch(error) { if(error.code!=='ENOENT')throw error; }
 const response=await fetch('https://teacher-student-photo.web.app/__/firebase/init.json',{signal:AbortSignal.timeout(20000)});
