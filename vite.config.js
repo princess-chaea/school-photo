@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
       generateBundle(_options,bundle) {
         if(!student)return;
         for(const output of Object.values(bundle))if(output.type==='chunk')for(const id of Object.keys(output.modules)) {
-          if(/\/(admin|cloud|libraries|frame-editor|frame-upload)\.js$/.test(id)||id.includes('/@firebase/auth/'))throw new Error('학생 빌드에 관리자 모듈이 포함됐습니다: '+id);
+          if(/\/(admin|cloud|libraries|operations|frame-editor|frame-upload)\.js$/.test(id)||id.includes('/@firebase/auth/'))throw new Error('학생 빌드에 관리자 모듈이 포함됐습니다: '+id);
         }
       },
       async closeBundle() {

@@ -101,3 +101,26 @@ test('행사 공유 설정은 저장하되 API 키·학생 사진·임의 수합
  await assertFails(setDoc(doc(a,'events','relay'),{...config(),sharing:{...sharing,relayUrl:'https://evil.test/collect'}}));
  await assertFails(setDoc(doc(a,'events','data'),{...config(),sharing:{...sharing,photos:['private']}}));
 });
+
+test('운영자 현황 목록과 게시 중지는 지정 운영자만 허용한다',async()=>{
+ const a=env.authenticatedContext('teacher-a',{email:'a@example.com'}).firestore(),b=env.authenticatedContext('teacher-b',{email:'b@example.com'}).firestore(),admin=env.authenticatedContext('admin',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore();
+ await assertSucceeds(setDoc(doc(a,'userDirectory','teacher-a'),{displayName:'교사',email:'a@example.com',lastSeen:serverTimestamp()}));
+ await assertFails(getDocs(collection(b,'userDirectory')));await assertSucceeds(getDocs(collection(admin,'userDirectory')));
+ await setDoc(doc(a,'events','ops'),config(true));await assertSucceeds(getDocs(collection(admin,'events')));await assertFails(getDocs(collection(b,'events')));
+ const {updateDoc}=await import('firebase/firestore');await assertSucceeds(updateDoc(doc(admin,'events','ops'),{published:false,updatedAt:serverTimestamp()}));
+ await assertSucceeds(updateDoc(doc(admin,'userDirectory','teacher-a'),{publishingBlocked:true}));
+ await assertFails(updateDoc(doc(a,'userDirectory','teacher-a'),{publishingBlocked:false}));await assertFails(setDoc(doc(a,'events','blocked'),config(true)));await assertSucceeds(setDoc(doc(a,'events','draft'),config(false)));
+});
+test('정사각형 프레임 규격은 보관함에 보존하고 잘못된 규격은 차단한다',async()=>{
+ const a=env.authenticatedContext('teacher-a').firestore();const asset={name:'정사각형',kind:'frame',url:'https://example.com/frame.webp',path:'users/teacher-a/assets/square',layoutCount:4,orientation:'portrait',frameFormat:'square'};
+ await assertSucceeds(setDoc(doc(a,'users','teacher-a','assets','square'),asset));await assertFails(setDoc(doc(a,'users','teacher-a','assets','badformat'),{...asset,path:'users/teacher-a/assets/badformat',frameFormat:'unbounded'}));
+});
+
+test('공용 프레임에도 용도별 제작 규격을 저장한다',async()=>{
+ const admin=env.authenticatedContext('admin',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore();
+ await assertSucceeds(setDoc(doc(admin,'sharedAssets','squareformat'),{name:'공용 정사각',kind:'frame',url:'https://example.com/frame.webp',path:'shared/assets/squareformat',active:true,layoutCount:4,orientation:'portrait',frameFormat:'square'}));
+});
+
+test('행사 텍스트의 학교안심폰트는 저장하고 임의 글꼴 값은 차단한다',async()=>{
+ const a=env.authenticatedContext('teacher-a').firestore();const event=normalizeEvent({...DEFAULT_EVENT,title:'폰트 행사',branding:{title:{font:'poster'}}});await assertSucceeds(setDoc(doc(a,'events','font'),{...event,ownerId:'teacher-a',published:false,updatedAt:serverTimestamp()}));event.branding.title.font='untrusted';await assertFails(setDoc(doc(a,'events','bad-font'),{...event,ownerId:'teacher-a',published:false,updatedAt:serverTimestamp()}));
+});

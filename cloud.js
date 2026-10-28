@@ -1,7 +1,7 @@
 // 운영자 전용 모듈입니다. 참가자는 public-event.js의 읽기 기능만 사용합니다.
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, collection, query, where, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc, serverTimestamp, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc, serverTimestamp, connectFirestoreEmulator, limit,orderBy,documentId,startAfter } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, connectStorageEmulator } from 'firebase/storage';
 import { normalizeEvent } from './core.js';
 
@@ -81,3 +81,22 @@ export async function uploadSharedAsset(file, kind, name, metadata) {
   catch (error) { await deleteObject(object).catch(() => {}); throw error; }
 }
 export async function setSharedActive(id, active) { if (!isSiteAdmin(firebase().auth.currentUser)) throw new Error('운영자 전용입니다.'); await updateDoc(doc(firebase().db, 'sharedAssets', id), { active: Boolean(active) }); }
+
+export async function recordOperatorUser(user) {
+  await setDoc(doc(firebase().db,'userDirectory',user.uid),{displayName:(user.displayName||'').slice(0,80),email:user.email||'',lastSeen:serverTimestamp()},{merge:true});
+}
+export async function listOperationsPage(kind,after=null){
+  if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');
+  const constraints=[orderBy(documentId()),...(after?[startAfter(after)]:[]),limit(100)];
+  const snap=await getDocs(query(collection(firebase().db,kind==='users'?'userDirectory':'events'),...constraints));
+  return {items:snap.docs.map(d=>({...d.data(),id:d.id})),cursor:snap.docs.at(-1)?.id||null,more:snap.size===100};
+}
+export async function moderateEvent(id){
+  if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');
+  await updateDoc(doc(firebase().db,'events',id),{published:false,updatedAt:serverTimestamp()});
+}
+export async function setPublishingBlocked(uid,blocked){
+  if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');
+  if(uid===firebase().auth.currentUser.uid)throw new Error('본인의 운영 권한은 변경할 수 없습니다.');
+  await updateDoc(doc(firebase().db,'userDirectory',uid),{publishingBlocked:Boolean(blocked)});
+}

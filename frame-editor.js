@@ -1,10 +1,11 @@
+import {fillFontSelect,loadFont} from './fonts.js';
 import { brandingModel, BRAND_KEYS, BRAND_LABELS, BRAND_SIZES, clamp, compatibleFrame } from './core.js';
 import { paintFramePreview } from './frame-preview.js';
 import { labelButton } from './icons.js';
 const $ = id => document.getElementById(id);
-export function createFrameEditor({ getEvent, onChange }) {
+export function createFrameEditor({ getEvent, onChange, onSave }) {
   const dialog = $('frame-editor'), canvas = $('frame-editor-canvas'), stage = $('frame-editor-stage');
-  let focusSelection = true; const pointers=new Map();
+  let fontRequest=0;let focusSelection = true; const pointers=new Map();
   let count = 4, frameIndex = 0, selected = 'school', zoom = 1, last = null, gesture = null, version = 0;
   function cleanModel(model) { const { hasContent, hasTop, hasBottom, ...clean } = model; return clean; }
   function changePart(key, part) { const event = getEvent(); if (!event) return; const model = cleanModel(brandingModel(event)); model[key] = { ...model[key], ...part }; onChange(model); }
@@ -25,7 +26,7 @@ export function createFrameEditor({ getEvent, onChange }) {
     for (const key of BRAND_KEYS) { const option = document.createElement('option'); option.value = key; option.textContent = BRAND_LABELS[key]; option.disabled = !model[key].visible || !event[key]; $('frame-selected').append(option); }
     if (selected && (!event[selected] || !model[selected].visible)) selected = BRAND_KEYS.find(key => event[key] && model[key].visible) || null;
     $('frame-selected').value = selected || ''; $('frame-item-controls').hidden = !selected; $('frame-no-selection').hidden = Boolean(selected);
-    if (selected) { const item = model[selected]; $('frame-element-position').value = item.position; $('frame-size-value').textContent = `${Math.round(item.size / BRAND_SIZES[selected] * 100)}%`; $('frame-element-color').value = item.color || event.frames[frameIndex]?.ink || '#34372f'; $('frame-element-color').disabled = selected === 'logo'; $('frame-auto-color').disabled = selected === 'logo'; }
+    if (selected) { const item = model[selected];$('frame-element-font').value=item.font;$('frame-element-font').disabled=selected==='logo'; $('frame-element-position').value = item.position; $('frame-size-value').textContent = `${Math.round(item.size / BRAND_SIZES[selected] * 100)}%`; $('frame-element-color').value = item.color || event.frames[frameIndex]?.ink || '#34372f'; $('frame-element-color').disabled = selected === 'logo'; $('frame-auto-color').disabled = selected === 'logo'; }
     const height=String(Math.round(model.height*100));if(![...$('frame-brand-height').options].some(o=>o.value===height))$('frame-brand-height').append(Object.assign(document.createElement('option'),{value:height,textContent:height+'%'}));$('frame-brand-height').value=height; $('frame-brand-height').disabled = Boolean(event.frames[frameIndex]?.layoutCount);
     $('frame-example').replaceChildren(...event.frames.flatMap((frame, i) => compatibleFrame(frame,count) ? [Object.assign(document.createElement('option'), { value: i, textContent: frame.name })] : []));
     $('frame-example').value = String(frameIndex);
@@ -46,7 +47,9 @@ export function createFrameEditor({ getEvent, onChange }) {
   function close() { dialog.close(); gesture = null;pointers.clear(); }
   $('open-frame-editor').addEventListener('click', open); $('admin-preview').addEventListener('click', open);
   $('close-frame-editor').addEventListener('click', close); dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
-  $('reset-frame-branding').addEventListener('click', () => onChange(null));
+  $('reset-frame-branding').addEventListener('click', () => {if(confirm('로고·문구의 위치와 크기를 초기화할까요? 현재 배치는 사라집니다.'))onChange(null);});
+  fillFontSelect($('frame-element-font'));$('frame-element-font').onchange=async e=>{const key=selected,id=e.target.value,request=++fontRequest;$('save-frame-editor').disabled=true;try{await loadFont(id);if(request===fontRequest&&key)changePart(key,{font:id});}catch(error){if(request===fontRequest){$('frame-save-status').textContent=error.message;$('frame-element-font').value=brandingModel(getEvent())[key]?.font||'baeum';}}finally{if(request===fontRequest)$('save-frame-editor').disabled=false;}};
+  $('save-frame-editor').onclick=async()=>{const button=$('save-frame-editor');button.disabled=true;$('frame-save-status').textContent='저장 중…';try{await onSave();$('frame-save-status').textContent='';close();}catch(error){$('frame-save-status').textContent=error.message;}finally{button.disabled=false;}};
   $('frame-selected').addEventListener('change', e => { selected = e.target.value; focusSelection = true; refresh(); });
   $('frame-example').addEventListener('change', e => { frameIndex = Number(e.target.value); refresh(); });
   $('frame-view-minus').onclick=()=>{zoom=clamp(zoom-.25,1,3);updateSize();};

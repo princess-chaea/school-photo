@@ -1,0 +1,26 @@
+학교안심폰트 추가 서체
+공식 출처: https://copyright.keris.or.kr/wft/fntDwnld
+공식 배포 페이지는 제공 서체를 SIL Open Font License (OFL)로 명시합니다.
+폰트 내부 이름과 글리프를 유지하고 WOFF2 형식으로 변환했습니다.
+라이선스 전문은 같은 폴더 OFL.txt를 함께 배포합니다.
+
+학교안심 밤하늘
+Copyright © 2026 by KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+https://www.keris.or.kr/
+
+학교안심 덩덩이
+Copyright © 2026 by KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+https://www.keris.or.kr/
+
+학교안심 엣지
+Copyright © 2026 by KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+https://www.keris.or.kr/
+
+학교안심 포스터
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 보드마커
+Copyright (c) 2025 by KERIS. All rights reserved.

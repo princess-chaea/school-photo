@@ -1,3 +1,5 @@
+import {STICKER_PRESETS} from './sticker-presets.js';
+import {fontFamily,fillFontSelect,loadFont} from './fonts.js';
 import { decorationHit, rotatedPoint, radians, degrees, rotationDelta } from './decoration-geometry.js';
 import { normalizeSharing, callCollectionRelay, httpsURL, collectionName } from './sharing.js';
 import { drawLayoutGuide, fitLayoutGuide } from './layout-guide.js';
@@ -17,7 +19,7 @@ let state = { step: 0, count: 4, frame: 0, orientation: 'portrait', photos: Arra
 let stream = null, facing = 'user', busy = false, starting = false, cameraEpoch = 0, captureEpoch = 0, toastTimeout, downloadURL;
 let photoDate = new Date(), assetImages = new Map(), failedAssets = new Set();
 const pointers = new Map();
-let gesture = null, deletedDecoration = null, eventId='', submitting=false, lastSubmission=null;
+let gesture = null, deletedDecoration = null, eventId='', submitting=false, lastSubmission=null,lastDownloadedSignature=null;
 let blocked = false, assetReady = Promise.resolve();
 const editDialog = $('edit-dialog'), previewHome = canvas.parentElement, toolsHome = $('decoration-tools').parentElement;
 const cropCanvas = $('crop-preview'), cropPointers = new Map();
@@ -71,13 +73,9 @@ function renderChoices() {
     button.append(sample, label); $('frame-options').append(button);
   });
   $('frame-name').textContent = state.event.frames[state.frame].name;
-  $('filter-options').replaceChildren();
-  FILTERS.forEach(filter => {
-    const button = createButton(`filter-chip ${state.filter === filter.id ? 'selected' : ''}`, filter.name, () => { state.filter = filter.id; renderChoices(); render(); });
-    button.setAttribute('aria-pressed', String(state.filter === filter.id)); $('filter-options').append(button);
-  });
+  renderFilterChoices();
   $('sticker-options').replaceChildren();
-  state.event.stickers.forEach(sticker => {
+  [...STICKER_PRESETS,...state.event.stickers.filter(s=>!STICKER_PRESETS.some(p=>p.id===s.id))].forEach(sticker => {
     const button = createButton('sticker-button', sticker.text || '', () => {
       if (sticker.url && !assetImages.has(sticker.url)) { toast(failedAssets.has(sticker.url) ? '이 이미지를 불러오지 못했어요. 다른 스티커를 골라 주세요.' : '스티커를 불러오는 중이에요. 잠시 후 다시 선택해 주세요.'); return; }
       addDecoration({ type: sticker.url ? 'image' : 'symbol', text: sticker.text || '', url: sticker.url || '', color: '#ffffff' });
@@ -87,8 +85,22 @@ function renderChoices() {
     $('sticker-options').append(button);
   });
 }
+function renderFilterChoices(){
+  const list=$('filter-options');list.replaceChildren();const photo=state.photos[state.selectedPhoto]||state.photos.find(Boolean);
+  for(const group of [...new Set(FILTERS.map(f=>f.group))]){
+    const section=document.createElement('section');section.className='filter-category';const heading=document.createElement('h3');heading.textContent=group;const cards=document.createElement('div');cards.className='filter-cards';
+    for(const filter of FILTERS.filter(f=>f.group===group)){
+      const button=createButton(`filter-chip ${state.filter===filter.id?'selected':''}`,'',()=>{state.filter=filter.id;renderFilterChoices();render();});button.setAttribute('aria-label',filter.name);button.setAttribute('aria-pressed',String(state.filter===filter.id));
+      const preview=document.createElement('canvas');preview.width=96;preview.height=72;preview.setAttribute('aria-hidden','true');const context=preview.getContext('2d');context.filter=filter.css;
+      if(photo){const c=crop(photo.image.width,photo.image.height,96,72);context.drawImage(photo.image,c.x,c.y,c.w,c.h,0,0,96,72);}else{context.fillStyle='#a8d6c5';context.fillRect(0,0,96,72);context.fillStyle='#f6b4b9';context.fillRect(48,0,48,72);context.fillStyle='#ffdc7c';context.beginPath();context.arc(48,36,20,0,Math.PI*2);context.fill();}
+      const label=document.createElement('span');label.textContent=filter.name;button.append(preview,label);cards.append(button);
+    }
+    section.append(heading,cards);list.append(section);
+  }
+}
+function canEditDecoration(d){return d&&(editDialog.dataset.tool==='text'?d.type==='text':editDialog.dataset.tool==='stickers'&&d.type!=='text');}
 function go(step) {
-  if (busy) return; if(step===1)step=2;if(step===4)step=3;
+  if (busy) return; if(step===1)step=2;
   if (step >= 3 && !state.photos.every(Boolean)) { toast('모든 칸에 사진을 채워 주세요.'); return; }
   if (state.step === 2 && step !== 2) stopCamera();
   state.step = step; state.selectedDeco = null; pointers.clear(); gesture = null;
@@ -100,15 +112,15 @@ function go(step) {
 function renderSteps() {
   document.body.dataset.step = String(state.step);
   $('step-list').replaceChildren();
-  [0,2,3].forEach((step,index)=>{const li=document.createElement('li');li.className=step===state.step?'active':step<state.step?'done':'';if(step===state.step)li.setAttribute('aria-current','step');const n=document.createElement('span');n.className='step-number';n.textContent=step<state.step?'✓':String(index+1).padStart(2,'0');const label=document.createElement('span');label.className='step-label';label.textContent=['용도·프레임','촬영','꾸미기·저장'][index];li.append(n,label);$('step-list').append(li);});
+  [0,2,3,4].forEach((step,index)=>{const li=document.createElement('li');li.className=step===state.step?'active':step<state.step?'done':'';if(step===state.step)li.setAttribute('aria-current','step');const n=document.createElement('span');n.className='step-number';n.textContent=step<state.step?'✓':String(index+1).padStart(2,'0');const label=document.createElement('span');label.className='step-label';label.textContent=['용도·프레임','촬영','꾸미기','저장·공유'][index];li.append(n,label);$('step-list').append(li);});
   document.querySelectorAll('.step-content').forEach(el => el.hidden = Number(el.dataset.step) !== state.step);
-  $('step-title').textContent = titles[state.step]; $('step-kicker').textContent = `STEP ${String([0,2,3].indexOf(state.step)+1).padStart(2, '0')} / ${['LAYOUT', 'FRAME', 'CAPTURE', 'DECORATE', 'KEEP'][state.step]}`;
-  $('step-description').textContent = descriptions[state.step]; $('step-counter').textContent = `${[0,2,3].indexOf(state.step)+1} / 3`;
-  $('back').hidden = state.step === 0;labelButton($('back'),'back',state.step===3?'사진 다시 찍기':'이전'); $('next').hidden = state.step >=3 || state.step===2;
+  $('step-title').textContent = titles[state.step]; $('step-kicker').textContent = `STEP ${String([0,2,3,4].indexOf(state.step)+1).padStart(2, '0')} / ${['LAYOUT', 'FRAME', 'CAPTURE', 'DECORATE', 'KEEP'][state.step]}`;
+  $('step-description').textContent = descriptions[state.step]; $('step-counter').textContent = `${[0,2,3,4].indexOf(state.step)+1} / 4`;
+  $('back').hidden = state.step === 0;labelButton($('back'),'back',state.step===4?'꾸미기로 돌아가기':state.step===3?'사진 다시 찍기':'이전'); $('next').hidden = state.step===4;$('restart-corner').hidden=state.step!==4;
   $('expand-preview').hidden = state.step !== 3 && state.step !== 4;
   $('change-layout').hidden = state.step !== 3;
-  labelButton($('next'), ['frame', 'camera', 'sticker', 'check'][state.step] || 'check', nextLabels[state.step] || '', true);
-  $('preview-hint').textContent = state.step === 3 ? '사진 선택 · 드래그 이동 · 모서리 / 두 손가락으로 확대' : state.step === 4 ? '오늘의 우리, 오래 간직해요' : '나만의 한 장이 만들어지는 중';
+  labelButton($('next'), ['frame', 'camera', 'sticker', 'check'][state.step] || 'check', state.step===3?'저장·공유로':state.step===2?'꾸미기로':nextLabels[state.step] || '', true);
+  $('preview-hint').textContent = state.step === 3 ? '도구 탭을 눌러 원하는 기능을 선택해요' : state.step === 4 ? '오늘의 우리, 오래 간직해요' : '나만의 한 장이 만들어지는 중';
   updateButtons();
 }
 function updateCameraGeometry(){const slot=currentGeometry().slots[state.selectedPhoto]||currentGeometry().slots[0],shell=$('camera-shell'),parent=$('web-capture-area');if(!slot||parent.hidden)return;const ratio=slot.w/slot.h,maxH=Math.max(130,Math.min(innerHeight*.34,420)),width=Math.min(parent.clientWidth,maxH*ratio);shell.style.width=width+'px';shell.style.height=width/ratio+'px';$('web-capture-guide').textContent=(state.selectedPhoto+1)+'번 컷 · 사진 칸과 같은 비율·구도로 저장돼요.';}
@@ -131,9 +143,9 @@ function renderThumbnails() {
     const badge = document.createElement('span'); badge.textContent = String(i + 1).padStart(2, '0'); button.append(badge); $('thumbnails').append(button);
   }); updateButtons();
 }
-function fitText(text, x, y, maxWidth, size, color, weight = '500') {
+function fitText(text, x, y, maxWidth, size, color, weight = '500',font='baeum') {
   ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; let actual = size;
-  do { ctx.font = `${weight} ${actual}px KerisBaeum, Arial, "Malgun Gothic", sans-serif`; if (ctx.measureText(text).width <= maxWidth) break; actual -= 1; } while (actual > 9);
+  do { ctx.font = `${weight} ${actual}px ${fontFamily(font)}, Arial, "Malgun Gothic", sans-serif`; if (ctx.measureText(text).width <= maxWidth) break; actual -= 1; } while (actual > 9);
   ctx.fillText(text, x, y, maxWidth);
 }
 function branding(g, frame) {
@@ -142,7 +154,7 @@ function branding(g, frame) {
 function decorationBox(d, g) {
   const font = d.size * g.width; let w, h;
   if (d.type === 'image') { const img = assetImages.get(d.url); h = font; w = img ? font * img.width / img.height : font; }
-  else { ctx.font = `700 ${font}px KerisBaeum, Arial, "Malgun Gothic", sans-serif`; w = ctx.measureText(d.text).width; h = font * 1.2; }
+  else { ctx.font = `700 ${font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; w = ctx.measureText(d.text).width; h = font * 1.2; }
   return { x: d.x * g.width, y: d.y * g.height, w: Math.max(w, 20), h: Math.max(h, 20), font };
 }
 function geometryFor(preset, count=state.count, frame=state.event.frames[state.frame]) {
@@ -174,9 +186,9 @@ function render(exporting = false) {
   });
   const overlay = assetImages.get(frame.overlay); if (overlay) ctx.drawImage(overlay, 0, 0, g.width, g.height);
   branding(g, frame);
-  fitText($('caption').value || ' ', g.width / 2, g.footerY + 48, g.width - 80, 23, frame.ink, '700');
+  fitText($('caption').value || ' ', g.width / 2, g.footerY + 48, g.width - 80, 23, frame.ink, '700',$('caption-font').value);
   if ($('show-date').checked) fitText(photoDate.toLocaleDateString('sv-SE').replaceAll('-', '. '), g.width / 2, g.footerY + 82, g.width - 80, 13, frame.ink);
-  state.decorations.forEach(d => { const b = decorationBox(d, g); ctx.save();ctx.translate(b.x,b.y);ctx.rotate(radians(d.rotation||0)); ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.fillStyle = d.color; ctx.font = `700 ${b.font}px KerisBaeum, Arial, "Malgun Gothic", sans-serif`; if (d.type === 'image') { const image = assetImages.get(d.url); if (image) ctx.drawImage(image, -b.w / 2, -b.h / 2, b.w, b.h); } else ctx.fillText(d.text, 0, 0); ctx.restore(); });
+  state.decorations.forEach(d => { const b = decorationBox(d, g); ctx.save();ctx.translate(b.x,b.y);ctx.rotate(radians(d.rotation||0)); ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.fillStyle = d.color; ctx.font = `700 ${b.font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; if (d.type === 'image') { const image = assetImages.get(d.url); if (image) ctx.drawImage(image, -b.w / 2, -b.h / 2, b.w, b.h); } else ctx.fillText(d.text, 0, 0); ctx.restore(); });
   if (!exporting && state.step === 3 && editDialog.open) {
     if (state.selectedDeco !== null) {
       const d=state.decorations[state.selectedDeco];if(d){const b=decorationBox(d,g),scale=g.width/Math.max(1,canvas.getBoundingClientRect().width),gap=4*scale,h=5*scale;
@@ -236,7 +248,8 @@ function updateAdjustment() {
   const photo = state.photos[state.selectedPhoto]; $('photo-zoom-value').textContent=Math.round((photo?.zoom||1)*100)+'%';
   $('photo-zoom-out').disabled=!photo||photo.zoom<=1;$('photo-zoom-in').disabled=!photo||photo.zoom>=2.5;
   $('delete-decoration').disabled=state.selectedDeco===null;$('rotate-decoration').disabled=state.selectedDeco===null;$('undo-decoration').disabled=!deletedDecoration||state.decorations.length>=40;
-  const d = state.decorations[state.selectedDeco]; $('decoration-edit').hidden = !d; if(d)$('rotation-value').textContent=Math.round(d.rotation||0)+'°';
+  const d = state.decorations[state.selectedDeco]; $('decoration-edit').hidden = !d; if(d?.type==='text')$('text-font').value=d.font||'baeum';
+  if(d)$('rotation-value').textContent=Math.round(d.rotation||0)+'°';
   if (d) { $('decoration-color').value = d.color; $('decoration-color').closest('label').hidden=d.type==='image'; }
 }
 function renderPhotoPicker() {
@@ -249,10 +262,10 @@ function renderPhotoPicker() {
   });
 }
 function selectEditorTool(tool) {
-  editDialog.dataset.tool = tool;if(tool==='photo'||tool==='filter')state.selectedDeco=null;
+  editDialog.dataset.tool = tool;pointers.clear();gesture=null;cropPointers.clear();cropGesture=null;if(!canEditDecoration(state.decorations[state.selectedDeco]))state.selectedDeco=null;if(tool==='filter')renderFilterChoices();
   canvas.hidden = tool === 'photo'; cropCanvas.hidden = tool !== 'photo';
   $('edit-title').textContent = { stickers: '스티커로 꾸미기', text: '마음을 적어요', photo: '사진을 크게 보고 조정해요', filter: '오늘의 분위기' }[tool];
-  $('edit-help').textContent = tool === 'photo' ? '사진을 끌어 구도 이동 · 두 손가락 또는 +/−로 확대·축소' : '끌어서 이동 · 두 손가락으로 크기·회전 · 동그라미를 끌어 회전';
+  $('edit-help').textContent = tool === 'photo' ? '사진을 끌어 구도 이동 · 두 손가락 또는 +/−로 확대·축소' : tool==='filter'?'색감 필터를 눌러 비교해요. 모든 사진에 적용되며 원본은 유지돼요.':tool==='text'?'문구를 추가하고 끌어 이동해요. 모서리·두 손가락으로 크기와 회전을 조절해요.':'스티커를 끌어 이동 · 두 손가락으로 크기·회전 · 동그라미로 회전';
   document.querySelectorAll('[data-editor-tool]').forEach(b => { b.classList.toggle('selected', b.dataset.editorTool === tool); b.setAttribute('aria-pressed', String(b.dataset.editorTool === tool)); });
   renderPhotoPicker(); updateAdjustment(); render(); editorView.refresh();
 }
@@ -287,23 +300,23 @@ cropCanvas.addEventListener('pointermove', e => {
 for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) cropCanvas.addEventListener(type, e => { cropPointers.delete(e.pointerId); cropGesture = null; });
 function addDecoration(data) {
   if (state.decorations.length >= 40) { toast('꾸미기 요소는 최대 40개까지 추가할 수 있어요.'); return; }
-  state.decorations.push({ ...data, rotation:0, x: .5, y: .5 + (state.decorations.length % 4) * .035, size: data.type === 'text' ? .055 : .10 }); state.selectedDeco = state.decorations.length - 1; updateAdjustment(); render();
+  state.decorations.push({ ...data, font:$('text-font').value, rotation:0, x: .5, y: .5 + (state.decorations.length % 4) * .035, size: data.type === 'text' ? .055 : .10 }); state.selectedDeco = state.decorations.length - 1; updateAdjustment(); render();
 }
 function point(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) * canvas.width / r.width, y: (e.clientY - r.top) * canvas.height / r.height }; }
 function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 function rotationHandle(box,d,g){const scale=g.width/Math.max(1,canvas.getBoundingClientRect().width),p=rotatedPoint(0,-box.h/2-32*scale,box,d.rotation||0);return {x:clamp(p.x,16*scale,g.width-16*scale),y:clamp(p.y,16*scale,g.height-16*scale)};}
 function pointerDown(e) {
-  if (state.step !== 3 || !editDialog.open) return; e.preventDefault(); canvas.setPointerCapture(e.pointerId); const p = point(e); pointers.set(e.pointerId, p); const g = currentGeometry();
+  if (state.step !== 3 || !editDialog.open || !['stickers','text'].includes(editDialog.dataset.tool)) return; e.preventDefault(); canvas.setPointerCapture(e.pointerId); const p = point(e); pointers.set(e.pointerId, p); const g = currentGeometry();
   if (pointers.size === 2 && state.selectedDeco !== null) { const [a, b] = [...pointers.values()]; const d = state.decorations[state.selectedDeco]; gesture = { mode: 'pinch', distance: distance(a,b),size:d.size,angle:degrees(Math.atan2(b.y-a.y,b.x-a.x)),rotation:d.rotation||0 }; return; }
   if (pointers.size > 1) return;
-  const selected = state.decorations[state.selectedDeco];
+  const selected = canEditDecoration(state.decorations[state.selectedDeco])?state.decorations[state.selectedDeco]:null;
   if (selected) { const b = decorationBox(selected, g); const r = canvas.getBoundingClientRect(), hit = 22 * g.width / r.width;
     if(distance(p,rotationHandle(b,selected,g))<=22*g.width/r.width){gesture={mode:'rotate',angle:degrees(Math.atan2(p.y-b.y,p.x-b.x)),rotation:selected.rotation||0};return;}
     if (decorationHit(p,b,selected.rotation||0)) { gesture = { mode: 'move', dx: p.x / g.width - selected.x, dy: p.y / g.height - selected.y }; return; }
     const gap = 4 * g.width / r.width; for (const dx of [-1, 1]) for (const dy of [-1, 1]) { const corner=rotatedPoint(dx*(b.w/2+gap),dy*(b.h/2+gap),b,selected.rotation||0); if (distance(p, corner) <= hit) { gesture = { mode: 'resize', distance: distance(p, { x: b.x, y: b.y }), size: selected.size }; return; } }
   }
-  for (let i = state.decorations.length - 1; i >= 0; i--) { const b = decorationBox(state.decorations[i], g); if (decorationHit(p,b,state.decorations[i].rotation||0,16)) { state.selectedDeco = i; gesture = { mode: 'move', dx: p.x / g.width - state.decorations[i].x, dy: p.y / g.height - state.decorations[i].y }; updateAdjustment(); render(); return; } }
-  state.selectedDeco = null; const i = g.slots.findIndex(s => p.x >= s.x && p.x <= s.x + s.w && p.y >= s.y && p.y <= s.y + s.h); if (i >= 0) state.selectedPhoto = i; gesture = null; updateAdjustment(); render();
+  for (let i = state.decorations.length - 1; i >= 0; i--) { if(!canEditDecoration(state.decorations[i]))continue;const b = decorationBox(state.decorations[i], g); if (decorationHit(p,b,state.decorations[i].rotation||0,16)) { state.selectedDeco = i; gesture = { mode: 'move', dx: p.x / g.width - state.decorations[i].x, dy: p.y / g.height - state.decorations[i].y }; updateAdjustment(); render(); return; } }
+  state.selectedDeco = null; gesture = null; updateAdjustment(); render();
 }
 function pointerMove(e) {
   if (!pointers.has(e.pointerId)) return; e.preventDefault(); const p = point(e); pointers.set(e.pointerId, p); const d = state.decorations[state.selectedDeco]; if (!gesture || !d) return; const g = currentGeometry();
@@ -316,7 +329,7 @@ function pointerMove(e) {
 function pointerEnd(e) { pointers.delete(e.pointerId); if (pointers.size < 2 && gesture?.mode === 'pinch') gesture = null; if (!pointers.size) gesture = null; }
 async function exportImage() {
   if (!state.photos.every(Boolean)) throw new Error('사진을 모두 채워 주세요.');
-  await assetReady;
+  await assetReady;await Promise.all([...['school','title','schedule'].map(k=>loadFont(brandingModel(state.event)[k].font)),loadFont($('caption-font').value),...state.decorations.filter(d=>d.type==='text').map(d=>loadFont(d.font))]);
   const required = [state.event.frames[state.frame].overlay, ...(brandingModel(state.event).logo.visible ? [state.event.logo] : []), ...state.decorations.filter(d => d.type === 'image').map(d => d.url)].filter(Boolean);
   if (required.some(url => failedAssets.has(url))) throw new Error('선택한 디자인을 불러오지 못했어요. 다른 프레임을 선택하거나 네트워크를 확인해 주세요.');
   render(true);
@@ -324,7 +337,8 @@ async function exportImage() {
   finally { render(); }
 }
 async function loadAssets() {
-  const urls = [state.event.logo, ...state.event.frames.map(f => f.overlay), ...state.event.stickers.map(s => s.url)].filter(Boolean);
+  await Promise.all(['school','title','schedule'].map(k=>loadFont(brandingModel(state.event)[k].font)));
+  const urls = [...STICKER_PRESETS.map(s=>s.url),state.event.logo, ...state.event.frames.map(f => f.overlay), ...state.event.stickers.map(s => s.url)].filter(Boolean);
   await Promise.all([...new Set(urls)].map(async url => { try { assetImages.set(url, await imageFromURL(url)); } catch { failedAssets.add(url); } }));
   if (failedAssets.size) toast('일부 행사 디자인을 불러오지 못했어요. 다른 디자인을 선택할 수 있어요.');
   render();
@@ -332,19 +346,40 @@ async function loadAssets() {
 function renderCollection(){
   const s=normalizeSharing(state.event.sharing),name=collectionName(s);$('event-collection').hidden=s.mode==='none';document.querySelector('.private-badge').lastChild.textContent=s.mode==='none'?' 내 기기에서만':' 제출은 선택';
   labelButton($('submit-result'),'upload',name==='Padlet'?'Padlet에 올리기':name==='Google Drive'?'Google Drive에 공유':'행사 게시판에 공유');
-  $('collection-note').textContent=['drive','padlet'].includes(s.mode)?`제출 버튼을 누르면 이 완성 이미지 한 장이 선생님의 Google Drive${s.mode==='padlet'?'와 Padlet 게시판에':''}로 전송돼요.${s.mode==='padlet'?' 첨부 이미지 링크는 링크를 가진 사람이 볼 수 있어요.':''}`:'이 완성 이미지를 기기 공유로 보내요. 지원되지 않으면 저장한 뒤 열린 게시판·폴더에 올려 주세요.';
+  $('collection-note').textContent=['drive','padlet'].includes(s.mode)?`제출 버튼을 누르면 이 완성 이미지 한 장이 선생님의 Google Drive${s.mode==='padlet'?'와 Padlet 게시판에':''}로 전송돼요.${s.mode==='padlet'?' 첨부 이미지 링크는 링크를 가진 사람이 볼 수 있어요.':''}`:'먼저 완성 이미지를 저장한 뒤 게시판·폴더를 열어 올려요. 기기 공유창은 열지 않아요.';
 }
 async function submissionImage(){
   const png=await exportImage(),url=URL.createObjectURL(png);try{const image=await imageFromURL(url),c=document.createElement('canvas'),scale=Math.min(1,2400/Math.max(image.width,image.height));c.width=Math.round(image.width*scale);c.height=Math.round(image.height*scale);c.getContext('2d').drawImage(image,0,0,c.width,c.height);const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.9));if(!blob||blob.size>5*1024*1024)throw new Error('제출 이미지가 커요. 더 작은 용도를 선택해 주세요.');const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=reject;reader.readAsDataURL(blob);});return data;}finally{URL.revokeObjectURL(url);}
 }
+function currentResultSignature(){return state.step===4?$('export-format').value+':'+saveCanvas.toDataURL('image/png'):null;}
+async function downloadFinishedImage(){
+  const signature=currentResultSignature();
+  const blob=await exportImage();downloadBlob(blob,`moment-${$('export-format').value}-${photoDate.toISOString().slice(0,10)}.png`);
+  lastDownloadedSignature=signature&&signature===currentResultSignature()?signature:null;
+  return Boolean(lastDownloadedSignature);
+}
+function prepareCollectionLink(s){const link=$('collection-open');link.href=s.url;link.textContent='2. '+collectionName(s)+' 열고 올리기 ↗';}
+function openCollectionLink(s){
+  const link=document.createElement('a');link.href=s.url;link.target='_blank';link.rel='noopener noreferrer';document.body.append(link);link.click();link.remove();
+  $('collection-status').textContent=collectionName(s)+'를 열었어요. 다운로드한 이미지를 선택해 올려 주세요. 제출 완료 여부는 게시판에서 확인해 주세요.';
+}
+$('close-collection-save').onclick=()=>$('collection-save-dialog').close();
+$('collection-download').onclick=async()=>{
+ const button=$('collection-download');button.disabled=true;$('collection-open').hidden=true;$('collection-save-status').textContent='이미지를 준비하고 있어요…';
+ try{const unchanged=await downloadFinishedImage();$('collection-save-status').textContent=unchanged?'다운로드를 시작했어요. 파일이 저장됐는지 확인한 뒤 게시판을 열어 주세요.':'이미지가 변경됐어요. 저장·공유 단계에서 다시 확인해 주세요.';$('collection-open').hidden=!unchanged;}
+ catch(error){$('collection-save-status').textContent='저장하지 못했어요. '+error.message;}
+ finally{button.disabled=false;}
+};
+$('collection-open').onclick=()=>{$('collection-save-dialog').close();$('collection-status').textContent='게시판에서 저장한 이미지를 선택해 올려 주세요. 아직 자동 게시된 것은 아니에요.';};
 $('submit-result').onclick=async()=>{
-  if(submitting)return;const s=normalizeSharing(state.event.sharing);submitting=true;$('submit-result').disabled=true;$('collection-status').textContent='공유할 이미지를 준비하고 있어요…';
+  if(submitting)return;const s=normalizeSharing(state.event.sharing);
+  if(s.mode==='link'){
+    if(lastDownloadedSignature&&lastDownloadedSignature===currentResultSignature()){openCollectionLink(s);return;}
+    prepareCollectionLink(s);$('collection-open').hidden=true;$('collection-save-status').textContent='';$('collection-save-title').textContent=lastDownloadedSignature?'바뀐 이미지를 다시 저장해요':'먼저 완성 이미지를 저장해요';$('collection-save-dialog').showModal();return;
+  }
+  submitting=true;$('submit-result').disabled=true;$('collection-status').textContent='공유할 이미지를 준비하고 있어요…';
   try{
-    if(s.mode==='link'){
-      const file=new File([await exportImage()],'moment.png',{type:'image/png'});
-      if(navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:state.event.title,text:s.url});$('collection-status').textContent='기기 공유 화면을 열었어요. 제출 여부는 공유한 앱에서 확인해 주세요.';}
-      else{downloadBlob(file,'moment.png');window.open(s.url,'_blank','noopener,noreferrer');$('collection-status').replaceChildren(document.createTextNode('이미지를 저장했어요. '));const a=document.createElement('a');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=collectionName(s)+' 열고 이미지 올리기 ↗';$('collection-status').append(a);}
-    }else if(['drive','padlet'].includes(s.mode)){
+    if(['drive','padlet'].includes(s.mode)){
       if(!eventId||new URLSearchParams(location.search).has('preview'))throw new Error('미리보기에서는 전송하지 않아요. 게시한 행사 QR로 이용해 주세요.');
       const imageBase64=await submissionImage(),fingerprint=await crypto.subtle.digest('SHA-256',Uint8Array.from(atob(imageBase64),c=>c.charCodeAt(0))),hash=[...new Uint8Array(fingerprint)].map(x=>x.toString(16).padStart(2,'0')).join('');
       if(lastSubmission?.hash!==hash)lastSubmission={hash,id:crypto.randomUUID()};
@@ -373,7 +408,7 @@ async function bootEvent() {
   renderCollection();renderChoices(); renderSteps(); render(); assetReady = loadAssets();
 }
 
-$('next').addEventListener('click', () => go(2)); $('back').addEventListener('click', () => go(state.step===3?2:0));
+$('next').addEventListener('click', () => go(state.step===3?4:state.step===2?3:2)); $('back').addEventListener('click', () => go(state.step===4?3:state.step===3?2:0));
 $('caption').addEventListener('input', () => render()); $('show-date').addEventListener('change', () => render());
 $('camera-start').addEventListener('click', startCamera); $('camera-flip').addEventListener('click', () => { facing = facing === 'user' ? 'environment' : 'user'; startCamera(); });
 $('capture').setAttribute('aria-label','남은 컷 연속 촬영');$('capture').addEventListener('click', () => capture(true)); $('auto-capture').addEventListener('click', () => capture(true));
@@ -411,21 +446,21 @@ $('delete-decoration').replaceChildren(icon('trash'));$('undo-decoration').repla
 $('delete-decoration').addEventListener('click', () => { if (state.selectedDeco === null) return; deletedDecoration={item:state.decorations[state.selectedDeco],index:state.selectedDeco};state.decorations.splice(state.selectedDeco, 1); state.selectedDeco = null; updateAdjustment(); render(); });
 canvas.addEventListener('clear-selection',()=>{state.selectedDeco=null;updateAdjustment();render();});
 canvas.addEventListener('pointerdown', pointerDown); canvas.addEventListener('pointermove', pointerMove); for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(event, pointerEnd);
-canvas.addEventListener('click', e => { if (state.step !== 3 || editDialog.open) return; const p = point(e), g = currentGeometry(); const i = g.slots.findIndex(s => p.x >= s.x && p.x <= s.x + s.w && p.y >= s.y && p.y <= s.y + s.h); if (i >= 0) state.selectedPhoto = i; openEditorTool(i >= 0 ? 'photo' : 'stickers'); });
+
 $('expand-preview').addEventListener('click', () => {if(state.step===4)go(3);openEditorTool();});
 $('change-layout').addEventListener('click', () => go(0));
 document.querySelectorAll('[data-open-tool]').forEach(b => b.addEventListener('click', () => openEditorTool(b.dataset.openTool)));
 document.querySelectorAll('[data-editor-tool]').forEach(b => b.addEventListener('click', () => selectEditorTool(b.dataset.editorTool)));
 $('close-edit').addEventListener('click', closeEditor);
 editDialog.addEventListener('cancel', e => { e.preventDefault(); closeEditor(); });
-canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if(e.key.toLowerCase()==='r'){e.preventDefault();d.rotation=(d.rotation||0)+(e.shiftKey?-15:15);updateAdjustment();render();} if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
-$('editor-download').onclick=()=>{closeEditor();$('download').click();};
-$('download').addEventListener('click', async () => { try { downloadBlob(await exportImage(), `moment-${$('export-format').value}-${photoDate.toISOString().slice(0, 10)}.png`); toast('이미지를 만들었어요. 기기의 다운로드를 확인해 주세요.'); } catch (error) { toast(`저장 실패: ${error.message}`); } });
+canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3 || !editDialog.open || !canEditDecoration(d)) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if(e.key.toLowerCase()==='r'){e.preventDefault();d.rotation=(d.rotation||0)+(e.shiftKey?-15:15);updateAdjustment();render();} if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
+$('download').addEventListener('click', async () => { try { await downloadFinishedImage(); toast('다운로드를 시작했어요. 기기의 저장 위치를 확인해 주세요.'); } catch (error) { toast(`저장 실패: ${error.message}`); } });
 $('share').addEventListener('click', async () => { try { const blob = await exportImage(), file = new File([blob], 'moment.png', { type: 'image/png' }); if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: state.event.title }); else { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: downloadURL, target: '_blank', rel: 'noopener' }); link.click(); toast('이미지를 길게 눌러 저장하거나 PNG 저장 버튼을 이용해 주세요.'); } } catch (error) { if (error.name !== 'AbortError') toast('공유하지 못했어요. PNG 저장 버튼을 이용해 주세요.'); } });
-$('restart').addEventListener('click', () => { if (!confirm('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return; stopCamera(); state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
+$('restart').addEventListener('click', () => { if (!confirm('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return; stopCamera();lastDownloadedSignature=null; state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopCamera(); }); window.addEventListener('pagehide', stopCamera);
 window.addEventListener('beforeunload', e => { if (state.photos.some(Boolean)) { e.preventDefault(); e.returnValue = ''; } });
 for (const [id, name, label] of [['back', 'back', '이전'], ['native-capture', 'camera', '기본 카메라로 촬영'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '돌아가기'], ['expand-preview', 'expand', '크게 편집'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);
 document.querySelectorAll('[data-open-tool], [data-editor-tool]').forEach(b => { const tool = b.dataset.openTool || b.dataset.editorTool; const name = { stickers: 'sticker', text: 'text', photo: 'crop', filter: 'filter' }[tool]; labelButton(b, name, { stickers: '스티커', text: '문구', photo: '사진 구도', filter: '필터' }[tool]); });
+for(const id of ['text-font','caption-font']){fillFontSelect($(id));$(id).onchange=async()=>{const font=$(id).value;try{await loadFont(font);const d=state.decorations[state.selectedDeco];if(id==='text-font'&&d?.type==='text')d.font=font;render();}catch(error){toast(error.message);}};}
 renderChoices(); renderThumbnails(); renderSteps(); render(); bootEvent();
 document.fonts.ready.then(() => render());

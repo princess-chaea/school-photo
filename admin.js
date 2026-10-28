@@ -1,3 +1,4 @@
+import {createOperations} from './operations.js';
 import {normalizeSharing,validateSharing,parsePadletDetails,callCollectionRelay} from './sharing.js';
 import QRCode from 'qrcode';
 import { DEFAULT_EVENT, DEFAULT_FRAMES, DEFAULT_STICKERS, normalizeEvent, imageFromURL, downloadBlob, eventURL, brandingModel, BRAND_KEYS } from './core.js';
@@ -12,6 +13,7 @@ const $ = id => document.getElementById(id);
 let user = null, events = [], assets = [], editing = null, dirty = false, locked = false, qrEvent = null, toastTimer, previewEpoch = 0, authEpoch = 0;
 let school = { school: '', logo: '' }, profileDirty = false;
 let frameEditor, libraries, sharedAssets = [];
+const operations=createOperations({cloud,getUser:()=>user,run,toast});
 const demo = !cloud.configured || new URLSearchParams(location.search).has('demo');
 const kinds = { logo: '학교 로고', frame: '투명 프레임', sticker: '스티커', palette: '단색 프레임' };
 function toast(text) { $('toast').textContent = text; $('toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('visible'), 4500); }
@@ -27,8 +29,8 @@ async function run(action) {
 function button(text, action, className = 'text-button') { const el = document.createElement('button'); el.type = 'button'; el.className = className; el.textContent = text; if (text.includes('QR')) labelButton(el, 'qr', text.replace(' ↗', '')); el.addEventListener('click', action); return el; }
 function text(tag, content, className = '') { const el = document.createElement(tag); el.textContent = content; el.className = className; return el; }
 function persistDemo() { if (!demo) return; try { sessionStorage.setItem('moment-admin-demo', JSON.stringify({ events, assets, school })); } catch { toast('탭 임시 저장 용량이 부족해요. 작은 이미지를 사용해 주세요.'); } }
-function switchTab(tab) { if (tab === 'shared' && !cloud.isSiteAdmin(user)) return; for (const id of ['events', 'frames', 'assets', 'school', 'shared']) { $(`${id}-view`).hidden = id !== tab; $(`${id}-tab`).classList.toggle('selected', id === tab); $(`${id}-tab`).setAttribute('aria-selected', String(id === tab)); } if (tab === 'school') renderSchool(); }
-function framesAvailable() { return [...DEFAULT_FRAMES, ...[...assets.filter(a => ['frame','palette'].includes(a.kind)), ...sharedAssets.filter(a => a.active && a.kind === 'frame')].map(a => ({ id: a.shared ? `shared-${a.id}` : a.id, name: a.name, bg: a.bg || '#fffdf6', ink: a.ink || '#34372f', layoutCount: a.layoutCount || 0, orientation: a.orientation || 'portrait', ...(a.photoSlots ? {photoSlots:a.photoSlots} : {}), shared: Boolean(a.shared), ...(a.url ? { overlay: a.url } : {}) }))]; }
+function switchTab(tab) { if (['shared','operations'].includes(tab) && !cloud.isSiteAdmin(user)) return; for (const id of ['events', 'frames', 'assets', 'school', 'shared','operations']) { $(`${id}-view`).hidden = id !== tab; $(`${id}-tab`).classList.toggle('selected', id === tab); $(`${id}-tab`).setAttribute('aria-selected', String(id === tab)); } if (tab === 'school') renderSchool();if(tab==='operations')operations.refresh(); }
+function framesAvailable() { return [...DEFAULT_FRAMES, ...[...assets.filter(a => ['frame','palette'].includes(a.kind)), ...sharedAssets.filter(a => a.active && a.kind === 'frame')].map(a => ({ id: a.shared ? `shared-${a.id}` : a.id, name: a.name, bg: a.bg || '#fffdf6', ink: a.ink || '#34372f', layoutCount: a.layoutCount || 0, orientation: a.orientation || 'portrait',frameFormat:a.frameFormat||'print-4x6', ...(a.photoSlots ? {photoSlots:a.photoSlots} : {}), shared: Boolean(a.shared), ...(a.url ? { overlay: a.url } : {}) }))]; }
 function stickersAvailable() { return [...DEFAULT_STICKERS, ...[...assets.filter(a => a.kind === 'sticker'), ...sharedAssets.filter(a => a.active && a.kind === 'sticker')].map(a => ({ id: a.shared ? `shared-${a.id}` : a.id, name: a.name, url: a.url, shared: Boolean(a.shared) }))]; }
 function usesAsset(event, asset) { return (asset.url && (event.logo === asset.url || event.frames.some(f => f.overlay === asset.url) || event.stickers.some(s => s.url === asset.url))) || event.frames.some(f => f.id === asset.id); }
 function renderEvents() {
@@ -146,6 +148,7 @@ async function refreshQR() {
 $('google-login').addEventListener('click', () => run(() => cloud.login())); $('redirect-login').addEventListener('click', () => run(() => cloud.login(true)));
 $('sign-out').addEventListener('click', () => run(async () => { if ((dirty || profileDirty) && !confirm('저장하지 않은 변경이 있어요. 로그아웃할까요?')) return; await cloud.logout(); }));
 $('events-tab').addEventListener('click', () => switchTab('events')); $('assets-tab').addEventListener('click', () => switchTab('assets')); $('school-tab').addEventListener('click', () => switchTab('school'));
+$('operations-tab').onclick=()=>switchTab('operations');
 $('frames-tab').addEventListener('click', () => switchTab('frames')); $('shared-tab').addEventListener('click', () => switchTab('shared'));
 function readSharingSettings(){
   return validateSharing({mode:$('event-sharing-mode').value,url:$('event-sharing-url').value.trim(),relayUrl:$('event-sharing-relay').value.trim(),boardId:$('event-padlet-board').value.trim(),submissionKey:editing?.sharing?.submissionKey||crypto.randomUUID()});
@@ -182,7 +185,7 @@ $('asset-form').addEventListener('submit', e => { e.preventDefault(); run(async 
     const optimized = await optimizeDesign(file, kind, { forceWasm: new URLSearchParams(location.search).has('wasm') });
     labelButton($('upload-asset'), 'upload', '보관함에 저장 중…');
     const asset = demo ? { id: crypto.randomUUID(), name, kind, url: await demoImage(optimized.file), ...optimized.metadata } : await cloud.uploadAsset(user.uid, optimized.file, kind, name, optimized.metadata);
-    assets.push(asset); persistDemo(); renderAssets(); renderEditorChoices(); $('asset-form').reset();
+    assets.push(asset); persistDemo(); renderAssets(); renderEditorChoices(); $('asset-form').reset();$('asset-kind').value=kind;
     toast(`${formatBytes(file.size)} → ${formatBytes(optimized.file.size)} WebP로 ${demo ? '탭에 임시 보관' : '내 보관함에 저장'}했어요.`);
   } finally { labelButton($('upload-asset'), 'upload', '최적화 후 보관함에 추가'); }
 }); });
@@ -193,7 +196,7 @@ $('copy-link').addEventListener('click', () => run(async () => { try { await nav
 window.addEventListener('beforeunload', e => { if (dirty || profileDirty) { e.preventDefault(); e.returnValue = ''; } });
 for (const [id, name, label] of [['new-event', 'plus', '새 행사 만들기'], ['preview-event', 'camera', '참가자 화면 미리보기'], ['save-draft', 'save', '임시 저장'], ['publish-event', 'check', '저장하고 게시'], ['close-editor', 'close', '닫기'], ['upload-asset', 'upload', '최적화 후 보관함에 추가'], ['download-qr', 'qr', 'QR 저장'], ['close-qr', 'close', '닫기'], ['enter-demo', 'camera', '관리 화면 체험하기']]) labelButton($(id), name, label);
 libraries = createLibraries({ getAssets: () => assets, getShared: () => sharedAssets, getUser: () => user, demo, run, toast, removePrivate: removePrivateAsset, added: asset => { assets.push(asset); persistDemo(); renderAssets(); renderEditorChoices(); }, sharedAdded: asset => { sharedAssets.push(asset); renderAssets(); renderEditorChoices(); }, sharedChanged: (id, active) => { sharedAssets = sharedAssets.map(a => a.id === id ? { ...a, active } : a); renderAssets(); renderEditorChoices(); } });
-frameEditor = createFrameEditor({ getEvent: previewEvent, onChange: branding => { if (!editing) return; editing.branding = branding || undefined; dirty = true; updatePreview(); } });
+frameEditor = createFrameEditor({ getEvent: previewEvent, onSave:()=>saveEditor(false), onChange: branding => { if (!editing) return; editing.branding = branding || undefined; dirty = true; updatePreview(); } });
 document.fonts.ready.then(() => { if (editing) updatePreview(); });
 if (demo) {
   $('setup-banner').hidden = false; $('login-card').hidden = false; $('google-login').disabled = true; $('redirect-login').hidden = true; $('demo-login-note').hidden = false; $('enter-demo').hidden = false; $('admin-workspace').hidden = true; $('user-name').textContent = '체험 모드';
@@ -203,10 +206,11 @@ if (demo) {
 } else {
   cloud.redirectResult().catch(error => { $('admin-error').textContent = errorMessage(error); $('admin-error').hidden = false; });
   cloud.watchUser(async current => {
-    const epoch = ++authEpoch; user = current; events = []; assets = []; sharedAssets = []; school = { school: '', logo: '' }; profileDirty = false; dirty = false; editing = null; document.body.classList.toggle('signed-in', Boolean(current)); switchTab('events');
+    const epoch = ++authEpoch; user = current; operations.clear();events = []; assets = []; sharedAssets = []; school = { school: '', logo: '' }; profileDirty = false; dirty = false; editing = null; document.body.classList.toggle('signed-in', Boolean(current)); switchTab('events');
     $('user-name').textContent = current?.displayName || ''; $('sign-out').hidden = !current; $('login-card').hidden = Boolean(current); $('admin-workspace').hidden = !current; $('event-editor').hidden = true;
-    if (!current) return;
+    $('operations-tab').hidden=!cloud.isSiteAdmin(current);if (!current) return;
     try {
+      await cloud.recordOperatorUser(current).catch(()=>{});
       const [nextEvents, nextAssets, nextSchool, nextShared] = await Promise.all([cloud.listEvents(current.uid), cloud.listAssets(current.uid), cloud.loadSchool(current.uid), cloud.listSharedAssets(cloud.isSiteAdmin(current))]); if (epoch !== authEpoch) return; events = nextEvents; assets = nextAssets; school = nextSchool; sharedAssets = nextShared; renderEvents(); renderAssets(); renderSchool();
       try { const restored = JSON.parse(sessionStorage.getItem('moment-admin-editor') || 'null'); sessionStorage.removeItem('moment-admin-editor'); if (restored && (restored.ownerId === current.uid || !restored.ownerId)) { openEditor(restored); dirty = true; } } catch { /* 복구할 편집 내용 없음 */ }
     } catch (error) { if (epoch === authEpoch) { $('admin-error').textContent = errorMessage(error); $('admin-error').hidden = false; } }

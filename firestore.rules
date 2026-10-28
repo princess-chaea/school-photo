@@ -8,7 +8,8 @@ service cloud.firestore {
     function validPhotoSlots(d) { return !('photoSlots' in d) || (d.kind == 'frame' && d.photoSlots is list && d.photoSlots.size() == d.layoutCount && d.photoSlots.size() in [2,4,6,8] && (d.photoSlots.size() <= 0 || validPhotoRect(d.photoSlots[0])) && (d.photoSlots.size() <= 1 || validPhotoRect(d.photoSlots[1])) && (d.photoSlots.size() <= 2 || validPhotoRect(d.photoSlots[2])) && (d.photoSlots.size() <= 3 || validPhotoRect(d.photoSlots[3])) && (d.photoSlots.size() <= 4 || validPhotoRect(d.photoSlots[4])) && (d.photoSlots.size() <= 5 || validPhotoRect(d.photoSlots[5])) && (d.photoSlots.size() <= 6 || validPhotoRect(d.photoSlots[6])) && (d.photoSlots.size() <= 7 || validPhotoRect(d.photoSlots[7]))); }
     function validBrandPart(p, min, max) {
       return p is map && p.keys().hasAll(['visible','position','x','y','size','color'])
-        && p.keys().hasOnly(['visible','position','x','y','size','color'])
+        && p.keys().hasOnly(['visible','position','x','y','size','color','font'])
+        && (!('font' in p) || p.font in ['baeum','night','round','edge','poster','marker'])
         && p.visible is bool && p.position in ['top','bottom','free']
         && p.x is number && p.x >= 0.05 && p.x <= 0.95
         && p.y is number && p.y >= 0 && p.y <= 1
@@ -41,18 +42,28 @@ service cloud.firestore {
         && d.school is string && d.school.size() <= 60
         && d.schedule is string && d.schedule.size() <= 100
         && d.logo is string && d.logo.size() <= 4096
-        && (!('orientation' in d) || d.orientation in ['portrait','landscape'])
+        && (!('frameFormat' in d) || d.frameFormat in ['print-4x6','print-3x5','print-5x7','square','feed','story','a4','screen'])
+            && (!('orientation' in d) || d.orientation in ['portrait','landscape'])
         && d.logoPosition in ['top', 'bottom']
         && d.frames is list && d.frames.size() > 0 && d.frames.size() <= 32
         && d.stickers is list && d.stickers.size() <= 64
         && d.updatedAt == request.time;
     }
+    function mayPublish(data) {
+      return data.published == false || !exists(/databases/$(database)/documents/userDirectory/$(request.auth.uid)) || !('publishingBlocked' in get(/databases/$(database)/documents/userDirectory/$(request.auth.uid)).data) || get(/databases/$(database)/documents/userDirectory/$(request.auth.uid)).data.publishingBlocked != true;
+    }
+    match /userDirectory/{uid} {
+      allow read: if siteAdmin();
+      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.keys().hasOnly(['displayName','email','lastSeen']) && validDirectory(request.resource.data);
+      allow update: if (signedIn() && request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName','email','lastSeen']) && validDirectory(request.resource.data)) || (siteAdmin() && request.auth.uid != uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['publishingBlocked']) && request.resource.data.publishingBlocked is bool);
+    }
+    function validDirectory(d) { return d.displayName is string && d.displayName.size() <= 80 && d.email == request.auth.token.email && d.lastSeen == request.time; }
     match /events/{eventId} {
       // 참가자는 QR에 적힌 게시 행사 한 건만 읽습니다. 전체 공개 목록은 허용하지 않습니다.
       allow get: if resource.data.published == true || owns(resource.data);
-      allow list: if owns(resource.data);
-      allow create: if owns(request.resource.data) && validEvent(request.resource.data);
-      allow update: if owns(resource.data) && request.resource.data.ownerId == resource.data.ownerId && validEvent(request.resource.data);
+      allow list: if siteAdmin() || owns(resource.data);
+      allow create: if owns(request.resource.data) && validEvent(request.resource.data) && mayPublish(request.resource.data);
+      allow update: if (owns(resource.data) && request.resource.data.ownerId == resource.data.ownerId && validEvent(request.resource.data) && mayPublish(request.resource.data)) || (siteAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['published','updatedAt']) && request.resource.data.published == false && request.resource.data.updatedAt == request.time);
       allow delete: if owns(resource.data);
     }
     match /users/{uid}/assets/{assetId} {
@@ -61,7 +72,8 @@ service cloud.firestore {
         return validPhotoSlots(d) && d.keys().hasAll(['name', 'kind']) && d.name is string && d.name.size() > 0 && d.name.size() <= 60
           && ((d.kind == 'palette' && d.keys().hasOnly(['name', 'kind', 'bg', 'ink'])
             && d.bg is string && d.bg.matches('#[0-9a-fA-F]{6}') && d.ink is string && d.ink.matches('#[0-9a-fA-F]{6}'))
-          || (d.kind in ['logo', 'frame', 'sticker'] && d.keys().hasOnly(['name', 'kind', 'url', 'path', 'originalBytes', 'optimizedBytes', 'width', 'height', 'format', 'layoutCount', 'orientation', 'photoSlots'])
+          || (d.kind in ['logo', 'frame', 'sticker'] && d.keys().hasOnly(['name', 'kind', 'url', 'path', 'originalBytes', 'optimizedBytes', 'width', 'height', 'format', 'layoutCount', 'orientation', 'photoSlots','frameFormat'])
+            && (!('frameFormat' in d) || d.frameFormat in ['print-4x6','print-3x5','print-5x7','square','feed','story','a4','screen'])
             && (!('orientation' in d) || d.orientation in ['portrait','landscape'])
             && (!('layoutCount' in d) || (d.kind == 'frame' && d.layoutCount in [2,4,6,8]))
             && d.url is string && d.url.size() <= 4096 && d.path is string && d.path == 'users/' + uid + '/assets/' + assetId));
@@ -82,8 +94,9 @@ service cloud.firestore {
     match /sharedAssets/{assetId} {
       function validShared(d) {
         return validPhotoSlots(d) && d.keys().hasAll(['name','kind','url','path','active'])
-          && d.keys().hasOnly(['name','kind','url','path','active','originalBytes','optimizedBytes','width','height','format','layoutCount','orientation','photoSlots'])
+          && d.keys().hasOnly(['name','kind','url','path','active','originalBytes','optimizedBytes','width','height','format','layoutCount','orientation','photoSlots','frameFormat'])
           && d.name is string && d.name.size() > 0 && d.name.size() <= 60
+          && (!('frameFormat' in d) || d.frameFormat in ['print-4x6','print-3x5','print-5x7','square','feed','story','a4','screen'])
           && d.kind in ['frame','sticker'] && d.url is string && d.url.size() <= 4096
           && d.path == 'shared/assets/' + assetId && d.active is bool
           && (d.kind != 'frame' || (d.layoutCount in [2,4,6,8]));

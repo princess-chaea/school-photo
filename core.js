@@ -1,3 +1,6 @@
+import {STICKER_PRESETS} from './sticker-presets.js';
+import {normalizeFont} from './fonts.js';
+import {frameSize,normalizeFrameFormat} from './frame-sizes.js';
 import { normalizeSharing } from './sharing.js';
 export const DEFAULT_FRAMES = [
   { id: 'ivory', name: '밀크 아이보리', bg: '#fffdf6', ink: '#34372f' },
@@ -11,15 +14,20 @@ export const DEFAULT_FRAMES = [
 ];
 export const DEFAULT_STICKERS = [
   ...[['camera', '찰칵 카메라'], ['friendship', '선생님과 우리'], ['school', '우리 학교'], ['flower', '웃음꽃']].map(([id, name]) => ({ id: `image-${id}`, name, url: `/stickers/${id}.webp` })),
-  ...['♡', '✦', '✿', '☺', '♥', '✧', '★', '☘'].map((text, i) => ({ id: `symbol-${i}`, name: text, text })),
+  ...STICKER_PRESETS,
 ];
 export const DEFAULT_EVENT = { title: '사제동행 찰칵! 포토', school: '', schedule: '', logo: '', logoPosition: 'top', frames: DEFAULT_FRAMES, stickers: DEFAULT_STICKERS };
 export const FILTERS = [
-  { id: 'original', name: '오리지널', css: 'none' },
-  { id: 'mono', name: '흑백', css: 'grayscale(1) contrast(1.08)' },
-  { id: 'warm', name: '따뜻하게', css: 'sepia(.25) saturate(.9) brightness(1.05)' },
-  { id: 'vintage', name: '빈티지', css: 'sepia(.4) contrast(.9) saturate(.8)' },
-  { id: 'clear', name: '선명하게', css: 'contrast(1.12) saturate(1.18)' },
+ {id:'original',name:'오리지널',group:'자연스러움',css:'none'},
+ {id:'clear',name:'선명하게',group:'자연스러움',css:'contrast(1.12) saturate(1.18)'},
+ {id:'warm',name:'따뜻하게',group:'색온도',css:'sepia(.25) saturate(.9) brightness(1.05)'},
+ {id:'cool',name:'시원하게',group:'색온도',css:'saturate(.85) hue-rotate(15deg) brightness(1.04)'},
+ {id:'soft',name:'소프트',group:'부드러움',css:'contrast(.85) brightness(1.08) saturate(.9)'},
+ {id:'pastel',name:'파스텔',group:'부드러움',css:'contrast(.8) saturate(.65) brightness(1.15)'},
+ {id:'vintage',name:'빈티지',group:'필름',css:'sepia(.4) contrast(.9) saturate(.8)'},
+ {id:'sepia',name:'세피아',group:'필름',css:'sepia(.85) saturate(.7) contrast(1.05)'},
+ {id:'mono',name:'흑백',group:'흑백',css:'grayscale(1) contrast(1.08)'},
+ {id:'dramatic',name:'진한 흑백',group:'흑백',css:'grayscale(1) contrast(1.55) brightness(.94)'}
 ];
 export const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 export const BRAND_KEYS = ['logo', 'school', 'title', 'schedule'];
@@ -38,7 +46,7 @@ export function brandingModel(event = DEFAULT_EVENT) {
     const index = textKeys.indexOf(key);
     const defaultY = key === 'logo' ? .5 : index >= 0 ? (index + 1) / (textKeys.length + 1) : .5;
     const defaultX = hasLogo && textKeys.length ? key === 'logo' ? .28 : .60 : .5;
-    model[key] = { visible: item.visible !== false, position: position(key), x: number(item.x, defaultX, .05, .95), y: number(item.y, position(key) === 'free' ? .5 : defaultY, 0, 1), size: number(item.size, BRAND_SIZES[key], key === 'logo' ? .035 : .012, key === 'logo' ? .35 : .10), color: /^#[0-9a-f]{6}$/i.test(item.color || '') ? item.color : '' };
+    model[key] = { visible: item.visible !== false, position: position(key), x: number(item.x, defaultX, .05, .95), y: number(item.y, position(key) === 'free' ? .5 : defaultY, 0, 1), size: number(item.size, BRAND_SIZES[key], key === 'logo' ? .035 : .012, key === 'logo' ? .35 : .10), font:normalizeFont(item.font), color: /^#[0-9a-f]{6}$/i.test(item.color || '') ? item.color : '' };
   }
   model.hasContent = visible.length > 0;
   model.hasTop = visible.some(key => position(key) === 'top');
@@ -54,7 +62,8 @@ export function layout(count, event = DEFAULT_EVENT, options = {}) {
   if (![2,4,6,8].includes(count)) throw new Error('지원하지 않는 컷 수');
   const orientation = options.orientation || (options.frame?.layoutCount ? options.frame.orientation : event.orientation) || 'portrait';
   const landscape = orientation === 'landscape', fixed = Boolean(options.frame?.layoutCount);
-  const width = !fixed && options.width || (landscape ? 1800 : 1200), height = !fixed && options.height || (landscape ? 1200 : 1800);
+  const dimensions=frameSize(options.frame?.frameFormat,orientation);
+  const width = !fixed && options.width || dimensions.width, height = !fixed && options.height || dimensions.height;
   const pad = fixed ? 48 : Math.round(Math.min(width,height) * Math.max(.02, options.padding || 0)), gap = fixed ? 24 : Math.round(Math.min(width,height) * .015), cols = landscape ? ({2:2,4:2,6:3,8:4}[count]) : count === 2 ? 1 : 2, rows = count / cols;
   const branding = brandingModel(event);
   const brandH = Math.round(height * (fixed ? .14 : branding.height));
@@ -63,9 +72,10 @@ export function layout(count, event = DEFAULT_EVENT, options = {}) {
   const bottomSpace = fixed ? brandH : bottomH + footerH;
   const photoW = (width - pad * 2 - gap * (cols - 1)) / cols, photoH = (height - pad * 2 - topH - bottomSpace - gap * (rows - 1)) / rows;
   const top = pad + topH, bottomY = height - pad - bottomSpace;
-  return { width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:topH},bottom:{y:bottomY,h:bottomH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoSlots,count)?.map(s=>({x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
+  const brandReference = !fixed && options.brandReference !== false && (options.width || options.height || options.padding) ? layout(count,event,{...options,width:undefined,height:undefined,padding:undefined,brandReference:false}) : null;
+  return { brandReference, width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:topH},bottom:{y:bottomY,h:bottomH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoSlots,count)?.map(s=>({x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
 }
-export function templateGeometry(count, orientation = 'portrait') { return layout(count, DEFAULT_EVENT, { frame: { layoutCount: count, orientation }, orientation }); }
+export function templateGeometry(count, orientation = 'portrait', frameFormat='print-4x6') { return layout(count, DEFAULT_EVENT, { frame: { layoutCount: count, orientation,frameFormat }, orientation }); }
 export function compatibleFrame(frame, count, orientation) { return !frame.layoutCount || (frame.layoutCount === count && (!orientation || (frame.orientation || 'portrait') === orientation)); }
 export function crop(imageW, imageH, targetW, targetH, zoom = 1, panX = 0, panY = 0) {
   const scale = Math.max(targetW / imageW, targetH / imageH) * zoom;
@@ -84,9 +94,9 @@ export function eventURL(base, id) {
 export function normalizeEvent(value) {
   const text = (v, max) => typeof v === 'string' ? v.slice(0, max) : '';
   const color = (v, fallback) => /^#[0-9a-f]{6}$/i.test(v || '') ? v : fallback;
-  const safeURL = v => typeof v === 'string' && (/^https:\/\//.test(v) || /^data:image\/(png|jpeg|webp);base64,/.test(v) || /^\/stickers\/[a-z-]+\.webp$/.test(v)) ? v : '';
-  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
-  const stickers = Array.isArray(value.stickers) ? value.stickers.slice(0, 64).map((s, i) => ({ id: text(s.id, 100) || `sticker-${i}`, name: text(s.name, 40), text: text(s.text, 8), url: safeURL(s.url) })).filter(s => s.text || s.url) : [];
+  const safeURL = v => typeof v === 'string' && (/^https:\/\//.test(v) || /^data:image\/(png|jpeg|webp);base64,/.test(v) || /^\/stickers\/[a-z-]+\.(?:webp|svg)$/.test(v)) ? v : '';
+  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', frameFormat:normalizeFrameFormat(f.frameFormat), ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
+  const stickers = Array.isArray(value.stickers) ? value.stickers.slice(0, 64).map((s, i) => ({ id: text(s.id, 100) || `sticker-${i}`, name: text(s.name, 40), text: text(s.text, 8), url: safeURL(s.url) })).filter(s => s.url) : [];
   const event = { title: text(value.title, 80) || DEFAULT_EVENT.title, school: text(value.school, 60), schedule: text(value.schedule, 100), logo: safeURL(value.logo), logoPosition: value.logoPosition === 'bottom' ? 'bottom' : 'top', orientation: value.orientation === 'landscape' ? 'landscape' : 'portrait', frames: frames.length ? frames : DEFAULT_FRAMES, stickers };
   const { hasContent, hasTop, hasBottom, ...branding } = brandingModel({ ...event, branding: value.branding });
   return { ...event, branding, sharing:normalizeSharing(value.sharing) };

@@ -33,7 +33,7 @@ test('QR은 관리 화면이 아닌 행사 URL을 가리킨다', () => {
 });
 test('외부 행사 데이터에서 실행 가능한 URL과 잘못된 색상을 제거한다', () => {
   const event = normalizeEvent({ title: '축제', logo: 'javascript:alert(1)', frames: [{ id: 'a', bg: 'red;display:none', ink: '#ffffff', overlay: 'http://bad.test/x' }], stickers: [{ text: '♡', url: 'javascript:x' }] });
-  assert.equal(event.logo, ''); assert.equal(event.frames[0].bg, '#fffdf6'); assert.equal(event.frames[0].overlay, ''); assert.equal(event.stickers[0].url, '');
+  assert.equal(event.logo, ''); assert.equal(event.frames[0].bg, '#fffdf6'); assert.equal(event.frames[0].overlay, ''); assert.equal(event.stickers.length,0);
 });
 test('업로드 프레임의 제작 규격과 사진 칸은 정보 표시 설정이 바뀌어도 유지된다', () => {
   for (const n of [2,4,6,8]) {
