@@ -1,3 +1,6 @@
+import {createTextStyleControls} from './text-style-controls.js';
+import {textColorSettings,paintColoredText,measureStyledText} from './text-colors.js';
+import {confirmAction} from './app-dialog.js';
 import {STICKER_PRESETS} from './sticker-presets.js';
 import {fontFamily,fillFontSelect,loadFont} from './fonts.js';
 import { decorationHit, rotatedPoint, radians, degrees, rotationDelta } from './decoration-geometry.js';
@@ -6,7 +9,7 @@ import { drawLayoutGuide, fitLayoutGuide } from './layout-guide.js';
 import { EXPORT_FORMATS, paintExport, createExportPicker } from './export-formats.js';
 import { createEditorView } from './editor-view.js';
 import { printPNG } from './print-png.js';
-import { DEFAULT_EVENT, FILTERS, layout, crop, clamp, normalizeEvent, imageFromURL, downloadBlob, brandingModel, compatibleFrame } from './core.js';
+import { DEFAULT_EVENT, FILTERS, layout, crop, clamp, normalizeEvent, imageFromURL, downloadBlob, brandingModel, brandEntries, compatibleFrame } from './core.js';
 import { drawBranding } from './branding.js';
 import { icon, labelButton } from './icons.js';
 
@@ -31,6 +34,10 @@ $('export-format').value='print-4x6';
 function changePurpose(){ state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}}); renderChoices(); renderThumbnails(); render(); }
 $('export-format').addEventListener('change',changePurpose);
 const exportPicker=createExportPicker(()=>canvas,changePurpose,preset=>spaceGeometryFor(preset));
+const studentTextStyles=createTextStyleControls($('student-text-style'),{
+ getState:()=>{const d=state.decorations[state.selectedDeco];return d?.type==='text'?{key:d.id,label:'문구',text:d.text,settings:{...d,...textColorSettings(d.text,d)},baseSize:.055,minSize:.015,maxSize:.35,ink:'#ffffff'}:null;},
+ onChange:part=>{const d=state.decorations[state.selectedDeco];if(d?.type==='text'){Object.assign(d,part);updateAdjustment();render();}}
+});
 function outputFormat(){return state.event.frames[state.frame]?.layoutCount ? $('export-format').value : 'original';}
 
 function toast(message) { $('toast').textContent = message; $('toast').classList.add('visible'); clearTimeout(toastTimeout); toastTimeout = setTimeout(() => $('toast').classList.remove('visible'), 4500); }
@@ -41,8 +48,8 @@ function renderChoices() {
   if (!state.event.frames[state.frame] || !compatibleFrame(state.event.frames[state.frame], state.count, state.orientation)) state.frame = state.event.frames.findIndex(f => compatibleFrame(f,state.count,state.orientation));
   $('cut-options').replaceChildren();
   for (const count of [2, 4, 6, 8]) {
-    const button = createButton(`cut-option ${state.count === count ? 'selected' : ''}`, '', () => {
-      if (count !== state.count && state.photos.some(Boolean) && !confirm('컷 수를 바꾸면 촬영한 사진과 꾸미기가 초기화돼요. 바꿀까요?')) return;
+    const button = createButton(`cut-option ${state.count === count ? 'selected' : ''}`, '', async () => {
+      if (count !== state.count && state.photos.some(Boolean) && !await confirmAction('컷 수를 바꾸면 촬영한 사진과 꾸미기가 초기화돼요. 바꿀까요?')) return;
       if (count !== state.count) { state.count = count; state.photos = Array(count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.selectedDeco = null; }
       renderChoices(); renderThumbnails(); render();
     });
@@ -155,7 +162,7 @@ function branding(g, frame) {
 function decorationBox(d, g) {
   const font = d.size * g.width; let w, h;
   if (d.type === 'image') { const img = assetImages.get(d.url); h = font; w = img ? font * img.width / img.height : font; }
-  else { ctx.font = `700 ${font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; w = ctx.measureText(d.text).width; h = font * 1.2; }
+  else { ctx.font = `700 ${font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; const metrics=measureStyledText(ctx,d.text,d);w=metrics.width;h=metrics.maxSize*1.2; }
   return { x: d.x * g.width, y: d.y * g.height, w: Math.max(w, 20), h: Math.max(h, 20), font };
 }
 function geometryFor(preset, count=state.count, frame=state.event.frames[state.frame]) {
@@ -189,7 +196,7 @@ function render(exporting = false) {
   branding(g, frame);
   fitText($('caption').value || ' ', g.width / 2, g.footerY + 48, g.width - 80, 23, frame.ink, '700',$('caption-font').value);
   if ($('show-date').checked) fitText(photoDate.toLocaleDateString('sv-SE').replaceAll('-', '. '), g.width / 2, g.footerY + 82, g.width - 80, 13, frame.ink);
-  state.decorations.forEach(d => { const b = decorationBox(d, g); ctx.save();ctx.translate(b.x,b.y);ctx.rotate(radians(d.rotation||0)); ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.fillStyle = d.color; ctx.font = `700 ${b.font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; if (d.type === 'image') { const image = assetImages.get(d.url); if (image) ctx.drawImage(image, -b.w / 2, -b.h / 2, b.w, b.h); } else ctx.fillText(d.text, 0, 0); ctx.restore(); });
+  state.decorations.forEach(d => { const b = decorationBox(d, g); ctx.save();ctx.translate(b.x,b.y);ctx.rotate(radians(d.rotation||0)); ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.fillStyle = d.color; ctx.font = `700 ${b.font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; if (d.type === 'image') { const image = assetImages.get(d.url); if (image) ctx.drawImage(image, -b.w / 2, -b.h / 2, b.w, b.h); } else paintColoredText(ctx,d.text,0,0,b.w,d,d.color); ctx.restore(); });
   if (!exporting && state.step === 3 && editDialog.open) {
     if (state.selectedDeco !== null) {
       const d=state.decorations[state.selectedDeco];if(d){const b=decorationBox(d,g),scale=g.width/Math.max(1,canvas.getBoundingClientRect().width),gap=4*scale,h=5*scale;
@@ -251,6 +258,7 @@ function updateAdjustment() {
   $('delete-decoration').disabled=state.selectedDeco===null;$('rotate-decoration').disabled=state.selectedDeco===null;$('undo-decoration').disabled=!deletedDecoration||state.decorations.length>=40;
   const d = state.decorations[state.selectedDeco]; $('decoration-edit').hidden = !d; if(d?.type==='text')$('text-font').value=d.font||'baeum';
   if(d)$('rotation-value').textContent=Math.round(d.rotation||0)+'°';
+  $('selected-text-controls').hidden=d?.type!=='text';if(d?.type==='text'){Object.assign(d,textColorSettings(d.text,d));if($('selected-decoration-text').value!==d.text)$('selected-decoration-text').value=d.text;}studentTextStyles.refresh();
   if (d) { $('decoration-color').value = d.color; $('decoration-color').closest('label').hidden=d.type==='image'; }
 }
 function renderPhotoPicker() {
@@ -301,7 +309,7 @@ cropCanvas.addEventListener('pointermove', e => {
 for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) cropCanvas.addEventListener(type, e => { cropPointers.delete(e.pointerId); cropGesture = null; });
 function addDecoration(data) {
   if (state.decorations.length >= 40) { toast('꾸미기 요소는 최대 40개까지 추가할 수 있어요.'); return; }
-  state.decorations.push({ ...data, font:$('text-font').value, rotation:0, x: .5, y: .5 + (state.decorations.length % 4) * .035, size: data.type === 'text' ? .055 : .10 }); state.selectedDeco = state.decorations.length - 1; updateAdjustment(); render();
+  state.decorations.push({ ...data,id:crypto.randomUUID(),...textColorSettings(data.text||''), font:$('text-font').value, rotation:0, x: .5, y: .5 + (state.decorations.length % 4) * .035, size: data.type === 'text' ? .055 : .10 }); state.selectedDeco = state.decorations.length - 1; updateAdjustment(); render();
 }
 function point(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) * canvas.width / r.width, y: (e.clientY - r.top) * canvas.height / r.height }; }
 function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -330,7 +338,7 @@ function pointerMove(e) {
 function pointerEnd(e) { pointers.delete(e.pointerId); if (pointers.size < 2 && gesture?.mode === 'pinch') gesture = null; if (!pointers.size) gesture = null; }
 async function exportImage() {
   if (!state.photos.every(Boolean)) throw new Error('사진을 모두 채워 주세요.');
-  await assetReady;await Promise.all([...['school','title','schedule'].map(k=>loadFont(brandingModel(state.event)[k].font)),loadFont($('caption-font').value),...state.decorations.filter(d=>d.type==='text').map(d=>loadFont(d.font))]);
+  await assetReady;await Promise.all([...brandEntries(state.event).filter(item=>item.key!=='logo').map(item=>loadFont(item.settings.font)),loadFont($('caption-font').value),...state.decorations.filter(d=>d.type==='text').map(d=>loadFont(d.font))]);
   const required = [state.event.frames[state.frame].overlay, ...(brandingModel(state.event).logo.visible ? [state.event.logo] : []), ...state.decorations.filter(d => d.type === 'image').map(d => d.url)].filter(Boolean);
   if (required.some(url => failedAssets.has(url))) throw new Error('선택한 디자인을 불러오지 못했어요. 다른 프레임을 선택하거나 네트워크를 확인해 주세요.');
   render(true);
@@ -338,7 +346,7 @@ async function exportImage() {
   finally { render(); }
 }
 async function loadAssets() {
-  await Promise.all(['school','title','schedule'].map(k=>loadFont(brandingModel(state.event)[k].font)));
+  await Promise.all(brandEntries(state.event).filter(item=>item.key!=='logo').map(item=>loadFont(item.settings.font)));
   const urls = [...STICKER_PRESETS.map(s=>s.url),state.event.logo, ...state.event.frames.map(f => f.overlay), ...state.event.stickers.map(s => s.url)].filter(Boolean);
   await Promise.all([...new Set(urls)].map(async url => { try { assetImages.set(url, await imageFromURL(url)); } catch { failedAssets.add(url); } }));
   if (failedAssets.size) toast('일부 행사 디자인을 불러오지 못했어요. 다른 디자인을 선택할 수 있어요.');
@@ -431,7 +439,7 @@ function selectCaptureMethod(native){if(busy)return;if(native)stopCamera();$('na
 $('native-mode').addEventListener('click',()=>selectCaptureMethod(true));$('web-mode').addEventListener('click',()=>selectCaptureMethod(false));
 $('native-capture').addEventListener('click',()=>{if(busy)return;stopCamera();$('native-photo').click();});
 $('demo').addEventListener('click', async () => {
-  if (state.photos.some(Boolean) && !confirm('현재 사진을 샘플 이미지로 바꿀까요?')) return;
+  if (state.photos.some(Boolean) && !await confirmAction('현재 사진을 샘플 이미지로 바꿀까요?')) return;
   busy = true; updateButtons();
   try { for (let i = 0; i < state.count; i++) { const c = document.createElement('canvas'); c.width = 1000; c.height = 750; const cc = c.getContext('2d'); const colors = [['#cbdac1', '#7c946b'], ['#ead4c6', '#b87a64'], ['#d0ddec', '#748ca8'], ['#e0d5e5', '#9c81a5']][i % 4]; const grad = cc.createLinearGradient(0, 0, 1000, 750); grad.addColorStop(0, colors[0]); grad.addColorStop(1, colors[1]); cc.fillStyle = grad; cc.fillRect(0, 0, 1000, 750); cc.fillStyle = '#ffffff55'; cc.beginPath(); cc.arc(780, 130, 190, 0, Math.PI * 2); cc.fill(); cc.fillStyle = '#fffaf0'; cc.font = '200px Georgia'; cc.textAlign = 'center'; cc.fillText(['✿', '☺', '✦', '♡'][i % 4], 500, 380); cc.font = '18px Arial'; cc.fillText('S A M P L E   M O M E N T   ' + String(i + 1).padStart(2, '0'), 500, 550); savePhoto(await imageFromURL(c.toDataURL()), i); } toast('샘플 사진이에요. 마음껏 꾸며보세요.'); } finally { busy = false; renderThumbnails(); updateButtons();if(state.photos.every(Boolean))go(3); }
 });
@@ -440,7 +448,8 @@ $('photo-reset').onclick=()=>{const p=state.photos[state.selectedPhoto];if(p){p.
 cropCanvas.addEventListener('wheel',e=>{e.preventDefault();const p=state.photos[state.selectedPhoto];if(p){p.zoom=clamp(p.zoom*(e.deltaY<0?1.1:1/1.1),1,2.5);updateAdjustment();render();}},{passive:false});
 $('toggle-editor-tools').onclick=()=>{const hidden=!$('expanded-tools').hidden;$('expanded-tools').hidden=hidden;$('toggle-editor-tools').setAttribute('aria-expanded',String(!hidden));$('toggle-editor-tools').textContent=hidden?'도구 펼치기 ⌃':'도구 접기 ⌄';editorView.refresh();};
 $('add-text').addEventListener('click', () => { const text = $('decoration-text').value.trim(); if (!text) return toast('문구를 먼저 입력해 주세요.'); addDecoration({ type: 'text', text, color: '#ffffff' }); $('decoration-text').value = ''; });
-$('decoration-color').addEventListener('input', e => { const d = state.decorations[state.selectedDeco]; if (d) { d.color = e.target.value; render(); } });
+$('selected-decoration-text').addEventListener('input',e=>{const d=state.decorations[state.selectedDeco];if(d?.type==='text'){d.text=e.target.value;updateAdjustment();render();}});
+$('decoration-color').addEventListener('input', e => { const d = state.decorations[state.selectedDeco]; if (d) { d.color = e.target.value;d.letterColors=[];updateAdjustment(); render(); } });
 $('undo-decoration').onclick=()=>{if(!deletedDecoration||state.decorations.length>=40)return;const {item,index}=deletedDecoration;state.decorations.splice(index,0,item);state.selectedDeco=index;deletedDecoration=null;updateAdjustment();render();};
 $('rotate-decoration').replaceChildren(icon('refresh'));$('rotate-decoration').onclick=()=>{const d=state.decorations[state.selectedDeco];if(d){d.rotation=(d.rotation||0)+15;updateAdjustment();render();}};
 $('delete-decoration').replaceChildren(icon('trash'));$('undo-decoration').replaceChildren(icon('undo'));
@@ -457,7 +466,7 @@ editDialog.addEventListener('cancel', e => { e.preventDefault(); closeEditor(); 
 canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3 || !editDialog.open || !canEditDecoration(d)) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if(e.key.toLowerCase()==='r'){e.preventDefault();d.rotation=(d.rotation||0)+(e.shiftKey?-15:15);updateAdjustment();render();} if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
 $('download').addEventListener('click', async () => { try { await downloadFinishedImage(); toast('다운로드를 시작했어요. 기기의 저장 위치를 확인해 주세요.'); } catch (error) { toast(`저장 실패: ${error.message}`); } });
 $('share').addEventListener('click', async () => { try { const blob = await exportImage(), file = new File([blob], 'moment.png', { type: 'image/png' }); if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: state.event.title }); else { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: downloadURL, target: '_blank', rel: 'noopener' }); link.click(); toast('이미지를 길게 눌러 저장하거나 PNG 저장 버튼을 이용해 주세요.'); } } catch (error) { if (error.name !== 'AbortError') toast('공유하지 못했어요. PNG 저장 버튼을 이용해 주세요.'); } });
-$('restart').addEventListener('click', () => { if (!confirm('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return; stopCamera();lastDownloadedSignature=null; state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
+$('restart').addEventListener('click', async () => { if (!await confirmAction('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return; stopCamera();lastDownloadedSignature=null; state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopCamera(); }); window.addEventListener('pagehide', stopCamera);
 window.addEventListener('beforeunload', e => { if (state.photos.some(Boolean)) { e.preventDefault(); e.returnValue = ''; } });
 for (const [id, name, label] of [['back', 'back', '이전'], ['native-capture', 'camera', '기본 카메라로 촬영'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '돌아가기'], ['expand-preview', 'expand', '크게 편집'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);

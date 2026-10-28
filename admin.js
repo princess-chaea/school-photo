@@ -1,3 +1,6 @@
+import {createExtraTextEditor} from './extra-text-editor.js';
+import {createTextStyleControls} from './text-style-controls.js';
+import {confirmAction} from './app-dialog.js';
 import {fillFontSelect,loadFont,fontFamily} from './fonts.js';
 import {createOperations} from './operations.js';
 import {normalizeSharing,validateSharing,parsePadletDetails,callCollectionRelay} from './sharing.js';
@@ -13,7 +16,8 @@ import { createLibraries } from './libraries.js';
 const $ = id => document.getElementById(id);
 let user = null, events = [], assets = [], editing = null, dirty = false, locked = false, qrEvent = null, toastTimer, previewEpoch = 0, authEpoch = 0;
 let school = { school: '', logo: '' }, profileDirty = false;
-let frameEditor, libraries, sharedAssets = [];
+let frameEditor, libraries, extraTextEditor, sharedAssets = [];
+const textStyleControls=[];
 const operations=createOperations({cloud,getUser:()=>user,run,toast});
 const demo = !cloud.configured || new URLSearchParams(location.search).has('demo');
 const kinds = { logo: '학교 로고', frame: '투명 프레임', sticker: '스티커', palette: '단색 프레임' };
@@ -44,13 +48,13 @@ function renderEvents() {
     const body = document.createElement('div'); body.className = 'event-card-body'; body.append(text('span', event.published ? '● 게시 중' : '○ 비공개', `status-pill ${event.published ? '' : 'draft'}`), text('h3', event.title), text('p', [event.school, event.schedule].filter(Boolean).join(' · ') || '우리만의 행사'));
     const actions = document.createElement('div'); actions.className = 'card-actions';
     actions.append(button('편집', () => openEditor(event)), button('복제', () => openEditor({ ...structuredClone(event), id: crypto.randomUUID(), title: `${event.title.slice(0, 72)} (복제)`, published: false })));
-    if (event.published) { actions.append(button('QR 발급 ↗', () => run(() => showQR(event)))); actions.append(button('게시 중지', () => run(async () => { if (!confirm('게시를 중지하면 이 QR로 새로 접속할 수 없어요. 중지할까요?')) return; await storeEvent(event.id, event, false); toast('게시를 중지했어요. 이미 열린 화면에는 설정이 남아 있을 수 있어요.'); }))); }
-    actions.append(button('삭제', () => run(async () => { if (!confirm(`‘${event.title}’ 행사를 삭제할까요? 발급된 QR도 사용할 수 없게 됩니다.`)) return; if (!demo) await cloud.removeEvent(event.id); events = events.filter(e => e.id !== event.id); if (editing?.id === event.id) { editing = null; dirty = false; $('event-editor').hidden = true; } persistDemo(); renderEvents(); }), 'text-button danger'));
+    if (event.published) { actions.append(button('QR 발급 ↗', () => run(() => showQR(event)))); actions.append(button('게시 중지', () => run(async () => { if (!await confirmAction('게시를 중지하면 이 QR로 새로 접속할 수 없어요. 중지할까요?')) return; await storeEvent(event.id, event, false); toast('게시를 중지했어요. 이미 열린 화면에는 설정이 남아 있을 수 있어요.'); }))); }
+    actions.append(button('삭제', () => run(async () => { if (!await confirmAction(`‘${event.title}’ 행사를 삭제할까요? 발급된 QR도 사용할 수 없게 됩니다.`)) return; if (!demo) await cloud.removeEvent(event.id); events = events.filter(e => e.id !== event.id); if (editing?.id === event.id) { editing = null; dirty = false; $('event-editor').hidden = true; } persistDemo(); renderEvents(); }), 'text-button danger'));
     body.append(actions); card.append(art, body); $('event-list').append(card);
   });
 }
-function openEditor(event) {
-  if (dirty && !confirm('저장하지 않은 변경을 버리고 다른 행사를 열까요?')) return;
+async function openEditor(event) {
+  if (dirty && !await confirmAction('저장하지 않은 변경을 버리고 다른 행사를 열까요?')) return;
   editing = event ? structuredClone(event) : { ...structuredClone(DEFAULT_EVENT), id: crypto.randomUUID(), published: false, title: '', school: school.school, logo: school.logo, schedule: '' };
   $('event-title').value = editing.title; $('event-school').value = editing.school; $('event-schedule').value = editing.schedule; $('logo-position').value = editing.logoPosition;
   $('editor-title').textContent = editing.title || '새 행사 만들기'; $('event-editor').hidden = false; dirty = false;
@@ -98,11 +102,11 @@ async function storeEvent(id, event, published) {
 }
 async function saveEditor(publish) { const event = readEditor(); if(publish&&!demo&&['drive','padlet'].includes(event.sharing?.mode))await callCollectionRelay(event.sharing.relayUrl,{action:'verify',eventId:event.id,idToken:await user.getIdToken()}); const saved = await storeEvent(event.id, event, publish || event.published); toast(demo ? '이 탭에 체험 행사를 저장했어요. 클라우드에는 저장되지 않아요.' : saved.published ? '행사를 저장하고 게시했어요.' : '비공개로 저장했어요.'); if (publish && !demo) await showQR(saved); }
 function previewEvent() { return editing ? { ...editing, title: $('event-title').value || '행사 이름', school: $('event-school').value, schedule: $('event-schedule').value, logo: $('event-logo').value, logoPosition: $('logo-position').value } : null; }
-async function updatePreview() { const event = previewEvent(); if (!event) return; for(const key of ['title','school','schedule']){const select=$(`event-${key}-font`);select.value=brandingModel(event)[key].font;select.style.fontFamily=fontFamily(select.value);$(`event-${key}`).style.fontFamily=fontFamily(select.value);} frameEditor?.refresh(); await paintFramePreview($('admin-preview'), event); }
+async function updatePreview() { const event = previewEvent(); if (!event) return; for(const key of ['title','school','schedule']){const select=$(`event-${key}-font`);select.value=brandingModel(event)[key].font;select.style.fontFamily=fontFamily(select.value);$(`event-${key}`).style.fontFamily=fontFamily(select.value);} for(const controls of textStyleControls)controls.refresh();extraTextEditor?.refresh(); frameEditor?.refresh(); await paintFramePreview($('admin-preview'), event); }
 function renderAssets() { libraries?.render(); }
 async function removePrivateAsset(asset) {
   if (events.some(e => usesAsset(e, asset)) || (editing && usesAsset(editing, asset)) || (asset.url && school.logo === asset.url)) return toast('행사나 학교 설정에서 사용 중인 자료예요. 먼저 해제하고 저장해 주세요.');
-  if (!confirm('‘' + asset.name + '’ 자료를 내 보관함에서 삭제할까요?')) return;
+  if (!await confirmAction('‘' + asset.name + '’ 자료를 내 보관함에서 삭제할까요?')) return;
   if (!demo) await cloud.removeAsset(user.uid, asset); assets = assets.filter(a => a.id !== asset.id); persistDemo(); renderAssets(); renderEditorChoices(); renderSchool();
 }
 async function demoImage(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); }); }
@@ -147,7 +151,7 @@ async function refreshQR() {
 }
 
 $('google-login').addEventListener('click', () => run(() => cloud.login())); $('redirect-login').addEventListener('click', () => run(() => cloud.login(true)));
-$('sign-out').addEventListener('click', () => run(async () => { if ((dirty || profileDirty) && !confirm('저장하지 않은 변경이 있어요. 로그아웃할까요?')) return; await cloud.logout(); }));
+$('sign-out').addEventListener('click', () => run(async () => { if ((dirty || profileDirty) && !await confirmAction('저장하지 않은 변경이 있어요. 로그아웃할까요?')) return; await cloud.logout(); }));
 $('events-tab').addEventListener('click', () => switchTab('events')); $('assets-tab').addEventListener('click', () => switchTab('assets')); $('school-tab').addEventListener('click', () => switchTab('school'));
 $('operations-tab').onclick=()=>switchTab('operations');
 $('frames-tab').addEventListener('click', () => switchTab('frames')); $('shared-tab').addEventListener('click', () => switchTab('shared'));
@@ -169,12 +173,19 @@ $('connect-collection').onclick=()=>run(async()=>{
   $('event-padlet-key').value='';$('collection-connection-status').textContent=result.message||'수합 연결을 확인했어요. 게시 후 학생 제출을 받을 수 있어요.';
 });
 
-$('new-event').addEventListener('click', () => openEditor()); $('close-editor').addEventListener('click', () => { if (dirty && !confirm('저장하지 않은 변경을 버릴까요?')) return; dirty = false; editing = null; $('event-editor').hidden = true; });
+$('new-event').addEventListener('click', () => openEditor()); $('close-editor').addEventListener('click', async () => { if (dirty && !await confirmAction('저장하지 않은 변경을 버릴까요?')) return; dirty = false; editing = null; $('event-editor').hidden = true; });
 for (const [id, key] of [['event-title', 'title'], ['event-school', 'school'], ['event-schedule', 'schedule'], ['event-logo', 'logo'], ['logo-position', 'logoPosition']]) $(id).addEventListener('input', e => { dirty = true; if (editing) { editing[key] = e.target.value; if (key === 'logoPosition') { const { hasContent, hasTop, hasBottom, ...model } = brandingModel(editing); for (const part of BRAND_KEYS) model[part].position = e.target.value; editing.branding = model; } } if (key === 'logo') renderLogoPreview('event', e.target.value); updatePreview(); });
 for(const key of ['title','school','schedule']){
   const select=$(`event-${key}-font`);fillFontSelect(select);
   select.addEventListener('change',()=>{if(!editing)return;const id=select.value;run(async()=>{await loadFont(id);if(!editing)return;const {hasContent,hasTop,hasBottom,...model}=brandingModel(editing);model[key]={...model[key],font:id};editing.branding=model;dirty=true;await updatePreview();});});
 }
+for(const [key,label] of [['title','행사명'],['school','학교명'],['schedule','행사 날짜']]){
+ textStyleControls.push(createTextStyleControls($(`event-${key}-style`),{
+  getState:()=>editing?{key,label,text:$(`event-${key}`).value,settings:brandingModel(previewEvent())[key],ink:editing.frames[0]?.ink}:null,
+  onChange:part=>{if(!editing)return;const {hasContent,hasTop,hasBottom,...model}=brandingModel(previewEvent());model[key]={...model[key],...part};editing.branding=model;dirty=true;updatePreview();}
+ }));
+}
+extraTextEditor=createExtraTextEditor($('extra-text-editor'),{getEvent:previewEvent,onChange:branding=>{if(!editing)return;editing.branding=branding;dirty=true;updatePreview();}});
 $('school-name').addEventListener('input', e => { school.school = e.target.value; profileDirty = true; });
 $('school-logo').addEventListener('change', e => { school.logo = e.target.value; profileDirty = true; renderLogoPreview('school', school.logo); });
 for (const target of ['school', 'event']) $(`clear-${target}-logo`).addEventListener('click', () => { if (target === 'school') { school.logo = ''; profileDirty = true; $('school-logo').value = ''; } else if (editing) { editing.logo = ''; dirty = true; $('event-logo').value = ''; updatePreview(); } renderLogoPreview(target, ''); });
@@ -217,7 +228,7 @@ if (demo) {
     try {
       await cloud.recordOperatorUser(current).catch(()=>{});
       const [nextEvents, nextAssets, nextSchool, nextShared] = await Promise.all([cloud.listEvents(current.uid), cloud.listAssets(current.uid), cloud.loadSchool(current.uid), cloud.listSharedAssets(cloud.isSiteAdmin(current))]); if (epoch !== authEpoch) return; events = nextEvents; assets = nextAssets; school = nextSchool; sharedAssets = nextShared; renderEvents(); renderAssets(); renderSchool();
-      try { const restored = JSON.parse(sessionStorage.getItem('moment-admin-editor') || 'null'); sessionStorage.removeItem('moment-admin-editor'); if (restored && (restored.ownerId === current.uid || !restored.ownerId)) { openEditor(restored); dirty = true; } } catch { /* 복구할 편집 내용 없음 */ }
+      try { const restored = JSON.parse(sessionStorage.getItem('moment-admin-editor') || 'null'); sessionStorage.removeItem('moment-admin-editor'); if (restored && (restored.ownerId === current.uid || !restored.ownerId)) { await openEditor(restored); dirty = true; } } catch { /* 복구할 편집 내용 없음 */ }
     } catch (error) { if (epoch === authEpoch) { $('admin-error').textContent = errorMessage(error); $('admin-error').hidden = false; } }
   });
 }

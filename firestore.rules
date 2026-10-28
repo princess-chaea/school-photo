@@ -7,18 +7,23 @@ service cloud.firestore {
     function validPhotoRect(s) { return s is map && s.keys().hasOnly(['x','y','w','h']) && s.x is number && s.y is number && s.w is number && s.h is number && s.x >= 0 && s.y >= 0 && s.w >= 0.025 && s.h >= 0.025 && s.x+s.w <= 1.000001 && s.y+s.h <= 1.000001; }
     function validPhotoSlots(d) { return !('photoSlots' in d) || (d.kind == 'frame' && d.photoSlots is list && d.photoSlots.size() == d.layoutCount && d.photoSlots.size() in [2,4,6,8] && (d.photoSlots.size() <= 0 || validPhotoRect(d.photoSlots[0])) && (d.photoSlots.size() <= 1 || validPhotoRect(d.photoSlots[1])) && (d.photoSlots.size() <= 2 || validPhotoRect(d.photoSlots[2])) && (d.photoSlots.size() <= 3 || validPhotoRect(d.photoSlots[3])) && (d.photoSlots.size() <= 4 || validPhotoRect(d.photoSlots[4])) && (d.photoSlots.size() <= 5 || validPhotoRect(d.photoSlots[5])) && (d.photoSlots.size() <= 6 || validPhotoRect(d.photoSlots[6])) && (d.photoSlots.size() <= 7 || validPhotoRect(d.photoSlots[7]))); }
     function validBrandPart(p, min, max) {
-      return p is map && p.keys().hasAll(['visible','position','x','y','size','color'])
-        && p.keys().hasOnly(['visible','position','x','y','size','color','font'])
-        && (!('font' in p) || p.font in ['baeum','night','round','edge','poster','marker'])
-        && p.visible is bool && p.position in ['top','bottom','free']
-        && p.x is number && p.x >= 0.05 && p.x <= 0.95
-        && p.y is number && p.y >= 0 && p.y <= 1
-        && p.size is number && p.size >= min && p.size <= max
-        && p.color is string && (p.color == '' || p.color.matches('#[0-9a-fA-F]{6}'));
+      return p.keys().hasOnly(['visible','position','x','y','size','color','font','anchor','styledText','letterColors','letterSizes'])
+        && p.visible is bool && p.position.matches('(top|bottom|free)')
+        && p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1
+        && p.size >= min && p.size <= max
+        && p.color.matches('(|#[0-9a-fA-F]{6})')
+        && p.get('font','baeum').matches('(baeum|night|round|edge|poster|marker|keris-[a-z0-9-]{1,100})')
+        && p.get('anchor','').matches('(|top|bottom)')
+        && p.get('styledText','').size() <= 100
+        && p.get('letterColors',[]).size() <= 100
+        && p.get('letterColors',[]).join('|').matches('(#[0-9a-fA-F]{6})?(\\|(#[0-9a-fA-F]{6})?)*')
+        && p.get('letterSizes',[]).size() <= 100;
     }
+    // As with frame/sticker lists, each text box is normalized before rendering.
+    function validExtraTexts(texts) { return texts is list && texts.size() <= 8; }
     function validBranding(b) {
-      return b is map && b.keys().hasAll(['height','captureDate','logo','school','title','schedule'])
-        && b.keys().hasOnly(['height','captureDate','logo','school','title','schedule'])
+      return b is map && b.keys().hasOnly(['height','captureDate','logo','school','title','schedule','texts'])
+        && validExtraTexts(b.get('texts',[]))
         && b.height is number && b.height >= 0.08 && b.height <= 0.60 && b.captureDate is bool
         && validBrandPart(b.logo,0.035,0.35) && validBrandPart(b.school,0.012,0.10)
         && validBrandPart(b.title,0.012,0.10) && validBrandPart(b.schedule,0.012,0.10);
@@ -33,8 +38,7 @@ service cloud.firestore {
         && s.submissionKey is string && s.submissionKey.size() <= 100 && (s.submissionKey == '' || s.submissionKey.matches('[a-zA-Z0-9_-]{20,100}'));
     }
     function validEvent(d) {
-      return d.keys().hasAll(['ownerId', 'published', 'title', 'school', 'schedule', 'logo', 'logoPosition', 'frames', 'stickers', 'updatedAt'])
-        && d.keys().hasOnly(['ownerId', 'published', 'title', 'school', 'schedule', 'logo', 'logoPosition', 'frames', 'stickers', 'updatedAt', 'branding', 'orientation', 'sharing'])
+      return d.keys().hasOnly(['ownerId', 'published', 'title', 'school', 'schedule', 'logo', 'logoPosition', 'frames', 'stickers', 'updatedAt', 'branding', 'orientation', 'sharing'])
         && (!('branding' in d) || validBranding(d.branding))
         && (!('sharing' in d) || validSharing(d.sharing))
         && d.ownerId is string && d.published is bool

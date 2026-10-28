@@ -87,7 +87,8 @@
           </div>
           <div class="tool-group" data-tool="text">
           <label class="field-label" for="text-font">글꼴</label><select id="text-font"></select><label class="field-label" for="decoration-text">한 줄 더, 마음 한 스푼</label>
-          <div class="input-row"><input id="decoration-text" maxlength="24" placeholder="하고 싶은 말 (24자 이내)"><button class="button" id="add-text">추가</button></div>
+          <div class="input-row"><input id="decoration-text" maxlength="100" placeholder="하고 싶은 말 (100자 이내)"><button class="button" id="add-text">추가</button></div>
+          <div id="selected-text-controls" hidden><label class="field-label" for="selected-decoration-text">선택한 문구 수정</label><input id="selected-decoration-text" maxlength="100"><div id="student-text-style" class="text-style-controls"></div></div>
           </div>
           <div class="decoration-edit" id="decoration-edit" hidden><label>색상<input type="color" id="decoration-color" value="#ffffff"></label><output id="rotation-value">0°</output><span class="small muted">이동 · 모서리/두 손가락으로 크기 · 동그라미로 회전</span></div>
           </div>

@@ -124,3 +124,19 @@ test('공용 프레임에도 용도별 제작 규격을 저장한다',async()=>{
 test('행사 텍스트의 학교안심폰트는 저장하고 임의 글꼴 값은 차단한다',async()=>{
  const a=env.authenticatedContext('teacher-a').firestore();const event=normalizeEvent({...DEFAULT_EVENT,title:'폰트 행사',branding:{title:{font:'poster'}}});await assertSucceeds(setDoc(doc(a,'events','font'),{...event,ownerId:'teacher-a',published:false,updatedAt:serverTimestamp()}));event.branding.title.font='untrusted';await assertFails(setDoc(doc(a,'events','bad-font'),{...event,ownerId:'teacher-a',published:false,updatedAt:serverTimestamp()}));
 });
+
+test('확장 글꼴·글자별 색상·자유 배치 저장은 허용하고 잘못된 스타일은 차단한다',async()=>{
+ const {FONTS}=await import('../fonts.js');const a=env.authenticatedContext('teacher-a').firestore();
+ const e=normalizeEvent({...DEFAULT_EVENT,title:'우정',branding:{title:{position:'free',anchor:'top',x:.03,y:.05,font:FONTS.at(-1).id,styledText:'우정',letterColors:['#ff0000','#0000ff']}}});
+ const data={...e,ownerId:'teacher-a',published:true,updatedAt:serverTimestamp()};await assertSucceeds(setDoc(doc(a,'events','letters'),data));
+ const loaded=(await getDoc(doc(a,'events','letters'))).data();assert.deepEqual(loaded.branding.title.letterColors,['#ff0000','#0000ff']);
+ for(const part of [{font:'not-a-font'},{letterColors:['url(evil)']},{letterColors:[1]},{letterColors:Array(101).fill('#ff0000')},{anchor:'outside'},{x:'0.5'},{y:false},{size:'large'},{color:123}]){
+  const bad={...data,branding:{...data.branding,title:{...data.branding.title,...part}}};await assertFails(setDoc(doc(a,'events','bad-style'),bad));
+ }
+});
+test('추가 문구 8개와 글자별 크기 설정을 저장하고 상자 개수를 제한한다',async()=>{
+ const a=env.authenticatedContext('teacher-a').firestore();const texts=Array.from({length:8},(_,i)=>({id:'extra-'+i,text:'추가 문구',letterSizes:[2,1,.5],letterColors:['#ff0000','','#0000ff']}));
+ const e=normalizeEvent({...DEFAULT_EVENT,title:'행사',branding:{texts}}),data={...e,ownerId:'teacher-a',published:true,updatedAt:serverTimestamp()};
+ await assertSucceeds(setDoc(doc(a,'events','extra-texts'),data));
+ await assertFails(setDoc(doc(a,'events','too-many-texts'),{...data,branding:{...data.branding,texts:[...data.branding.texts,data.branding.texts[0]]}}));
+});

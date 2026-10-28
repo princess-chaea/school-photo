@@ -1,3 +1,4 @@
+import {textColorSettings} from './text-colors.js';
 import {STICKER_PRESETS} from './sticker-presets.js';
 import {normalizeFont} from './fonts.js';
 import {frameSize,normalizeFrameFormat} from './frame-sizes.js';
@@ -46,13 +47,24 @@ export function brandingModel(event = DEFAULT_EVENT) {
     const index = textKeys.indexOf(key);
     const defaultY = key === 'logo' ? .5 : index >= 0 ? (index + 1) / (textKeys.length + 1) : .5;
     const defaultX = hasLogo && textKeys.length ? key === 'logo' ? .28 : .60 : .5;
-    model[key] = { visible: item.visible !== false, position: position(key), x: number(item.x, defaultX, .05, .95), y: number(item.y, position(key) === 'free' ? .5 : defaultY, 0, 1), size: number(item.size, BRAND_SIZES[key], key === 'logo' ? .035 : .012, key === 'logo' ? .35 : .10), font:normalizeFont(item.font), color: /^#[0-9a-f]{6}$/i.test(item.color || '') ? item.color : '' };
+    model[key] = { visible: item.visible !== false, position: position(key), x: number(item.x, defaultX, position(key)==='free'?0:.05, position(key)==='free'?1:.95), y: number(item.y, position(key) === 'free' ? .5 : defaultY, 0, 1), size: number(item.size, BRAND_SIZES[key], key === 'logo' ? .035 : .012, key === 'logo' ? .35 : .10), font:normalizeFont(item.font), color: /^#[0-9a-f]{6}$/i.test(item.color || '') ? item.color : '', anchor:position(key)==='free'&&['top','bottom'].includes(item.anchor)?item.anchor:'', ...(key==='logo'?{}:textColorSettings(contents[key]||'',item)) };
   }
-  model.hasContent = visible.length > 0;
-  model.hasTop = visible.some(key => position(key) === 'top');
-  model.hasBottom = visible.some(key => position(key) === 'bottom');
+  model.texts=(Array.isArray(raw.texts)?raw.texts:[]).slice(0,8).map((item,index)=>{
+    const text=typeof item?.text==='string'?item.text.slice(0,100):'',position=['top','bottom','free'].includes(item?.position)?item.position:'free';
+    return {id:/^extra-[a-zA-Z0-9-]{1,80}$/.test(item?.id||'')?item.id:`extra-${index+1}`,text,visible:item?.visible!==false,position,anchor:position==='free'&&['top','bottom'].includes(item?.anchor)?item.anchor:'',x:number(item?.x,.5,0,1),y:number(item?.y,.65,0,1),size:number(item?.size,.027,.012,.1),font:normalizeFont(item?.font),color:/^#[0-9a-f]{6}$/i.test(item?.color||'')?item.color:'',...textColorSettings(text,item||{})};
+  }).filter((item,index,all)=>all.findIndex(other=>other.id===item.id)===index);
+  model.hasContent = visible.length > 0 || model.texts.some(t=>t.visible&&t.text);
+  model.hasTop = visible.some(key => position(key) === 'top' || model[key].anchor === 'top') || model.texts.some(t=>t.visible&&t.text&&(t.position==='top'||t.anchor==='top'));
+  model.hasBottom = visible.some(key => position(key) === 'bottom' || model[key].anchor === 'bottom') || model.texts.some(t=>t.visible&&t.text&&(t.position==='bottom'||t.anchor==='bottom'));
   return model;
 }
+export function brandEntries(event=DEFAULT_EVENT){
+ event=event||DEFAULT_EVENT;
+ const model=brandingModel(event);
+ return [...BRAND_KEYS.map(key=>({key,label:BRAND_LABELS[key],content:key==='title'&&event.title===DEFAULT_EVENT.title&&!event.branding?'':event[key],settings:model[key]})),...model.texts.map((item,i)=>({key:item.id,label:`추가 문구 ${i+1}`,content:item.text,settings:item}))];
+}
+export function brandPart(event,key){return brandEntries(event).find(item=>item.key===key);}
+export function changeBrandPart(event,key,part){const {hasContent,hasTop,hasBottom,...model}=brandingModel(event);if(BRAND_KEYS.includes(key))model[key]={...model[key],...part};else model.texts=model.texts.map(item=>item.id===key?{...item,...part}:item);return model;}
 export function normalizeSlots(slots, count) {
   if (!Array.isArray(slots) || slots.length !== count) return null;
   if (!slots.every(s => s && ['x','y','w','h'].every(k => Number.isFinite(s[k])) && s.x >= 0 && s.y >= 0 && s.w >= .025 && s.h >= .025 && s.x + s.w <= 1.000001 && s.y + s.h <= 1.000001)) return null;

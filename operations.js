@@ -1,3 +1,4 @@
+import {confirmAction} from './app-dialog.js';
 export function createOperations({cloud,getUser,run,toast}){
  const $=id=>document.getElementById(id);let users=[],events=[],epoch=0;
  const pages={users:{cursor:null,more:false},events:{cursor:null,more:false}};
@@ -10,7 +11,7 @@ export function createOperations({cloud,getUser,run,toast}){
    for(const item of items.filter(i=>[i.displayName,i.email,i.title,i.school,i.ownerId,i.id].join(' ').toLowerCase().includes(term))){
     const row=el('article','');row.className='operations-row';row.append(el('strong',kind==='users'?(item.displayName||'이름 없음'):item.title),el('p',kind==='users'?item.email:[item.school,item.published?'게시 중':'비공개','소유자 '+item.ownerId].filter(Boolean).join(' · ')));
     const button=el('button',kind==='users'?(item.publishingBlocked?'게시 제한 해제':'새 게시 제한'):'게시 중지');button.className='button';button.disabled=kind==='events'&&!item.published||kind==='users'&&item.id===getUser().uid;
-    button.onclick=()=>run(async()=>{if(!confirm(kind==='users'?'이 사용자의 새 행사 게시 권한을 변경할까요? 기존 게시물은 개별적으로 관리합니다.':'이 활동을 비공개로 전환할까요? 행사 QR의 신규 접속이 중단됩니다.'))return;if(kind==='users'){await cloud.setPublishingBlocked(item.id,!item.publishingBlocked);item.publishingBlocked=!item.publishingBlocked;}else{await cloud.moderateEvent(item.id);item.published=false;}render();toast('반영했어요.');});row.append(button);list.append(row);
+    button.onclick=()=>run(async()=>{if(!await confirmAction(kind==='users'?'이 사용자의 새 행사 게시 권한을 변경할까요? 기존 게시물은 개별적으로 관리합니다.':'이 활동을 비공개로 전환할까요? 행사 QR의 신규 접속이 중단됩니다.'))return;if(kind==='users'){await cloud.setPublishingBlocked(item.id,!item.publishingBlocked);item.publishingBlocked=!item.publishingBlocked;}else{await cloud.moderateEvent(item.id);item.published=false;}render();toast('반영했어요.');});row.append(button);list.append(row);
    }
    if(!list.children.length)list.append(el('p','표시할 항목이 없습니다.'));
    if(pages[kind].more){const more=el('button','다음 100개 불러오기');more.className='button';more.onclick=()=>run(()=>load(kind,epoch));list.append(more);}
