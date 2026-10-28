@@ -12,9 +12,9 @@ import { icon, labelButton } from './icons.js';
 
 const $ = id => document.getElementById(id);
 const canvas = $('preview'), ctx = canvas.getContext('2d');
-const titles = ['어디에 사용할 사진인가요?', '오늘의 무드를 골라요.', '준비됐나요? 하나, 둘, 셋.', '우리답게, 조금 더 특별하게.', '이 순간을 간직해요.'];
-const descriptions = ['용도를 먼저 고르고 담을 컷 수를 선택하세요.', '사진을 감싸 줄 색과 한마디를 골라주세요.', '사진을 찍거나 기기에 있는 사진을 골라주세요.', '사진 위에 스티커와 문구를 자유롭게 놓아보세요.', '완성 이미지는 내 기기에만 저장돼요.'];
-const nextLabels = ['촬영 시작', '촬영 시작', '꾸미러 가기', '이미지 저장'];
+const titles = ['어디에 사용할 사진인가요?', '어떤 프레임에 담을까요?', '준비됐나요? 하나, 둘, 셋.', '우리답게, 조금 더 특별하게.', '이 순간을 간직해요.'];
+const descriptions = ['사진을 사용할 용도를 선택한 뒤 다음으로 넘어가세요.', '컷 수와 방향, 프레임 디자인을 선택하세요.', '사진을 찍거나 기기에 있는 사진을 골라주세요.', '사진 위에 스티커와 문구를 자유롭게 놓아보세요.', '완성 이미지는 내 기기에만 저장돼요.'];
+const nextLabels = ['프레임 선택으로', '촬영 시작', '꾸미기로', '저장·공유로'];
 let state = { step: 0, count: 4, frame: 0, orientation: 'portrait', photos: Array(4).fill(null), selectedPhoto: 0, selectedDeco: null, filter: 'original', decorations: [], event: structuredClone(DEFAULT_EVENT) };
 let stream = null, facing = 'user', busy = false, starting = false, cameraEpoch = 0, captureEpoch = 0, toastTimeout, downloadURL;
 let photoDate = new Date(), assetImages = new Map(), failedAssets = new Set();
@@ -73,6 +73,7 @@ function renderChoices() {
     button.append(sample, label); $('frame-options').append(button);
   });
   $('frame-name').textContent = state.event.frames[state.frame].name;
+  $('chosen-purpose').textContent = '선택한 용도: '+$('export-format').selectedOptions[0].textContent;
   renderFilterChoices();
   $('sticker-options').replaceChildren();
   [...STICKER_PRESETS,...state.event.stickers.filter(s=>!STICKER_PRESETS.some(p=>p.id===s.id))].forEach(sticker => {
@@ -100,7 +101,7 @@ function renderFilterChoices(){
 }
 function canEditDecoration(d){return d&&(editDialog.dataset.tool==='text'?d.type==='text':editDialog.dataset.tool==='stickers'&&d.type!=='text');}
 function go(step) {
-  if (busy) return; if(step===1)step=2;
+  if (busy) return;
   if (step >= 3 && !state.photos.every(Boolean)) { toast('모든 칸에 사진을 채워 주세요.'); return; }
   if (state.step === 2 && step !== 2) stopCamera();
   state.step = step; state.selectedDeco = null; pointers.clear(); gesture = null;
@@ -112,10 +113,10 @@ function go(step) {
 function renderSteps() {
   document.body.dataset.step = String(state.step);
   $('step-list').replaceChildren();
-  [0,2,3,4].forEach((step,index)=>{const li=document.createElement('li');li.className=step===state.step?'active':step<state.step?'done':'';if(step===state.step)li.setAttribute('aria-current','step');const n=document.createElement('span');n.className='step-number';n.textContent=step<state.step?'✓':String(index+1).padStart(2,'0');const label=document.createElement('span');label.className='step-label';label.textContent=['용도·프레임','촬영','꾸미기','저장·공유'][index];li.append(n,label);$('step-list').append(li);});
+  [0,1,2,3,4].forEach((step,index)=>{const li=document.createElement('li');li.className=step===state.step?'active':step<state.step?'done':'';if(step===state.step)li.setAttribute('aria-current','step');const n=document.createElement('span');n.className='step-number';n.textContent=step<state.step?'✓':String(index+1).padStart(2,'0');const label=document.createElement('span');label.className='step-label';label.textContent=['용도','프레임','촬영','꾸미기','저장·공유'][index];li.append(n,label);$('step-list').append(li);});
   document.querySelectorAll('.step-content').forEach(el => el.hidden = Number(el.dataset.step) !== state.step);
-  $('step-title').textContent = titles[state.step]; $('step-kicker').textContent = `STEP ${String([0,2,3,4].indexOf(state.step)+1).padStart(2, '0')} / ${['LAYOUT', 'FRAME', 'CAPTURE', 'DECORATE', 'KEEP'][state.step]}`;
-  $('step-description').textContent = descriptions[state.step]; $('step-counter').textContent = `${[0,2,3,4].indexOf(state.step)+1} / 4`;
+  $('step-title').textContent = titles[state.step]; $('step-kicker').textContent = `STEP ${String([0,1,2,3,4].indexOf(state.step)+1).padStart(2, '0')} / ${['LAYOUT', 'FRAME', 'CAPTURE', 'DECORATE', 'KEEP'][state.step]}`;
+  $('step-description').textContent = descriptions[state.step]; $('step-counter').textContent = `${[0,1,2,3,4].indexOf(state.step)+1} / 5`;
   $('back').hidden = state.step === 0;labelButton($('back'),'back',state.step===4?'꾸미기로 돌아가기':state.step===3?'사진 다시 찍기':'이전'); $('next').hidden = state.step===4;$('restart-corner').hidden=state.step!==4;
   $('expand-preview').hidden = state.step !== 3 && state.step !== 4;
   $('change-layout').hidden = state.step !== 3;
@@ -408,7 +409,7 @@ async function bootEvent() {
   renderCollection();renderChoices(); renderSteps(); render(); assetReady = loadAssets();
 }
 
-$('next').addEventListener('click', () => go(state.step===3?4:state.step===2?3:2)); $('back').addEventListener('click', () => go(state.step===4?3:state.step===3?2:0));
+$('next').addEventListener('click', () => go(state.step+1)); $('back').addEventListener('click', () => go(state.step-1));
 $('caption').addEventListener('input', () => render()); $('show-date').addEventListener('change', () => render());
 $('camera-start').addEventListener('click', startCamera); $('camera-flip').addEventListener('click', () => { facing = facing === 'user' ? 'environment' : 'user'; startCamera(); });
 $('capture').setAttribute('aria-label','남은 컷 연속 촬영');$('capture').addEventListener('click', () => capture(true)); $('auto-capture').addEventListener('click', () => capture(true));
@@ -448,7 +449,7 @@ canvas.addEventListener('clear-selection',()=>{state.selectedDeco=null;updateAdj
 canvas.addEventListener('pointerdown', pointerDown); canvas.addEventListener('pointermove', pointerMove); for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(event, pointerEnd);
 
 $('expand-preview').addEventListener('click', () => {if(state.step===4)go(3);openEditorTool();});
-$('change-layout').addEventListener('click', () => go(0));
+$('change-layout').addEventListener('click', () => go(1));
 document.querySelectorAll('[data-open-tool]').forEach(b => b.addEventListener('click', () => openEditorTool(b.dataset.openTool)));
 document.querySelectorAll('[data-editor-tool]').forEach(b => b.addEventListener('click', () => selectEditorTool(b.dataset.editorTool)));
 $('close-edit').addEventListener('click', closeEditor);

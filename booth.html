@@ -32,20 +32,20 @@
 
         <div class="step-content" data-step="0">
           <div class="export-format-field"><label class="field-label" for="export-format">어디에 사용할까요?</label><select id="export-format" aria-label="저장 용도" hidden></select><button type="button" id="choose-export-format" aria-describedby="export-format-note" aria-haspopup="dialog"></button><p class="small muted" id="export-format-note">선택한 용도에 맞춰 처음부터 사진을 크게 배치해요.</p></div>
-          <div class="cut-grid" id="cut-options"></div>
-          <div class="layout-space-card"><canvas id="layout-space-preview" width="240" height="180" aria-label="선택한 규격의 실제 사진 영역"></canvas><div><strong>이만큼 사진이 들어가요</strong><p id="layout-space-summary" aria-live="polite"></p><p class="small muted">숫자가 표시된 칸이 실제 사진 공간이에요.</p></div></div>
-          <div class="orientation-options" id="orientation-options" aria-label="프레임 방향"></div>
-          <div class="note-card"><span class="note-icon">▧</span><div><strong>용도를 고르고 사진을 크게 담아요.</strong><p>직접 만든 이미지 프레임은 디자인 보존을 위해 원래 비율로 맞춰요.</p></div></div>
-          <details class="optional-frame"><summary>프레임·한마디 바꾸기 (선택)</summary>          <p class="field-label">프레임 컬러 <span id="frame-name"></span></p>
-          <div class="frame-grid" id="frame-options"></div>
-          <label class="field-label" for="caption-font">한마디 글꼴</label><select id="caption-font"></select><label class="field-label" for="caption">아래에 남길 한마디</label>
-          <input id="caption" maxlength="32" placeholder="원할 때만 한마디를 남겨요 (32자 이내)">
-          <label class="switch-row"><span>오늘 날짜 넣기</span><input id="show-date" type="checkbox" checked></label></details>
           <div class="detail-line"><span>로그인 없이 바로 시작</span><span>제출은 내가 선택</span></div>
         </div>
 
         <div class="step-content" data-step="1" hidden>
-
+          <p class="small muted" id="chosen-purpose"></p>
+          <div class="cut-grid" id="cut-options"></div>
+          <div class="layout-space-card"><canvas id="layout-space-preview" width="240" height="180" aria-label="선택한 규격의 실제 사진 영역"></canvas><div><strong>이만큼 사진이 들어가요</strong><p id="layout-space-summary" aria-live="polite"></p><p class="small muted">숫자가 표시된 칸이 실제 사진 공간이에요.</p></div></div>
+          <div class="orientation-options" id="orientation-options" aria-label="프레임 방향"></div>
+          <div class="note-card"><span class="note-icon">▧</span><div><strong>사진 공간을 확인하고 프레임을 골라요.</strong><p>직접 만든 이미지 프레임은 디자인 보존을 위해 원래 비율로 맞춰요.</p></div></div>
+          <p class="field-label">프레임 디자인 <span id="frame-name"></span></p>
+          <div class="frame-grid" id="frame-options"></div>
+          <details class="optional-frame"><summary>한마디 추가 (선택)</summary><label class="field-label" for="caption-font">한마디 글꼴</label><select id="caption-font"></select><label class="field-label" for="caption">아래에 남길 한마디</label>
+          <input id="caption" maxlength="32" placeholder="원할 때만 한마디를 남겨요 (32자 이내)">
+          <label class="switch-row"><span>오늘 날짜 넣기</span><input id="show-date" type="checkbox" checked></label></details>
         </div>
 
         <div class="step-content" data-step="2" hidden>
