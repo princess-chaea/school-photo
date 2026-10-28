@@ -2,17 +2,21 @@
 
 학교 행사에서 QR로 참여하는 모바일 포토부스입니다. 공식 첫 화면은 운영자 Google 로그인입니다. 참가자는 행사 QR로 촬영 화면에 바로 접속하며, 참가자 화면에는 운영자 링크가 없습니다.
 
+다른 컴퓨터에서 이어 작업하려면 [이어서 작업하기 안내](docs/HANDOFF.md)를 먼저 확인하세요.
+
 ## 실행
 
 Node.js 22.12 이상 또는 24 LTS를 사용하세요.
 
 ```sh
+git clone https://github.com/princess-chaea/school-photo.git
+cd school-photo
 npm ci
-cp .env.example .env.local
+npm run setup
 npm run dev
 ```
 
-PowerShell에서는 `Copy-Item .env.example .env.local`을 사용합니다. `.env.local`에 Firebase 웹 앱 설정을 입력하면 Google 로그인과 내 계정 보관함이 활성화됩니다. 설정이 없을 때는 체험 모드이며 클라우드 저장·게시·QR 발급은 활성화되지 않습니다.
+자동 설정이 안 되면 `.env.example`을 `.env.local`로 복사합니다. PowerShell에서는 `Copy-Item .env.example .env.local`을 사용합니다. `.env.local`에 Firebase 웹 앱 설정을 입력하면 Google 로그인과 내 계정 보관함이 활성화됩니다. 설정이 없을 때는 체험 모드이며 클라우드 저장·게시·QR 발급은 활성화되지 않습니다.
 
 ## 운영 흐름
 
@@ -55,9 +59,9 @@ gcloud storage buckets update gs://teacher-student-photo.firebasestorage.app --c
 
 ```sh
 npm run build
-npx firebase login
-npx firebase use teacher-student-photo
-npx firebase deploy --only hosting,firestore,storage
+npx --yes --package firebase-tools firebase login
+npx --yes --package firebase-tools firebase use teacher-student-photo
+npx --yes --package firebase-tools firebase deploy --only hosting,firestore,storage
 ```
 
 공식 주소: https://teacher-student-photo.web.app/ . QR은 `/booth.html?event=...`로 생성됩니다. 로컬 주소로 만든 QR은 휴대폰에서 사용할 운영 QR이 아닙니다. 현재 Firestore는 서울, 디자인 Storage는 기본 무료 위치인 US-EAST1에 구성했습니다. 참가자 사진은 어느 리전에도 업로드하지 않습니다.
@@ -98,7 +102,7 @@ npm run build
 Firebase 규칙 통합 테스트는 Java 21 및 Firebase CLI가 필요합니다. 테스트는 실제 프로젝트를 사용하지 않습니다.
 
 ```sh
-npx firebase emulators:exec --project demo-school-photo --only firestore,storage "node --test tests/security.rules.test.mjs"
+npx --yes --package firebase-tools firebase emulators:exec --project demo-school-photo --only firestore,storage "node --test tests/security.rules.test.mjs"
 ```
 
 기본 테스트는 2·4·6·8컷 배치/경계, 사진 크롭 경계, QR 참가자 경로, 외부 행사 URL 정제를 검사합니다. 규칙 테스트는 소유자 격리, 공개 행사 단건 읽기, 비공개 읽기 차단, 학교 설정 격리, 참가자 쓰기 차단, 디자인 업로드 형식·용량을 검사합니다.
