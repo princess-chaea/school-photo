@@ -1,3 +1,5 @@
+import {renderFrameGroups} from './frame-groups.js';
+import './frame-groups.css';
 import {createStickerSelector} from './sticker-selector.js';
 import {createExtraTextEditor} from './extra-text-editor.js';
 import {createTextStyleControls} from './text-style-controls.js';
@@ -37,7 +39,7 @@ function button(text, action, className = 'text-button') { const el = document.c
 function text(tag, content, className = '') { const el = document.createElement(tag); el.textContent = content; el.className = className; return el; }
 function persistDemo() { if (!demo) return; try { sessionStorage.setItem('moment-admin-demo', JSON.stringify({ events, assets, school })); } catch { toast('탭 임시 저장 용량이 부족해요. 작은 이미지를 사용해 주세요.'); } }
 function switchTab(tab) { document.body.dataset.adminTab=tab; if (['shared','operations'].includes(tab) && !cloud.isSiteAdmin(user)) return; for (const id of ['events', 'frames', 'assets', 'school', 'shared','operations']) { $(`${id}-view`).hidden = id !== tab; $(`${id}-tab`).classList.toggle('selected', id === tab); $(`${id}-tab`).setAttribute('aria-selected', String(id === tab)); } if (tab === 'school') renderSchool();if(tab==='operations')operations.refresh(); }
-function framesAvailable() { return [...DEFAULT_FRAMES, ...[...assets.filter(a => ['frame','palette'].includes(a.kind)), ...sharedAssets.filter(a => a.active && a.kind === 'frame')].map(a => ({ id: a.shared ? `shared-${a.id}` : a.id, name: a.name, bg: a.bg || '#fffdf6', ink: a.ink || '#34372f', layoutCount: a.layoutCount || 0, orientation: a.orientation || 'portrait',frameFormat:a.frameFormat||'print-4x6', ...(a.preserveAspect ? {preserveAspect:true,clearPhotoSlots:a.clearPhotoSlots===true} : {}), ...(a.photoSlots ? {photoSlots:a.photoSlots} : {}), shared: Boolean(a.shared), ...(a.url ? { overlay: a.url } : {}) }))]; }
+function framesAvailable() { return [...DEFAULT_FRAMES, ...[...assets.filter(a => ['frame','palette'].includes(a.kind)), ...sharedAssets.filter(a => a.active && a.kind === 'frame')].map(a => ({ id: a.shared ? `shared-${a.id}` : a.id, name: a.name, bg: a.bg || '#fffdf6', ink: a.ink || '#34372f', layoutCount: a.layoutCount || 0, orientation: a.orientation || 'portrait',frameFormat:a.frameFormat||'print-4x6',source:a.shared?'theme':'personal', ...(a.preserveAspect ? {preserveAspect:true,clearPhotoSlots:a.clearPhotoSlots===true} : {}), ...(a.photoSlots ? {photoSlots:a.photoSlots} : {}), shared: Boolean(a.shared), ...(a.url ? { overlay: a.url } : {}) }))]; }
 function stickersAvailable() { return [...DEFAULT_STICKERS, ...[...assets.filter(a => a.kind === 'sticker'), ...sharedAssets.filter(a => a.active && a.kind === 'sticker')].map(a => ({ id: a.shared ? `shared-${a.id}` : a.id, name: a.name, url: a.url, shared: Boolean(a.shared) }))]; }
 function usesAsset(event, asset) { return (asset.url && (event.logo === asset.url || event.frames.some(f => f.overlay === asset.url) || event.stickers.some(s => s.url === asset.url))) || event.frames.some(f => f.id === asset.id); }
 function renderEvents() {
@@ -69,23 +71,19 @@ function renderEditorChoices() {
   if (editing.logo && !assets.some(a => a.url === editing.logo)) $('event-logo').append(Object.assign(document.createElement('option'), { value: editing.logo, textContent: '기존 행사 로고' }));
   $('event-logo').value = editing.logo || '';
   renderLogoPreview('event', editing.logo);
-  for (const [kind, available] of [['frames', framesAvailable()]]) {
-    // 기존 행사에 연결된 디자인도 보존합니다.
-    const all = [...available, ...editing[kind].filter(a => !available.some(b => b.id === a.id))];
-    $(`event-${kind}`).replaceChildren();
-    all.forEach(design => {
-      const selected = editing[kind].some(d => d.id === design.id);
-      const b = button('', () => {
-        if (selected) { if (kind === 'frames' && editing.frames.length === 1) return toast('프레임은 하나 이상 선택해 주세요.'); editing[kind] = editing[kind].filter(d => d.id !== design.id); }
-        else { if (editing[kind].length >= (kind === 'frames' ? 32 : 256)) return toast('선택 가능한 디자인 개수에 도달했어요.'); editing[kind].push(design); }
-        dirty = true; renderEditorChoices(); updatePreview();
-      }, `design-choice ${selected ? 'selected' : ''}`);
-      b.setAttribute('aria-pressed', String(selected)); b.setAttribute('aria-label', `${design.name} ${selected ? '선택 해제' : '선택'}`);
-      if (design.url || design.overlay) { const img = new Image(); img.src = design.url || design.overlay; img.alt = ''; b.append(img); }
-      else if (design.bg) { const swatch = text('span', '', 'swatch'); swatch.style.background = design.bg; b.append(swatch); }
-      b.append(text('span', design.text || (kind === 'frames' ? `${design.name}${design.layoutCount ? ` · ${design.layoutCount}컷` : ''}` : ''))); if (design.shared) b.classList.add('shared-choice'); if (design.url) b.title = `${design.shared ? '공용 · ' : ''}${design.name}`; $(`event-${kind}`).append(b);
-    });
-  }
+  const availableFrames=framesAvailable(),allFrames=[...availableFrames,...editing.frames.filter(f=>!availableFrames.some(a=>a.id===f.id))];
+  renderFrameGroups($('event-frames'),allFrames,{renderCard:design=>{
+    const selected=editing.frames.some(f=>f.id===design.id);
+    const card=button('',()=>{
+      if(selected){if(editing.frames.length===1)return toast('프레임은 하나 이상 선택해 주세요.');editing.frames=editing.frames.filter(f=>f.id!==design.id);}
+      else{if(editing.frames.length>=32)return toast('프레임은 최대 32개까지 선택할 수 있어요.');editing.frames.push(design);}
+      dirty=true;renderEditorChoices();updatePreview();
+    },`design-choice ${selected?'selected':''}`);
+    card.setAttribute('aria-pressed',String(selected));card.setAttribute('aria-label',design.name+(selected?' 선택 해제':' 선택'));
+    if(design.overlay){const image=new Image();image.src=design.overlay;image.alt='';card.append(image);}
+    else{const swatch=text('span','','swatch');swatch.style.background=design.bg;card.append(swatch);}
+    card.append(text('span',design.name+(design.layoutCount?' · '+design.layoutCount+'컷':'')));return card;
+  }});
   const availableStickers=stickersAvailable();stickerSelector.render([...availableStickers,...editing.stickers.filter(s=>!availableStickers.some(a=>a.id===s.id))],editing.stickers);
   $('publication-state').textContent = editing.published ? '● 게시 중 · 저장하면 기존 QR에도 반영됩니다' : '○ 비공개 · 게시 후 QR을 발급할 수 있어요';
   $('save-draft').textContent = editing.published ? '저장 (게시 유지)' : '임시 저장';

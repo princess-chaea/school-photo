@@ -1,3 +1,5 @@
+import {renderFrameGroups} from './frame-groups.js';
+import './frame-groups.css';
 import {drawFrameOverlay} from './frame-overlay.js';
 import {createUsageTracker} from './usage-data.js';
 import {createTextStyleControls} from './text-style-controls.js';
@@ -70,17 +72,16 @@ function renderChoices() {
     $('cut-options').append(button);
   }
   $('orientation-options').replaceChildren(...[['portrait','세로 구성'],['landscape','가로 구성']].map(([value,label]) => { const b = createButton(state.orientation === value ? 'selected' : '',label,()=>{state.orientation=value;state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}});renderChoices();renderThumbnails();render();});b.setAttribute('aria-pressed',String(state.orientation===value));b.disabled=!state.event.frames.some(f=>!f.layoutCount||(f.orientation||'portrait')===value);return b; }));
-  $('frame-options').replaceChildren();
-  state.event.frames.forEach((frame, index) => {
-    if (!compatibleFrame(frame, state.count, state.orientation)) return;
-    const button = createButton(`frame-option ${state.frame === index ? 'selected' : ''}`, '', () => { state.frame = index; renderChoices(); render(); });
-    button.setAttribute('aria-pressed', String(state.frame === index));
-    const sample = document.createElement('span'); sample.className = 'color-sample frame-layout-sample'; sample.style.background = frame.bg;
-    const guide=document.createElement('canvas');guide.width=160;guide.height=120;drawLayoutGuide(guide,spaceGeometryFor(EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{},state.count,frame),{background:frame.bg,ink:frame.ink});sample.append(guide);
-    if (frame.overlay) { const image = new Image(); image.src = frame.overlay; image.alt = ''; sample.append(image); }
-    const label = document.createElement('span'); label.textContent = frame.name;
-    button.append(sample, label); $('frame-options').append(button);
-  });
+  renderFrameGroups($('frame-options'),state.event.frames,{student:true,filter:frame=>compatibleFrame(frame,state.count,state.orientation),renderCard:(frame,index,group)=>{
+    const button=createButton(`frame-option ${state.frame===index?'selected':''}`,'',()=>{state.frame=index;renderChoices();render();});button.setAttribute('aria-pressed',String(state.frame===index));button.setAttribute('aria-label',frame.name+' 프레임 선택');
+    if(group==='base'){const dot=document.createElement('span');dot.className='palette-dot';dot.style.background=frame.bg;button.append(dot);}
+    else{
+      const sample=document.createElement('span');sample.className='color-sample frame-layout-sample';sample.style.background=frame.bg;
+      const guide=document.createElement('canvas');guide.width=160;guide.height=120;drawLayoutGuide(guide,spaceGeometryFor(EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{},state.count,frame),{background:frame.bg,ink:frame.ink});sample.append(guide);
+      if(frame.overlay){const image=new Image();image.src=frame.overlay;image.alt='';sample.append(image);}button.append(sample);
+    }
+    const label=document.createElement('span');label.textContent=frame.name;button.append(label);return button;
+  }});
   $('frame-name').textContent = state.event.frames[state.frame].name;
   $('chosen-purpose').textContent = $('export-format').selectedOptions[0].textContent+' · '+state.count+'컷 · '+(state.orientation==='landscape'?'가로 배치':'세로 배치');
   renderFilterChoices();

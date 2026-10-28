@@ -1,18 +1,11 @@
+import {FRAME_PALETTES} from './frame-palettes.js';
+import {frameSource} from './frame-groups.js';
 import {textColorSettings} from './text-colors.js';
 import {STICKER_PRESETS} from './sticker-presets.js';
 import {normalizeFont} from './fonts.js';
 import {frameSize,normalizeFrameFormat} from './frame-sizes.js';
 import { normalizeSharing } from './sharing.js';
-export const DEFAULT_FRAMES = [
-  { id: 'ivory', name: '밀크 아이보리', bg: '#fffdf6', ink: '#34372f' },
-  { id: 'black', name: '클래식 블랙', bg: '#242622', ink: '#fffdf6' },
-  { id: 'sage', name: '소프트 세이지', bg: '#cbd7bf', ink: '#3e5134' },
-  { id: 'pink', name: '피치 핑크', bg: '#f5d5d2', ink: '#79524d' },
-  { id: 'blue', name: '클라우드 블루', bg: '#d5e3ed', ink: '#3e5969' },
-  { id: 'butter', name: '버터 옐로', bg: '#f5e7a9', ink: '#706130' },
-  { id: 'lilac', name: '라일락', bg: '#e0d8ee', ink: '#635075' },
-  { id: 'lime', name: '프레시 라임', bg: '#c5f564', ink: '#354822' },
-];
+export const DEFAULT_FRAMES = FRAME_PALETTES;
 export const DEFAULT_STICKERS = [
   ...[['camera', '찰칵 카메라'], ['friendship', '선생님과 우리'], ['school', '우리 학교'], ['flower', '웃음꽃']].map(([id, name]) => ({ id: `image-${id}`, name, category: '마스코트', url: `/stickers/${id}.webp` })),
   ...STICKER_PRESETS,
@@ -111,7 +104,7 @@ export function normalizeEvent(value) {
   const text = (v, max) => typeof v === 'string' ? v.slice(0, max) : '';
   const color = (v, fallback) => /^#[0-9a-f]{6}$/i.test(v || '') ? v : fallback;
   const safeURL = v => typeof v === 'string' && (/^https:\/\//.test(v) || /^data:image\/(png|jpeg|webp);base64,/.test(v) || /^\/stickers\/[a-z-]+\.(?:webp|svg)$/.test(v)) ? v : '';
-  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', frameFormat:normalizeFrameFormat(f.frameFormat), ...(f.preserveAspect === true ? {preserveAspect:true,clearPhotoSlots:f.clearPhotoSlots === true} : {}), ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
+  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), source:frameSource(f), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', frameFormat:normalizeFrameFormat(f.frameFormat), ...(f.preserveAspect === true ? {preserveAspect:true,clearPhotoSlots:f.clearPhotoSlots === true} : {}), ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
   const stickers = Array.isArray(value.stickers) ? value.stickers.slice(0, 256).map((s, i) => ({ id: text(s.id, 100) || `sticker-${i}`, name: text(s.name, 40), category: text(s.category,16), text: text(s.text, 8), url: safeURL(s.url) })).filter(s => s.url) : [];
   const event = { title: text(value.title, 80) || DEFAULT_EVENT.title, school: text(value.school, 60), schedule: text(value.schedule, 100), logo: safeURL(value.logo), logoPosition: value.logoPosition === 'bottom' ? 'bottom' : 'top', orientation: value.orientation === 'landscape' ? 'landscape' : 'portrait', frames: frames.length ? frames : DEFAULT_FRAMES, stickers };
   const { hasContent, hasTop, hasBottom, ...branding } = brandingModel({ ...event, branding: value.branding });
