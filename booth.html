@@ -46,7 +46,9 @@
         </div>
 
         <div class="step-content" data-step="2" hidden>
-          <div class="camera-shell" id="camera-shell">
+          <div class="capture-methods" aria-label="촬영 방법"><button type="button" id="native-mode" aria-pressed="true">기본 카메라</button><button type="button" id="web-mode" aria-pressed="false">웹 카메라</button></div>
+<div id="native-capture-area" class="native-capture-area"><span class="native-camera-symbol" aria-hidden="true">◎</span><strong>카메라 앱으로 크게 찍어요</strong><p>촬영 후 ‘사진 사용’을 누르면<br>선택한 칸에 바로 등록돼요.</p><label class="native-facing-label">카메라<select id="native-facing"><option value="user">전면 · 셀카</option><option value="environment">후면 · 친구 촬영</option></select></label><button type="button" class="button lime" id="native-capture">기본 카메라로 촬영</button><input type="file" id="native-photo" accept="image/*" capture="user" hidden><span id="native-capture-status" role="status">1번 컷 촬영 준비</span><p class="native-camera-note">기기에 따라 카메라 선택창이 먼저 표시될 수 있어요.</p></div>
+<div id="web-capture-area" hidden><div class="camera-shell" id="camera-shell">
             <video id="video" autoplay playsinline muted aria-label="카메라 미리보기"></video>
             <div class="camera-placeholder" id="camera-placeholder"><span class="camera-symbol">◎</span><strong>여기가 오늘의 작은 스튜디오</strong><p>카메라를 켜고 가장 나다운 표정을 지어봐요.</p><button class="button lime" id="camera-start">카메라 켜기</button></div>
             <span class="camera-live" id="camera-live" hidden>● LIVE</span>
@@ -56,7 +58,7 @@
           <div class="camera-settings"><label>타이머 <select id="timer"><option value="3">3초</option><option value="5">5초</option><option value="0">바로 촬영</option></select></label><button class="text-button" id="camera-flip">↺ 카메라 전환</button></div>
           <div class="capture-row"><span id="capture-progress">0 / 4</span><button class="shutter" id="capture" disabled aria-label="사진 한 장 촬영"><span></span></button><button class="text-button" id="auto-capture" disabled>연속 촬영</button></div>
           <button class="button cancel-button" id="cancel-capture" hidden>촬영 취소</button>
-          <div class="divider"><span>또는</span></div>
+          </div><div class="divider"><span>또는</span></div>
           <label class="button upload-button">내 사진으로 채우기<input type="file" id="photo-upload" accept="image/*" multiple hidden></label>
           <p class="small muted">선택한 칸부터 채워져요. 아래 썸네일을 눌러 재촬영할 수 있어요.</p>
           <div class="thumbnails" id="thumbnails"></div>

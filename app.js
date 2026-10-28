@@ -105,7 +105,8 @@ function renderSteps() {
 function updateButtons() {
   $('next').disabled = blocked || busy || (state.step === 2 && !state.photos.every(Boolean)); $('back').disabled = busy;
   $('capture').disabled = !stream || busy; $('auto-capture').disabled = !stream || busy;
-  $('camera-flip').disabled = busy || starting; $('photo-upload').disabled = busy; $('demo').disabled = busy;
+  $('camera-flip').disabled = busy || starting; $('photo-upload').disabled = busy; $('native-capture').disabled=busy; $('native-facing').disabled=busy; $('native-photo').disabled=busy; $('demo').disabled = busy;
+  $('native-capture-status').textContent=(state.selectedPhoto+1)+'번 컷 '+(state.photos[state.selectedPhoto]?'다시 찍기':'촬영 준비')+' · '+state.photos.filter(Boolean).length+'/'+state.count+'장 등록';
   $('cancel-capture').hidden = !busy; $('capture-progress').textContent = `${state.photos.filter(Boolean).length} / ${state.count}`;
 }
 function renderThumbnails() {
@@ -315,7 +316,7 @@ $('caption').addEventListener('input', () => render()); $('show-date').addEventL
 $('camera-start').addEventListener('click', startCamera); $('camera-flip').addEventListener('click', () => { facing = facing === 'user' ? 'environment' : 'user'; startCamera(); });
 $('capture').addEventListener('click', () => capture(false)); $('auto-capture').addEventListener('click', () => capture(true));
 $('cancel-capture').addEventListener('click', () => { captureEpoch++; busy = false; $('countdown').textContent = ''; renderThumbnails(); });
-$('photo-upload').addEventListener('change', async e => {
+async function importPhotoFiles(e) {
   if (busy) return; const files = [...e.target.files]; if (!files.length) return; busy = true; updateButtons(); let imported = 0;
   try {
     const indices = Array.from({ length: state.count }, (_, n) => (state.selectedPhoto + n) % state.count);
@@ -326,7 +327,11 @@ $('photo-upload').addEventListener('change', async e => {
     }
     if (imported) { state.selectedPhoto = Math.max(0, state.photos.findIndex(p => !p)); toast(`${imported}장의 사진을 담았어요. 사진은 전송되지 않았어요.`); }
   } finally { busy = false; e.target.value = ''; renderThumbnails(); updateButtons(); }
-});
+}
+$('photo-upload').addEventListener('change',importPhotoFiles); $('native-photo').addEventListener('change',importPhotoFiles);
+function selectCaptureMethod(native){if(busy)return;if(native)stopCamera();$('native-capture-area').hidden=!native;$('web-capture-area').hidden=native;$('native-mode').setAttribute('aria-pressed',String(native));$('web-mode').setAttribute('aria-pressed',String(!native));}
+$('native-mode').addEventListener('click',()=>selectCaptureMethod(true));$('web-mode').addEventListener('click',()=>selectCaptureMethod(false));
+$('native-capture').addEventListener('click',()=>{if(busy)return;stopCamera();$('native-photo').setAttribute('capture',$('native-facing').value);$('native-photo').click();});
 $('demo').addEventListener('click', async () => {
   if (state.photos.some(Boolean) && !confirm('현재 사진을 샘플 이미지로 바꿀까요?')) return;
   busy = true; updateButtons();
@@ -351,7 +356,7 @@ $('share').addEventListener('click', async () => { try { const blob = await expo
 $('restart').addEventListener('click', () => { if (!confirm('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return; stopCamera(); state.photos = Array(state.count).fill(null); state.decorations = []; state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopCamera(); }); window.addEventListener('pagehide', stopCamera);
 window.addEventListener('beforeunload', e => { if (state.photos.some(Boolean)) { e.preventDefault(); e.returnValue = ''; } });
-for (const [id, name, label] of [['back', 'back', '이전'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '돌아가기'], ['expand-preview', 'expand', '크게 편집'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);
+for (const [id, name, label] of [['back', 'back', '이전'], ['native-capture', 'camera', '기본 카메라로 촬영'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '돌아가기'], ['expand-preview', 'expand', '크게 편집'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);
 document.querySelectorAll('[data-open-tool], [data-editor-tool]').forEach(b => { const tool = b.dataset.openTool || b.dataset.editorTool; const name = { stickers: 'sticker', text: 'text', photo: 'crop', filter: 'filter' }[tool]; labelButton(b, name, { stickers: '스티커', text: '문구', photo: '사진 구도', filter: '필터' }[tool]); });
 renderChoices(); renderThumbnails(); renderSteps(); render(); bootEvent();
 document.fonts.ready.then(() => render());
