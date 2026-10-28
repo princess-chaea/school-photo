@@ -1,0 +1,66 @@
+/* Keep Korean words intact while allowing long event names and links to fit. */
+body.booth-app :is(button,label,summary,h1,h2,h3,p){word-break:keep-all;overflow-wrap:anywhere}
+body.booth-app .button>span{font-size:inherit}
+body.booth-app .navigation .button{white-space:nowrap;min-width:0;padding-inline:12px}
+body.booth-app .frame-group-grid :is(.design-choice,.frame-option)>span{word-break:keep-all;overflow-wrap:normal}
+
+/* Inputs yield space to action labels; a short label must never collapse vertically. */
+body.booth-app .input-row{align-items:center;min-width:0}
+body.booth-app .input-row input{flex:1 1 0;min-width:0;width:0;height:44px}
+body.booth-app .input-row .button{flex:0 0 auto;min-width:64px;min-height:44px;white-space:nowrap;padding:10px 14px}
+body.booth-app #text-font{width:min(100%,320px);max-width:100%;min-height:40px;margin-bottom:8px}
+body.booth-app #selected-decoration-text{width:100%;min-width:0}
+
+/* Center the shutter and let the surrounding words wrap at spaces. */
+body.booth-app[data-step="2"] .capture-row{display:grid;grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);gap:10px;width:100%;max-width:420px;height:auto;min-height:58px}
+body.booth-app .capture-row>span,body.booth-app .capture-row>.text-button{width:auto;min-width:0}
+body.booth-app .capture-row>.text-button{white-space:normal;line-height:1.5;overflow-wrap:normal}
+body.booth-app .capture-row .shutter{justify-self:center;flex:none}
+
+/* Preserve action widths in the editing and save dialogs. */
+body.booth-app .edit-header{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px}
+body.booth-app .edit-header #close-edit{width:auto;white-space:nowrap;padding:4px 2px}
+body.booth-app .edit-header #edit-title{line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
+body.booth-app .editor-view-controls{flex-wrap:wrap;justify-content:center}
+body.booth-app .editor-view-controls button{flex:none;white-space:nowrap}
+body.booth-app .editor-view-controls output{flex:none;white-space:nowrap}
+body.booth-app .edit-tool-tabs button{min-width:0;justify-content:center;white-space:nowrap;padding-inline:4px;gap:4px}
+body.booth-app .collection-save-dialog header{align-items:flex-start}
+body.booth-app .collection-save-dialog header h2{flex:1;min-width:0;line-height:1.5}
+body.booth-app .collection-save-dialog header button{flex:none;white-space:nowrap}
+
+/* A preview may shrink, but must never draw over the controls below it. */
+body.booth-app .preview-panel{min-width:0;overflow:hidden}
+@media(max-width:1100px){
+ body.booth-app[data-step="3"] .preview-panel,body.booth-app[data-step="4"] .preview-panel{flex:1 1 140px;min-height:100px}
+ body.booth-app[data-step="3"] .preview-stage,body.booth-app[data-step="4"] .preview-stage{height:auto;min-height:0;overflow:hidden}
+ body.booth-app[data-step="3"] .control-panel,body.booth-app[data-step="4"] .control-panel{flex:0 1 auto;min-height:0;max-height:100%;overflow-y:auto}
+}
+@media(max-width:700px){
+ body.booth-app #decoration-text,body.booth-app #selected-decoration-text{font-size:16px}
+}
+@media(max-width:370px){
+ body.booth-app .edit-header #close-edit{font-size:10px;gap:3px}
+ body.booth-app .edit-tool-tabs button>span{font-size:10px}
+ body.booth-app .edit-tool-tabs .ui-icon{width:15px;height:15px}
+}
+/* Use two columns on short landscape screens so controls retain useful height. */
+@media(min-width:601px) and (max-width:1100px) and (max-height:550px){
+ body.booth-app[data-step="3"] .workspace,body.booth-app[data-step="4"] .workspace{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+ body.booth-app[data-step="3"] .control-panel,body.booth-app[data-step="4"] .control-panel{grid-column:1;grid-row:1;order:0;height:100%;padding:10px 14px 0;min-width:0}
+ body.booth-app[data-step="3"] .preview-panel,body.booth-app[data-step="4"] .preview-panel{grid-column:2;grid-row:1;order:1;min-height:0;padding:8px 10px}
+ body.booth-app .preview-top{gap:5px}
+ body.booth-app .preview-top .eyebrow{display:none}
+ body.booth-app #edit-dialog[open]{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,1fr);grid-template-rows:48px 42px minmax(0,1fr) 38px;height:100dvh;max-height:100dvh;border-radius:0}
+ body.booth-app #edit-dialog .edit-header{grid-column:1/-1;grid-row:1;height:auto}
+ body.booth-app #edit-dialog .editor-view-controls{grid-column:1;grid-row:2;padding:3px 6px}
+ body.booth-app #edit-dialog .expanded-stage{grid-column:1;grid-row:3/5;min-height:0}
+ body.booth-app #edit-dialog[data-tool="photo"] .expanded-stage{grid-row:2/5}
+ body.booth-app #edit-dialog .edit-tool-tabs{grid-column:2;grid-row:2;min-width:0}
+ body.booth-app #edit-dialog .edit-tool-tabs button{font-size:10px;padding:5px 3px}
+ body.booth-app #edit-dialog .edit-tool-tabs button>span{font-size:10px}
+ body.booth-app #edit-dialog .edit-tool-tabs .ui-icon{width:15px;height:15px}
+ body.booth-app #edit-dialog .expanded-tools{grid-column:2;grid-row:3;min-height:0;max-height:none;height:auto;padding:8px 10px;overflow:auto}
+ body.booth-app #edit-dialog .editor-quick-row{grid-column:2;grid-row:4;margin:0}
+ body.booth-app #edit-dialog .edit-help{display:none}
+}

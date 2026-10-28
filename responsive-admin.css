@@ -1,0 +1,4 @@
+.admin-page .editor-actions .button{white-space:nowrap;word-break:keep-all;min-width:max-content}
+.admin-page .editor-actions .button>span{font-size:inherit}
+.admin-page .sticker-picker-grid .design-choice>span{word-break:keep-all;overflow-wrap:normal}
+@media(max-width:370px){.admin-page .sticker-picker-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}

@@ -16,7 +16,7 @@ export function createTextStyleControls(root,{getState,onChange}){
   if(identity!==currentIdentity){selected.clear();identity=currentIdentity;renderedText='';}
   const base=value.baseSize||BRAND_SIZES[key]||BRAND_SIZES.title;size.min=Math.ceil((value.minSize||.012)/base*100);size.max=Math.floor((value.maxSize||.1)/base*100);size.value=Math.round(settings.size/base*100);size.setAttribute('aria-label',value.label+' 크기 (%)');color.value=settings.color||ink||'#34372f';color.setAttribute('aria-label',value.label+' 전체 색상');
   if(renderedText!==text){selected.clear();renderedText=text;letters.replaceChildren();letterButtons=textLetters(text).map((letter,index)=>{const button=element('button',letter===' '?'␣':letter,'letter-color-button');button.type='button';button.setAttribute('aria-label',`${index+1}번째 글자 ${letter===' '?'공백':letter}`);button.onclick=()=>{selected.has(index)?selected.delete(index):selected.add(index);refresh();};letters.append(button);return button;});}
-  letterButtons.forEach((button,i)=>{button.style.color=settings.letterColors?.[i]||color.value;button.setAttribute('aria-pressed',String(selected.has(i)));});
+  letterButtons.forEach((button,i)=>{button.style.color='#34372f';button.style.setProperty('--letter-color',settings.letterColors?.[i]||color.value);button.setAttribute('aria-pressed',String(selected.has(i)));});
   letterColor.disabled=letterSize.disabled=clear.disabled=selected.size===0;all.disabled=letterButtons.length===0;
   letterSize.value=Math.round((settings.letterSizes?.[[...selected][0]]||1)*100);letterSize.setAttribute('aria-label',value.label+' 선택한 글자 크기 (%)');letterColor.value=settings.letterColors?.[[...selected][0]]||color.value;letterColor.setAttribute('aria-label',value.label+' 선택한 글자 색');
  }
