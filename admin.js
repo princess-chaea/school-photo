@@ -1,3 +1,4 @@
+import {fillFontSelect,loadFont,fontFamily} from './fonts.js';
 import {createOperations} from './operations.js';
 import {normalizeSharing,validateSharing,parsePadletDetails,callCollectionRelay} from './sharing.js';
 import QRCode from 'qrcode';
@@ -51,7 +52,7 @@ function renderEvents() {
 function openEditor(event) {
   if (dirty && !confirm('저장하지 않은 변경을 버리고 다른 행사를 열까요?')) return;
   editing = event ? structuredClone(event) : { ...structuredClone(DEFAULT_EVENT), id: crypto.randomUUID(), published: false, title: '', school: school.school, logo: school.logo, schedule: '' };
-  $('event-title').value = editing.title; $('event-school').value = editing.school; $('event-schedule').value = editing.schedule; $('logo-position').value = editing.logoPosition; $('event-orientation').value = editing.orientation || 'portrait';
+  $('event-title').value = editing.title; $('event-school').value = editing.school; $('event-schedule').value = editing.schedule; $('logo-position').value = editing.logoPosition;
   $('editor-title').textContent = editing.title || '새 행사 만들기'; $('event-editor').hidden = false; dirty = false;
   renderSharingSettings();renderEditorChoices(); updatePreview(); $('event-editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -86,7 +87,7 @@ function renderEditorChoices() {
 function readEditor() {
   if (!editing) throw new Error('행사를 먼저 선택해 주세요.');
   const title = $('event-title').value.trim(); if (!title) { $('event-title').focus(); throw new Error('행사명을 입력해 주세요.'); }
-  return { ...editing, ...normalizeEvent({ ...editing, sharing:readSharingSettings(), title, school: $('event-school').value.trim(), schedule: $('event-schedule').value.trim(), logo: $('event-logo').value, orientation: $('event-orientation').value, logoPosition: $('logo-position').value }) };
+  return { ...editing, ...normalizeEvent({ ...editing, sharing:readSharingSettings(), title, school: $('event-school').value.trim(), schedule: $('event-schedule').value.trim(), logo: $('event-logo').value, logoPosition: $('logo-position').value }) };
 }
 async function storeEvent(id, event, published) {
   const saved = demo ? normalizeEvent(event) : await cloud.saveEvent(user.uid, id, event, published);
@@ -96,8 +97,8 @@ async function storeEvent(id, event, published) {
   return result;
 }
 async function saveEditor(publish) { const event = readEditor(); if(publish&&!demo&&['drive','padlet'].includes(event.sharing?.mode))await callCollectionRelay(event.sharing.relayUrl,{action:'verify',eventId:event.id,idToken:await user.getIdToken()}); const saved = await storeEvent(event.id, event, publish || event.published); toast(demo ? '이 탭에 체험 행사를 저장했어요. 클라우드에는 저장되지 않아요.' : saved.published ? '행사를 저장하고 게시했어요.' : '비공개로 저장했어요.'); if (publish && !demo) await showQR(saved); }
-function previewEvent() { return editing ? { ...editing, title: $('event-title').value || '행사 이름', school: $('event-school').value, schedule: $('event-schedule').value, logo: $('event-logo').value, orientation: $('event-orientation').value, logoPosition: $('logo-position').value } : null; }
-async function updatePreview() { const event = previewEvent(); if (!event) return; frameEditor?.refresh(); await paintFramePreview($('admin-preview'), event); }
+function previewEvent() { return editing ? { ...editing, title: $('event-title').value || '행사 이름', school: $('event-school').value, schedule: $('event-schedule').value, logo: $('event-logo').value, logoPosition: $('logo-position').value } : null; }
+async function updatePreview() { const event = previewEvent(); if (!event) return; for(const key of ['title','school','schedule']){const select=$(`event-${key}-font`);select.value=brandingModel(event)[key].font;select.style.fontFamily=fontFamily(select.value);$(`event-${key}`).style.fontFamily=fontFamily(select.value);} frameEditor?.refresh(); await paintFramePreview($('admin-preview'), event); }
 function renderAssets() { libraries?.render(); }
 async function removePrivateAsset(asset) {
   if (events.some(e => usesAsset(e, asset)) || (editing && usesAsset(editing, asset)) || (asset.url && school.logo === asset.url)) return toast('행사나 학교 설정에서 사용 중인 자료예요. 먼저 해제하고 저장해 주세요.');
@@ -169,7 +170,11 @@ $('connect-collection').onclick=()=>run(async()=>{
 });
 
 $('new-event').addEventListener('click', () => openEditor()); $('close-editor').addEventListener('click', () => { if (dirty && !confirm('저장하지 않은 변경을 버릴까요?')) return; dirty = false; editing = null; $('event-editor').hidden = true; });
-for (const [id, key] of [['event-orientation', 'orientation'], ['event-title', 'title'], ['event-school', 'school'], ['event-schedule', 'schedule'], ['event-logo', 'logo'], ['logo-position', 'logoPosition']]) $(id).addEventListener('input', e => { dirty = true; if (editing) { editing[key] = e.target.value; if (key === 'logoPosition') { const { hasContent, hasTop, hasBottom, ...model } = brandingModel(editing); for (const part of BRAND_KEYS) model[part].position = e.target.value; editing.branding = model; } } if (key === 'logo') renderLogoPreview('event', e.target.value); updatePreview(); });
+for (const [id, key] of [['event-title', 'title'], ['event-school', 'school'], ['event-schedule', 'schedule'], ['event-logo', 'logo'], ['logo-position', 'logoPosition']]) $(id).addEventListener('input', e => { dirty = true; if (editing) { editing[key] = e.target.value; if (key === 'logoPosition') { const { hasContent, hasTop, hasBottom, ...model } = brandingModel(editing); for (const part of BRAND_KEYS) model[part].position = e.target.value; editing.branding = model; } } if (key === 'logo') renderLogoPreview('event', e.target.value); updatePreview(); });
+for(const key of ['title','school','schedule']){
+  const select=$(`event-${key}-font`);fillFontSelect(select);
+  select.addEventListener('change',()=>{if(!editing)return;const id=select.value;run(async()=>{await loadFont(id);if(!editing)return;const {hasContent,hasTop,hasBottom,...model}=brandingModel(editing);model[key]={...model[key],font:id};editing.branding=model;dirty=true;await updatePreview();});});
+}
 $('school-name').addEventListener('input', e => { school.school = e.target.value; profileDirty = true; });
 $('school-logo').addEventListener('change', e => { school.logo = e.target.value; profileDirty = true; renderLogoPreview('school', school.logo); });
 for (const target of ['school', 'event']) $(`clear-${target}-logo`).addEventListener('click', () => { if (target === 'school') { school.logo = ''; profileDirty = true; $('school-logo').value = ''; } else if (editing) { editing.logo = ''; dirty = true; $('event-logo').value = ''; updatePreview(); } renderLogoPreview(target, ''); });

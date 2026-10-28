@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile.css">
   <script src="/app.js" type="module"></script>
-</head>
+<link rel="stylesheet" href="/legal.css"></head>
 <body class="booth-app">
   <header class="topbar">
     <div class="wordmark school-wordmark" aria-label="사제동행 찰칵! 포토"><img src="/school-booth-logo.webp" alt="선생님과 학생이 함께 포즈를 취하는 포토부스"><span><small>사제동행</small>찰칵! 포토</span></div>
@@ -32,15 +32,16 @@
 
         <div class="step-content" data-step="0">
           <div class="export-format-field"><label class="field-label" for="export-format">어디에 사용할까요?</label><select id="export-format" aria-label="저장 용도" hidden></select><button type="button" id="choose-export-format" aria-describedby="export-format-note" aria-haspopup="dialog"></button><p class="small muted" id="export-format-note">선택한 용도에 맞춰 처음부터 사진을 크게 배치해요.</p></div>
-          <div class="detail-line"><span>로그인 없이 바로 시작</span><span>제출은 내가 선택</span></div>
+          <p class="field-label">몇 장을 담을까요?</p>
+          <div class="cut-grid" id="cut-options"></div>
+          <div class="layout-space-card"><canvas id="layout-space-preview" width="240" height="180" aria-label="선택한 규격의 실제 사진 영역"></canvas><div><strong>이만큼 사진이 들어가요</strong><p id="layout-space-summary" aria-live="polite"></p><p class="small muted">숫자가 표시된 칸이 실제 사진 공간이에요.</p></div></div>
+          <p class="field-label">어떻게 배치할까요?</p>
+          <div class="orientation-options" id="orientation-options" aria-label="프레임 방향"></div>
+          <div class="note-card"><span class="note-icon">▧</span><div><strong>사진 공간을 확인한 뒤 디자인을 골라요.</strong><p>직접 만든 이미지 프레임은 디자인 보존을 위해 원래 비율로 맞춰요.</p></div></div>
         </div>
 
         <div class="step-content" data-step="1" hidden>
           <p class="small muted" id="chosen-purpose"></p>
-          <div class="cut-grid" id="cut-options"></div>
-          <div class="layout-space-card"><canvas id="layout-space-preview" width="240" height="180" aria-label="선택한 규격의 실제 사진 영역"></canvas><div><strong>이만큼 사진이 들어가요</strong><p id="layout-space-summary" aria-live="polite"></p><p class="small muted">숫자가 표시된 칸이 실제 사진 공간이에요.</p></div></div>
-          <div class="orientation-options" id="orientation-options" aria-label="프레임 방향"></div>
-          <div class="note-card"><span class="note-icon">▧</span><div><strong>사진 공간을 확인하고 프레임을 골라요.</strong><p>직접 만든 이미지 프레임은 디자인 보존을 위해 원래 비율로 맞춰요.</p></div></div>
           <p class="field-label">프레임 디자인 <span id="frame-name"></span></p>
           <div class="frame-grid" id="frame-options"></div>
           <details class="optional-frame"><summary>한마디 추가 (선택)</summary><label class="field-label" for="caption-font">한마디 글꼴</label><select id="caption-font"></select><label class="field-label" for="caption">아래에 남길 한마디</label>
@@ -113,7 +114,7 @@
     </div>
     <div class="privacy-note"><span>◈</span><p><strong>사진 제출은 내가 선택해요.</strong> 저장·꾸미기는 기기에서 처리하며, 제출 버튼을 누른 완성 이미지만 선생님의 수합 공간으로 보내요. 저장 전에 페이지를 닫거나 새로고침하면 작업이 사라져요.</p></div>
   </main>
-  <footer><span class="footer-brand">사제동행 찰칵! 포토</span><span>TOGETHER IN EVERY FRAME.</span><span>함께 찍고, 오래 기억해요.</span></footer>
+  <footer class="legal-footer"><span class="footer-brand">사제동행 찰칵! 포토</span><nav aria-label="서비스 안내"><a href="/legal.html#privacy" target="_blank" rel="noopener">개인정보처리방침</a><a href="/legal.html#terms" target="_blank" rel="noopener">이용약관</a></nav><address>문의 · 하주초 교사 이성근<br><a href="mailto:dltjdrms320@gmail.com">dltjdrms320@gmail.com</a></address></footer>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <dialog id="edit-dialog" data-tool="stickers" aria-label="사진 크게 꾸미기">
     <header class="edit-header"><button class="text-button" id="close-edit">돌아가기</button><strong id="edit-title">사진 꾸미기</strong><div class="editor-selection-actions"><button class="icon-button" id="undo-decoration" aria-label="스티커·문구 삭제 되돌리기" title="삭제 되돌리기" disabled></button><button class="icon-button" id="rotate-decoration" aria-label="선택한 요소 15도 회전" title="15도 회전" disabled></button><button class="icon-button danger" id="delete-decoration" aria-label="선택한 스티커·문구 삭제" title="선택한 스티커·문구 삭제" disabled></button></div></header>

@@ -136,7 +136,7 @@ UI 검수용 주소는 `/?demo=1`(실제 클라우드 저장 없는 운영자 �
 
 ## 출처
 
-로고·기본 이미지 스티커는 이 프로젝트를 위해 생성했습니다. UI 아이콘은 프로젝트 내 SVG 경로입니다. 케리스 배움체는 사용자가 제공한 원본에서 웹용 WOFF2로 압축했으며 KERIS 학교 안심폰트/OFL 안내를 함께 제공합니다. 자세한 내용은 `THIRD_PARTY_NOTICES.md`와 `public/fonts/`를 확인하세요.
+로고·기본 이미지 스티커는 이 프로젝트를 위해 생성했습니다. UI 아이콘은 프로젝트 내 SVG 경로입니다. 케리스 배움체는 사용자가 제공한 원본에서 웹용 WOFF2로 압축했으며 KERIS 학교 안심폰트/OFL 안내를 함께 제공합니다. 학교안심폰트 공식 OFL 목록의 서체별 대표 스타일도 웹용으로 압축해 제공하며, 글꼴은 선택할 때 불러옵니다. 자세한 내용은 `THIRD_PARTY_NOTICES.md`와 `public/fonts/`를 확인하세요.
 
 Firebase 공식 문서: [Google 로그인](https://firebase.google.com/docs/auth/web/google-signin), [Storage 요금제 요건](https://firebase.google.com/docs/storage/faqs-storage-changes-announced-sept-2024), [Canvas 이미지 CORS를 위한 Storage 설정](https://firebase.google.com/docs/storage/web/download-files#cors_configuration).
 

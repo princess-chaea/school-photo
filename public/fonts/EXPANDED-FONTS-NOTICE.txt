@@ -1,0 +1,1941 @@
+공식 출처: https://copyright.keris.or.kr/wft/fntDwnld
+확인: 2026-10-28. 공식 OFL 목록에서 서체별 대표 스타일을 가져왔습니다.
+글리프와 폰트 내부 이름을 유지하고 WOFF2로 압축했습니다. 라이선스: OFL.txt
+
+케리스 케듀체
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1215/0955/KERISKEDU_Line.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+KERIS
+https://www.keris.or.kr/
+
+학교안심 보드마카
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1624/Hakgyoansim_BoardmarkerR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 날개
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1628/Hakgyoansim_NalgaeR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 마니또
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1629/Hakgyoansim_ManitoR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 색연필
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1630/Hakgyoansim_SaekyeonpilR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 오카리나
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1631/Hakgyoansim_OcarinaR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 키다리풍선
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1631/Hakgyoansim_KidaripungseonL.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 책갈피
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1632/Hakgyoansim_ChaekgalpiR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 공룡알
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1633/Hakgyoansim_GongryongalR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 민들레홀씨
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1634/Hakgyoansim_MindeulleholssiR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 상장
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1634/Hakgyoansim_SangjangR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 스케치북
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1635/Hakgyoansim_SketchbookR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 떡볶이
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1636/Hakgyoansim_TteokbokkiB.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 이어달리기
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1637/Hakgyoansim_YieodalligiL.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 반달
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1638/Hakgyoansim_BandalL.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 어항꾸미기
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1638/Hakgyoansim_EohangkkumigiB.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 자연
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1639/Hakgyoansim_JayeonR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 자유시간
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1640/Hakgyoansim_JayusiganR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 몽당분필
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1640/Hakgyoansim_MondangbunfilR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 시간표
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1641/Hakgyoansim_SiganpyoR.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 수수깡
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1104/1642/Hakgyoansim_SusukkangL.ttf
+Copyright (c) 2025 by KERIS. All rights reserved.
+
+학교안심 그림일기
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0821/1120/Hakgyoansim%20Geurimilgi%20TTF%20R.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 나들이
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0821/1116/Hakgyoansim%20Nadeuri%20TTF%20L.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 둥근미소
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0821/1053/Hakgyoansim%20Dunggeunmiso%20TTF%20R.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 받아쓰기
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0821/1044/Hakgyoansim%20Badasseugi%20TTF%20L.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 별빛하늘
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0821/1026/Hakgyoansim%20Byeolbichhaneul%20TTF%20L.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 별자리
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0827/1431/Hakgyoansim%20Byeoljari%20TTF%20L.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 알림장
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0821/0958/Hakgyoansim%20Allimjang%20TTF%20R.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 출석부
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0821/0934/Hakgyoansim%20Chulseokbu%20TTF%20L.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 칠판지우개
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0821/0923/Hakgyoansim%20Chilpanjiugae%20TTF%20L.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 퍼즐
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0820/1744/Hakgyoansim%20Puzzle%20TTF%20Black.ttf
+Copyright © KERIS. All rights reserved.
+https://www.keris.or.kr/
+
+학교안심 몽글몽글
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1043/HakgyoansimMonggeulmonggeulR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 지우개
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1111/HakgyoansimJiugaeR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 물결
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1045/HakgyoansimMulgyeolB.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 꼬꼬마
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1043/HakgyoansimKkokkomaR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 모험가
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1037/HakgyoansimMoheomgaB.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 뜀틀
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1126/HakgyoansimTtwimteulR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 은하수
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1311/HakgyoansimEunhasuR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 여행
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1124/HakgyoansimYeohaengR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 콧수염
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1114/HakgyoansimKossuyeomR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 사물함
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1037/HakgyoansimSamulhamR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 꽈배기
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1043/HakgyoansimKkwabaegiR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 돋보기
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1048/HakgyoansimDotbogiR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 운동장
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1125/HakgyoansimUndongjangL.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 리코더
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1028/HakgyoansimRikodeoR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 우산
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1124/HakgyoansimUsanR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 점심시간
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1105/HakgyoansimJeomsimsiganB.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 마법사
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1026/HakgyoansimMabeopsaR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 소나기
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1127/HakgyoansimSonagiR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 투호
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1126/HakgyoansimTuhoR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 구름
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1023/HakgyoansimGureumR.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 나무
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1211/1049/HakgyoansimNamuL.ttf
+Copyright © KERIS. All rights reserved.
+
+학교안심 우주
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1545/HakgyoansimWoojuR.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 분필
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1540/HakgyoansimBunpilR.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 봄방학
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1539/HakgyoansimBombanghakR.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 꾸러기
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1526/HakgyoansimGgooreogiR.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 산뜻돋움
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1543/HakgyoansimSantteutdotumM.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 바른돋움
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0315/1714/HakgyoansimBareondotumB.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 바른바탕
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1538/HakgyoansimBareonbatangR.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 맑은날
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1533/HakgyoansimMalgeunnalB.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 돌담
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1531/HakgyoansimDoldamB.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 산뜻바탕
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1544/HakgyoansimSantteutbatangL.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 곧은제목
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1525/HakgyoansimGodeunjemokB.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 붓펜
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1541/HakgyoansimButpenB.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+학교안심 가을소풍
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1208/1523/HakgyoansimGaeulsopungB.ttf
+Copyright © KERIS. All rights reserved.
+KERIS (Korea Educational And Research Information Service)
+
+레벨업 이탤릭
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1019/1049/LevelUp-Italic.ttf
+Copyright 2026 Hada Type Foundry. Copyright 2023 Kil Hyung-jin. Copyright 2014-2021 Adobe.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available at https://openfontlicense.org
+https://openfontlicense.org
+
+레벨업
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1019/1041/LevelUp-Regular.ttf
+Copyright 2026 Hada Type Foundry. Copyright 2023 Kil Hyung-jin. Copyright 2014-2021 Adobe.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available at https://openfontlicense.org
+https://openfontlicense.org
+
+춤추는사람들
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1014/1330/DancingPeoples%5BDance%5D.ttf
+Copyright 2026 Hada Type Foundry. Copyright 2023 Kil Hyung-jin. Copyright 2014-2021 Adobe. Copyright 2024 Wanted Lab, Inc. Copyright 2022 Sun. Copyright 2019 eBay Korea Co., Ltd.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available at https://openfontlicense.org
+https://openfontlicense.org
+
+하다 모노
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1013/1332/HadaMono-Regular.ttf
+Copyright 2026 Hada Type Foundry. Copyright NAVER Corp. Copyright 2015-2026 Belleve Invis.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available at https://openfontlicense.org
+https://openfontlicense.org
+
+한굴림체
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1013/1712/%ED%95%9C%EA%B5%B4%EB%A6%BC%EC%B2%B4-Regular.ttf
+Copyright © 2026 AI올컷.
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+https://openfontlicense.org
+
+느좋체
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1013/1656/%EB%8A%90%EC%A2%8B%EC%B2%B4R.ttf
+Copyright (c) 2026 Neujot. Based on Pretendard (Copyright (c) 2021 Kil Hyung-jin, https://github.com/orioncactus/pretendard), licensed under the SIL Open Font License 1.1.
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+https://openfontlicense.org
+Copyright © 2026 느좋체 (Neujot). 본 폰트는 프리텐다드(Pretendard, © 길형진)를 기반으로 제작되었으며, SIL Open Font License 1.1을 따릅니다.
+
+히피체
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1013/1644/%ED%9E%88%ED%94%BC%EC%B2%B4.ttf
+Copyright (c) 2026 AIollcut.
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+https://openfontlicense.org
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+https://openfontlicense.org
+
+세방고딕 2.0
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1013/1546/%EC%84%B8%EB%B0%A9%EA%B3%A0%EB%94%95%202.0_Light.ttf
+Copyright (c) 2026 SEBANG CO., LTD. All rights reserved. Font designed by FONTRIX Inc.
+
+세방고딕 2.0 Italic
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1013/1533/%EC%84%B8%EB%B0%A9%EA%B3%A0%EB%94%95%202.0_Italic_Regular.ttf
+Copyright (c) 2026 SEBANG CO., LTD. All rights reserved. Font designed by FONTRIX Inc.
+
+하다 산스
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1013/1508/HadaSans-Light.ttf
+Copyright 2026 Hada Type Foundry. Copyright 2023 Kil Hyung-jin. Copyright 2014-2021 Adobe. Copyright 2024 Wanted Lab, Inc. Copyright 2022 Sun. Copyright 2019 eBay Korea Co., Ltd.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available at https://openfontlicense.org
+https://openfontlicense.org
+
+깍두기 도면체
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1013/1351/KkakdugiDrafting-Regular.ttf
+Copyright 2026 The Kkakdugi Drafting Project Authors (https://github.com/dynamic-potato/kkakdugi-drafting)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at https://openfontlicense.org
+https://openfontlicense.org
+
+하다 라운드
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1012/1743/HadaRound-Light.ttf
+Copyright 2026 Hada Type Foundry. Copyright 2023 Kil Hyung-jin. Copyright 2014-2021 Adobe. Copyright 2024 Wanted Lab, Inc. Copyright 2022 Sun. Copyright 2019 eBay Korea Co., Ltd.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available at https://openfontlicense.org
+https://openfontlicense.org
+
+하다 바탕
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1012/1755/HadaBatang%5BWeight%5D.ttf
+Copyright 2026 Hada Type Foundry. Copyright Ridi Corporation. Copyright 2016 Iropke. Copyright Naver Corp. and Naver Culture Foundation. Copyright 2021 Yanghee Ryu.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available at https://openfontlicense.org
+https://openfontlicense.org
+
+하다 콘덴스드
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1013/1152/HadaCondensed-Light.ttf
+Copyright 2026 Hada Type Foundry. Copyright 2023 Kil Hyung-jin. Copyright 2014-2021 Adobe. Copyright 2024 Wanted Lab, Inc. Copyright 2022 Sun. Copyright 2019 eBay Korea Co., Ltd.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available at https://openfontlicense.org
+https://openfontlicense.org
+
+빗썸고딕 Original
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1012/1659/Bithumb%20Gothic%20Original.ttf
+Copyright © 2026 Bithumb Co.
+Copyright © 2026, Bithumb Co., Ltd. (https://www.bithumb.com),
+with Reserved Font Name "Bithumb Gothic".
+
+This Font Software is based on Gmarket Sans.
+
+Original Font Copyright:
+Copyright © 2019, eBay Korea Co., Ltd. (www.gmarket.co.kr),
+with Reserved Font Name "Gmarket Sans Font".
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+http://scripts.sil.org/OFL
+
+빗썸고딕 Basic
+https://font-real.cdn.gov-ntruss.com/fnt/2026/1012/1659/Bithumb%20Gothic%20Basic.ttf
+Copyright © 2026 Bithumb Co.
+Copyright © 2026, Bithumb Co., Ltd. (https://www.bithumb.com),
+with Reserved Font Name "Bithumb Gothic".
+
+This Font Software is based on Gmarket Sans.
+
+Original Font Copyright:
+Copyright © 2019, eBay Korea Co., Ltd. (www.gmarket.co.kr),
+with Reserved Font Name "Gmarket Sans Font".
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+http://scripts.sil.org/OFL
+
+서초돋움
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0824/1315/SeochoDotum-Regular.ttf
+Rebuilt from public court judgment renderings. Not an official font of any court.
+SIL Open Font License 1.1
+https://openfontlicense.org
+
+서초바탕
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0824/1200/SeochoBatang-Regular.ttf
+Rebuilt from public court judgment renderings. Not an official font of any court.
+SIL Open Font License 1.1
+https://openfontlicense.org
+
+자연산스
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0721/1713/JayeonSans-Regular.ttf
+Copyright © 2026 Suh Ji-hwan
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL
+http://scripts.sil.org/OFL
+Copyright © 2026 서지환
+
+원주체
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0721/1657/%EC%9B%90%EC%A3%BC%EC%B2%B4TTF%20Regular.ttf
+Copyright © 2026 Wonju City Government. All Rights Reserved.
+
+명원체(한글재민체4.0)
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0721/1640/Hangeuljaemin4-Regular.ttf
+
+
+고신고딕
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0721/1612/GoshinGothic-Regular.ttf
+(c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+Copyright (c) 2023 Kil Hyung-jin
+Copyright (c) 2026 The Korea University Weekly (merged and modified version)
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+http://scripts.sil.org/OFL
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded, 
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+http://scripts.sil.org/OFL
+
+카스퀘어 코드 Italic
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0702/1326/CasquareCodeStd-Italic.ttf
+© 2021 Microsoft Corporation. All Rights Reserved.
+Microsoft supplied font. You may use this font to create, display, and print content as permitted by the license terms or terms of use, of the Microsoft product, service, or content in which this font was included. You may only (i) embed this font in content as permitted by the embedding restrictions included in this font; and (ii) temporarily download this font to a printer or other output device to help print content. Any other use is prohibited.
+ 
+The following license, based on the SIL Open Font license (https://scripts.sil.org/OFL), applies to this font. Additional license terms may be found on the GitHub repository for this font (https://github.com/microsoft/cascadia-code/blob/main/LICENSE).
+ 
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+ 
+1) Neither the Font Software nor any of its individual components, in Original or Modified Versions, may be sold by itself.
+ 
+2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+ 
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+ 
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+ 
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed under any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+ 
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+https://scripts.sil.org/OFL
+
+카스퀘어 코드
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0702/1038/CasquareCodeStd-Regular.ttf
+© 2021 Microsoft Corporation. All Rights Reserved.
+Microsoft supplied font. You may use this font to create, display, and print content as permitted by the license terms or terms of use, of the Microsoft product, service, or content in which this font was included. You may only (i) embed this font in content as permitted by the embedding restrictions included in this font; and (ii) temporarily download this font to a printer or other output device to help print content. Any other use is prohibited.
+ 
+The following license, based on the SIL Open Font license (https://scripts.sil.org/OFL), applies to this font. Additional license terms may be found on the GitHub repository for this font (https://github.com/microsoft/cascadia-code/blob/main/LICENSE).
+ 
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+ 
+1) Neither the Font Software nor any of its individual components, in Original or Modified Versions, may be sold by itself.
+ 
+2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+ 
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+ 
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+ 
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed under any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+ 
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+https://scripts.sil.org/OFL
+
+LXGW 문해 모노
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0421/1541/LXGWWenKaiMonoKR-Light.ttf
+Copyright 2025-2026 LXGW (https://github.com/lxgw/LxgwWenkaiKR)
+Copyright 2020 The Klee Project Authors (https://github.com/fontworks-fonts/Klee)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://openfontlicense.org
+https://openfontlicense.org
+
+LXGW 문해
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0421/1523/LXGWWenKaiKR-Light.ttf
+Copyright 2025-2026 LXGW (https://github.com/lxgw/LxgwWenkaiKR)
+Copyright 2020 The Klee Project Authors (https://github.com/fontworks-fonts/Klee)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://openfontlicense.org
+https://openfontlicense.org
+
+HS활공명조
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0421/1409/HSHwalkongSerif-Regular.ttf
+2025 Ⓒ RTF Type Study Dept. All Rights Reserved.
+
+우아한 세리프
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0421/1355/GraceSerif-Regular.ttf
+copyright missing
+
+송암 이형식체
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0402/1657/%EC%86%A1%EC%95%94%20%EC%9D%B4%ED%98%95%EC%8B%9D.ttf
+Copyright © © TypeE. Corp. & Lee Kyong Hwan, All rights reserved. Modification of this file requires prior written permission from © TypeE. Corp.
+www.griun.co.kr
+Copyright © 타이비 & 이경환, 모든 권리는 저작권자에게 있으며, 이 파일을 수정하기 위해서는 반드시 타이비의 사전 허가를 받아야 합니다.
+
+한국외대체
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0330/1531/%ED%95%9C%EA%B5%AD%EC%99%B8%EB%8C%80%EC%B2%B4M.ttf
+
+
+카페24 동동 Light
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0303/1330/Cafe24DongdongLight.ttf
+Copyright ⓒ Cafe24 Corp. All Rights Reserved. Cafe24 Dongdong is a trademark of Cafe24.
+https://fonts.cafe24.com
+
+카페24 쑥쑥 Light
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0303/1336/Cafe24SsukssukLight.ttf
+Copyright © Cafe24 Corp. All rights Reserved.
+https://fonts.cafe24.com
+
+에이투지체
+https://font-real.cdn.gov-ntruss.com/fnt/2026/0128/1348/%EC%97%90%EC%9D%B4%ED%88%AC%EC%A7%80%EC%B2%B4-1Thin.ttf
+Copyright © 2026 PT&
+This Font Software is licensed under the SIL Open Font License, Version 1.1. 
+http://scripts.sil.org/OFL
+이 글꼴은 SIL Open Font License 1.1로 배포하고 있습니다. 
+
+카페24 아네모네
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1728/Cafe24Ohsquare-v2.0.ttf
+https://fonts.cafe24.com
+Copyright (c) 2020by Cafe24. All rights reserved.
+
+카페24 쑥쑥
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1726/Cafe24Ssukssuk-v2.0.ttf
+https://fonts.cafe24.com
+Copyright © Cafe24 Corp. All rights Reserved.
+SIL OPEN FONT LICENSE(Version 1.1)
+
+카페24 심플해
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1723/Cafe24Simplehae-v2.0.ttf
+https://fonts.cafe24.com
+Copyright (c) Cafe24 Corp. All Rights Reserved.
+
+카페24 빛나는별
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1722/Cafe24Shiningstar-v2.0.ttf
+https://fonts.cafe24.com
+Copyright (c) 2019 by Cafe24. All rights reserved.
+
+카페24 동동
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1721/Cafe24Dongdong-v2.0.ttf
+https://fonts.cafe24.com
+Copyright (c) 2019 by Cafe24. All rights reserved.
+
+카페24 당당해
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1720/Cafe24Dangdanghae-v2.0.ttf
+www.cafe24corp.com
+Copyright (c) 2018 by cafe24. All rights reserved.
+
+카페24 단정해
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1718/Cafe24Danjunghae-v2.0.ttf
+https://fonts.cafe24.com
+Copyright © Cafe24 Corp. All Rights Reserved.
+
+카페24 써라운드
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1724/Cafe24Ssurround-v2.0.ttf
+https://fonts.cafe24.com
+Copyright © Cafe24 Corp. All Rights Reserved.
+
+카페24 고운밤
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1717/Cafe24Oneprettynight-v2.0.ttf
+https://fonts.cafe24.com
+Copyright (c) 2020 by Cafe24. All rights reserved.
+
+카페24 숑숑
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1713/Cafe24Syongsyong-v2.0.ttf
+https://fonts.cafe24.com
+Copyright © Cafe24 Corp. All rights Reserved.
+
+카페24 슈퍼매직
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1703/Cafe24Supermagic-Regular-v1.0.ttf
+Copyright ⓒ Cafe24 Corp. All Rights Reserved.
+https://fonts.cafe24.com
+
+카페24 클래식타입
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1707/Cafe24Classictype-v1.1.ttf
+https://fonts.cafe24.com
+Copyright ⓒ Cafe24 Corp. All Rights Reserved.
+
+Cafe24 PRO SLIM
+https://font-real.cdn.gov-ntruss.com/fnt/2025/1124/1452/Cafe24PROSlim-Air.ttf
+Copyright ⓒ Cafe24 Corp. All Rights Reserved. Cafe24 PRO Slim is a trademark of Cafe24.
+https://fonts.cafe24.com
+
+나눔명조옛한글
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1434/NanumMyeongjo-YetHangul.ttf
+Copyright (c) 2014 NHN Corporation. All rights reserved. Font designed by FONTRIX Inc.
+
+나눔바른고딕옛한글
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1428/NanumBarunGothic-YetHangul.ttf
+Copyright (c) 2014 NHN Corporation. All rights reserved. Font designed by FONTRIX Inc.
+NHN Corporation
+http://www.nhncorp.com
+
+나눔명조 에코
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1441/NanumMyeongjoEco.ttf
+Copyright © 2011 NHN Corporation. All rights reserved. Font designed by FONTRIX.
+NHN Corporation
+http://www.nhncorp.com
+
+나눔고딕 에코
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1448/NanumGothicEco.ttf
+Copyright © 2011 NHN Corporation. All rights reserved. Font designed by Sandoll Communications Inc.
+NHN Corporation
+http://www.nhncorp.com
+
+KCC방정환체
+https://font-real.cdn.gov-ntruss.com/fnt/2024/1113/1649/KCCBangJeonghwanTTF.ttf
+© 2024 Korea Copyright Commission. All rights reserved.
+https://www.copyright.or.kr/customer-center/user-guide/policy/index.do
+
+한글재민체 6.0
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0707/1357/Hangeuljaemin6_TTF.ttf
+Copyright © 2025 Jae-gahb Park, Min Kim, Yoon Jeong Park, Huang-jia Chen. All rights reserved.
+https://www.tlabfont.com/front/html/license
+
+그리운 김정원
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0707/1344/%EA%B7%B8%EB%A6%AC%EC%9A%B4%EA%B9%80%EC%A0%95%EC%9B%90%EC%B2%B4.ttf
+Copyright © 2024 © TypeE. Corp. & Lee Kyong Hwan, All rights reserved. Modification of this file requires prior written permission from © TypeE. Corp.
+www.griun.co.kr
+Copyright © 2024 타이비 & 이경환, 모든 권리는 저작권자에게 있으며, 이 파일을 수정하기 위해서는 반드시 타이비의 사전 허가를 받아야 합니다.
+
+Cafe24 PRO UP
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0707/1332/Cafe24PROUP.ttf
+Copyright ⓒ Cafe24 Corp. All Rights Reserved. Cafe24 Cafe24 PRO UP is a trademark of Cafe24.
+https://fonts.cafe24.com
+
+아스타산스
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0528/1656/AstaSans-Light.ttf
+Copyright 2024 The Asta Sans Project Authors (https://github.com/42dot/Asta-Sans).
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://openfontlicense.org
+https://openfontlicense.org
+
+조군 개발새발 V7
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0304/1356/CHOGOONCHICKENSCRATCHV7-Regular.ttf
+Copyright 2025. 조군. all rights reserved.
+
+칠칠공 발사체
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0528/1631/770Balsa-Regular.ttf
+Copyright (C) 2024 770 Corporation. All Rights Reserved.
+770Corporation
+
+펴진고딕
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0421/0945/PyeojinGothic-Light.ttf
+Copyright © 2025 Suh Ji-hwan
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL
+http://scripts.sil.org/OFL
+Copyright © 2025 서지환
+
+대화나눔 본문체
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0227/1006/1984%EB%8C%80%ED%99%94%EB%82%98%EB%88%94_%EB%B3%B8%EB%AC%B8%EC%B2%B4_Regular.ttf
+Copyright (c) 2024, DAE HWA PHARMACEUTICAL CO., LTD.
+대화나눔_본문체Regular2024체
+Copyright (c) 2024, DAE HW
+
+카카오 작은글씨
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0219/1018/KakaoSmallSans-Regular.ttf
+Copyright (c) 2021 Kakao Corp. All rights reserved. Font designed by FONTRIX Inc. & Min Bon & Park Min-gyu
+http://scripts.sil.org/OFL
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+
+카카오 큰글씨
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0219/1007/KakaoBigSans-Regular.ttf
+Copyright (c) 2021 Kakao Corp. All rights reserved. Font designed by FONTRIX Inc. & Min Bon & Park Min-gyu
+http://scripts.sil.org/OFL
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+
+나눔휴먼
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0204/1157/NanumHumanRegular.ttf
+Copyright © 2019 NAVER Corporation. All rights reserved. Font Designed by Sandoll Inc.
+NAVER Corporation
+http://www.navercorp.com & https://hangeul.naver.com/2017/nanum
+
+온글잎 의청수 다경체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0215/1002/Ownglyph_2022_UWY_Da_Gyeong-Rg.ttf
+Copyright © 2022 VoyagerX, inc. & Uiwang Youth Foundation, All rights reserved. Modification of this file requires prior written permission from VoyagerX, inc.
+VoyagerX, inc.
+http://www.ownglyph.com
+Copyright © 2022 (주)보이저엑스 & 의왕시청소년육성재단, 모든 권리는 저작권자에게 있으며, 이 파일을 수정하기 위해서는 반드시 (주)보이저엑스의 사전 허가를 받아야 합니다.
+
+온글잎 의청수 시우체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0215/1001/Ownglyph_2022_UWY_Si_Woo-Rg.ttf
+Copyright © 2022 VoyagerX, inc. & Uiwang Youth Foundation, All rights reserved. Modification of this file requires prior written permission from VoyagerX, inc.
+VoyagerX, inc.
+http://www.ownglyph.com
+Copyright © 2022 (주)보이저엑스 & 의왕시청소년육성재단 , 모든 권리는 저작권자에게 있으며, 이 파일을 수정하기 위해서는 반드시 (주)보이저엑스의 사전 허가를 받아야 합니다.
+
+온글잎 의청수 재선체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0215/1001/Ownglyph_2022_UWY_Jae_Seon-Rg.ttf
+Copyright © 2022 VoyagerX, inc. & Uiwang Youth Foundation, All rights reserved. Modification of this file requires prior written permission from VoyagerX, inc.
+VoyagerX, inc.
+http://www.ownglyph.com
+Copyright © 2022 (주)보이저엑스 & 의왕시청소년육성재단, 모든 권리는 저작권자에게 있으며, 이 파일을 수정하기 위해서는 반드시 (주)보이저엑스의 사전 허가를 받아야 합니다.
+
+온글잎 의청수 윤영체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0215/1000/Ownglyph_2022_UWY_Yoon_Yeong-Rg.ttf
+Copyright © 2022 VoyagerX, inc. & Uiwang Youth Foundation, All rights reserved. Modification of this file requires prior written permission from VoyagerX, inc.
+VoyagerX, inc.
+http://www.ownglyph.com
+Copyright © 2022 (주)보이저엑스 & 의왕청소년육성재단, 모든 권리는 저작권자에게 있으며, 이 파일을 수정하기 위해서는 반드시 (주)보이저엑스의 사전 허가를 받아야 합니다.
+
+온글잎 의청수 주빈체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0215/0959/Ownglyph_2022_UWY_Joo_Bin-Rg.ttf
+Copyright © 2022 VoyagerX, inc. & Uiwang Youth Foundation, All rights reserved. Modification of this file requires prior written permission from VoyagerX, inc.
+VoyagerX, inc.
+http://www.ownglyph.com
+Copyright © 2022 (주)보이저엑스 & 의왕시청소년육성재단, 모든 권리는 저작권자에게 있으며, 이 파일을 수정하기 위해서는 반드시 (주)보이저엑스의 사전 허가를 받아야 합니다.
+
+KCC혜림체
+https://font-real.cdn.gov-ntruss.com/fnt/2025/0106/0932/KCCHyerimTTF.ttf
+Copyright © 2024 Korea Copyright Commission. All rights reserved.
+https://www.copyright.or.kr/customer-center/user-guide/policy/index.do
+
+스터닝 산스
+https://font-real.cdn.gov-ntruss.com/fnt/2024/1028/1727/STUNNING.ttf
+Copyright (c) 2021 STUNNING INC. all rights reserved.
+STUNNING
+https://about.stunning.kr/
+
+북엔드 바탕
+https://font-real.cdn.gov-ntruss.com/fnt/2024/1028/1712/%EB%B6%81%EC%97%94%EB%93%9C%20%EB%B0%94%ED%83%95%20Regular.ttf
+Copyright 2024 Bookend Inc. All right reserved.
+
+아싸컴 무료고딕
+https://font-real.cdn.gov-ntruss.com/fnt/2024/1014/1644/AssacomFreeGothic.ttf
+Copyright © 2024 ASSACOM Co. All rights reserved.
+
+세구세구체
+https://font-real.cdn.gov-ntruss.com/fnt/2024/1014/1633/SeguSegu-Regular.ttf
+Copyright © 2022 JellyBrick.
+
+고서구체
+https://font-real.cdn.gov-ntruss.com/fnt/2024/1014/1636/Goseogu-Regular.ttf
+Copyright © 2022 JellyBrick.
+
+삼육대체
+https://font-real.cdn.gov-ntruss.com/fnt/2024/1014/1619/%EC%82%BC%EC%9C%A1%EB%8C%80%EC%B2%B4%20Regular.ttf
+Copyright 2024 Sahmyook University All right Reserved.
+
+꾸불림체
+https://font-real.cdn.gov-ntruss.com/fnt/2024/1014/1608/BMKkubulimTTF.ttf
+Copyright © Woowa Brothers Corporation. All right reserved.
+Woowa Brothers Corporation holds the intellectual property rights of BM kkubulim.
+https://www.woowahan.com
+배달의민족 꾸불림의 지적재산권은 ㈜우아한형제들에 있습니다.
+
+눈누 기초고딕
+https://font-real.cdn.gov-ntruss.com/fnt/2024/1014/1600/NoonnuBasicGothicRegular.ttf
+2024 (C) Project Noonnu, All Rights Reserved.
+
+조군 개발새발 V6
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0909/1108/CHOGOONCHICKENSCRATCHV6-Regular.ttf
+Copyright 2024. 조군. all rights reserved.
+
+페이퍼로지
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0819/1513/Paperlogy-1Thin.ttf
+Copyright © 2024 PT&
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+http://scripts.sil.org/OFL
+Copyright © 2024 피티앤
+이 글꼴은 SIL Open Font License 1.1로 배포하고 있습니다. 라이선스에 대한 자세한 내용은 이곳에서 확인할 수 있습니다(영문): https://scripts.sil.org/OFL
+
+조군 개발새발 V5
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0819/1450/CHOGOONCHICKENSCRATCHV5-Regular.ttf
+Copyright 2024. 조군. all rights reserved.
+https://www.dropbox.com/scl/fo/ywaaeu08jbe2hisilh6mb/AOkxAyO1RupYp-1Trag9enU?rlkey=xruyku3vl0ggfwq1mdve7bzym&st=34khbhi1&dl=0
+
+조군 개발새발 V3
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0819/1450/CHOGOONCHICKENSCRATCHV3-Regular.ttf
+Copyright 2024. 조군. all rights reserved.
+https://www.dropbox.com/scl/fo/3o2pg1sjhlu4xl3i8xx9u/AGBOfpXrJ267KOX0bRpgQII?rlkey=iim0mc13nbeht10w1hc5160lw&st=209230kk&dl=0
+
+구름 산스
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0814/1430/goorm-sans-regular.ttf
+Copyright (c) 2024 by goorm. All rights reserved.
+
+조군 개발새발 V2
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0802/1755/CHOGOONChickenScratchV2-Medium.ttf
+Copyright 2024. 조군. all rights reserved.
+chogoon
+https://mega.nz/file/TMcxiSYC#F7cl5M45gpW7ljjgSlNYwOQejxDtL8zVC_26NlYrdg8
+
+프리젠테이션
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0418/1737/Freesentation-1Thin.ttf
+Copyright © 2024 PT&
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+http://scripts.sil.org/OFL
+Copyright © 2024 피티앤
+이 글꼴은 SIL Open Font License 1.1로 배포하고 있습니다. 라이선스에 대한 자세한 내용은 이곳에서 확인할 수 있습니다(영문): https://scripts.sil.org/OFL
+
+KCC한빛체
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0325/1928/KCC-Hanbit.ttf
+Copyright ?2023 Korea Copyright Commission. All rights reserved..
+Copyright © 2023 Korea Copyright Commission. All rights reserved.
+
+능소화
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0226/1657/GrandifloraOne-Regular.ttf
+Copyright 2022 The Grandiflora Project Authors (https://github.com/JAMO-TYPEFACE/Grandiflora)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+https://scripts.sil.org/OFL
+
+가석체
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0226/1651/GasoekOne-Regular.ttf
+Copyright 2022 The Gasoek Project Authors (https://github.com/JAMO-TYPEFACE/Gasoek)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+https://scripts.sil.org/OFL
+
+산하엽
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0226/1647/Diphylleia-Regular.ttf
+Copyright 2022 The Diphylleia Project Authors (https://github.com/JAMO-TYPEFACE/Diphylleia)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+https://scripts.sil.org/OFL
+
+모이라이
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0226/1638/MoiraiOne-Regular.ttf
+Copyright 2022 The Moirai Project Authors (https://github.com/JAMO-TYPEFACE/Moirai)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+https://scripts.sil.org/OFL
+
+베이글팻
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0226/1527/BagelFatOne-Regular.ttf
+Copyright 2022 The Bagel Fat Project Authors (https://github.com/JAMO-TYPEFACE/BagelFat)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+https://scripts.sil.org/OFL
+
+대화나눔체
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0219/1329/1984%EB%8C%80%ED%99%94%EB%82%98%EB%88%94_%EC%86%8C%EA%B3%A4%EC%86%8C%EA%B3%A4.ttf
+Copyright (c) 2023, DAE HWA PHARMACEUTICAL CO., LTD.
+대화나눔소곤소곤2023체
+Copyright (c) 2023, DAE HW
+
+KCC 안창호체
+https://font-real.cdn.gov-ntruss.com/fnt/2024/0219/1323/KCC-Ahnchangho.ttf
+Copyright ?2023 Korea Copyright Commission. All rights reserved..
+Copyright © 2023 Korea Copyright Commission. All rights reserved.
+
+Wanted Sans
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1218/1926/WantedSans-Regular.ttf
+Copyright © 2023 Wanted Lab, Inc.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+https://scripts.sil.org/OFL
+이 글꼴은 SIL Open Font License 1.1로 배포하고 있습니다. 라이선스에 대한 자세한 내용은 이곳에서 확인할 수 있습니다(영문): https://scripts.sil.org/OFL
+
+중나좋체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1306/%EC%A4%91%EB%82%98%EC%A2%8B%EC%B2%B4%20Medium.ttf
+©Joonggonara Corp. All Rights Reserved.
+
+넷마블체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0901/1043/netmarbleM.ttf
+Copyright (c) 2018 by netmarble Co., Ltd. All rights reserved. Font designed by netmarble Co., Ltd.
+netmarble Co., Ltd.
+http://www.netmarble.net
+
+나눔고딕 코딩
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0817/1742/D2Coding-Ver1.3.2-20180524.ttf
+Copyright (c) 2015-2016 NHN Corporation. All rights reserved. Font designed by FONTRIX Inc.
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+http://dev.naver.com/wiki/nanumfont/index.php/OpenFontLicense
+
+리디바탕
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1020/1328/RIDIBatang.ttf
+
+
+안경잡이체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1321/FOUREYES.ttf
+Copyright (c) 2015 greenegg(www.greenegg.co.kr) with " FOUREYES "
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+www.greenegg.co.kr
+
+배달의 민족 기랑해랑체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1322/BMKIRANGHAERANG-TTF.ttf
+®œ WOOWA BROTHERS Corp. All right reserved. Font Designed by Sandoll Communications Inc.
+Copyright ®œ 2017, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM KIRANGHAERANG TTF, BM KIRANGHAERANG OTF  
+ 
+ 
+PREAMBLE  
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.  
+ 
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works. The fonts and derivatives, however, cannot be released under any other type of license.  
+ 
+The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.  
+ 
+ 
+ 
+PERMISSION & CONDITIONS  
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:  
+ 
+1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.  
+ 
+2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.  
+ 
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users. 
+ 
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.  
+ 
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.  
+ 
+ 
+ 
+TERMINATION  
+This license becomes null and void if any of the above conditions are not met.  
+ 
+ 
+ 
+DISCLAIMER  
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+http://www.sandoll.co.kr
+ⓒ WOOWA BROTHERS Corp. All right reserved. Font Designed by Sandoll Communications Inc.
+배달의민족 기랑해랑체의 지적 재산권은 ㈜우아한형제들에 있습니다.  
+배달의민족 기랑해랑체는 개인 및 기업 사용자를 포함한 모든 사용자에게 무료로 제공되며 자유롭게 수정하고 재배포하실 수 있습니다.  
+ 
+단, 글꼴 자체를 유료로 판매하는 것은 금지하며,  
+배달의민족 기랑해랑체는 본 저작권 안내와 라이선스 전문을 포함해서 다른 소프트웨어와 번들하거나 재배포 또는 판매가 가능합니다.  
+배달의민족 기랑해랑체 라이선스 전문을 포함하기 어려울 경우, 배달의민족 기랑해랑체의 출처 표기를 권장합니다.  
+ 
+배달의민족 기랑해랑체를 사용한 인쇄물, 광고물(온라인 포함)의 이미지는 우아한형제들(배달의민족) 프로모션을 위해 활용될 수 있습니다.  
+이를 원치 않는 사용자는 언제든지 당사에 요청하실 수 있습니다.  
+정확한 사용 조건은 아래 배달의민족 기랑해랑체 라이선스 전문을 참고하시기 바랍니다.  
+ 
+ 
+정의  
+‘폰트 소프트웨어’는 본 라이선스에 입거해 저작권자가 배포하고 명확하게 같은 표시가 된 파일들의 집합을 뜻하며, 여기에는 소스 파일, 빌드 스크립트와 문서가 이에 포함됩니다.  
+ 
+‘저작권이 있는 폰트명’은 저작권 정책에 따라서 지정된 이름을 말합니다.  
+ 
+‘원본’은 저작권자가 배포한 폰트 소프트웨어 구성요소를 의미합니다.  
+ 
+‘수정본’은 포맷의 변경이나 폰트 소프트웨어를 새로운 환경에 포팅시켜, 원본의 일부 혹은 전체에 추가, 삭제 대체해 만든 파생 저작물을 의미합니다. ‘저자’는 폰트 소프트웨어에 기여한 디자이너, 엔지니어, 프로그래머, 기술 전문가 등을 의미합니다.  
+ 
+ 
+전문  
+본 폰트 라이선스를 오픈 하는 것은(이하 OFL)는 전 세계 폰트 개발 프로젝트를 지원하고 학계와 언어 관련 학계의 폰트 개발을 위한 연구를 지지하기 위해서인 동시에, 폰트 제휴를 통해 폰트가 공유되고 개선될 수 있는 자유롭게 개방된 환경을 만들기 위해서 입니다.  
+ 
+OFL은 라이선스를 취득한 폰트가 그 자체로 판매되지 않는 한 자유롭게 사용, 연구, 수정, 재배포 하는 것을 허가합니다. 수정된 폰트를 포함한 폰트는 저작권 명이 사용되지 않는 한 기타 소프트웨어와 함께 묶이거나 삽입, 재배포 할 수 있습니다. 단 폰트와 수정된 폰트는 기타 다른 라이선스에 포함되어 배포될 수는 없습니다. 이 라이선스 하에 있기 위한 폰트에 대한 요구사항은 본 폰트나 수정본을 사용하여 제작된 어떠한 문서에도 적용되지 않습니다.  
+ 
+허가 및 조건  
+본 폰트 소프트웨어를 사용하도록 허가 받은 개인/기업/단체 누구라도 다음 명시된 조건에 따라 폰트 소프트웨어의 수정 혹은 수정되지 않은 복사본을 무료로 사용, 연구, 복사, 통합, 삽입, 수정, 재배포할 수 있도록 허가합니다.  
+ 
+원본이나 수정본의 폰트 소프트웨어 혹은 개별 구성요소인 폰트 자체가 판매되어서는 안됩니다.  
+ 
+본 폰트 소프트웨어의 원본 혹은 수정본은 상기 저작권 안내와 본 라이선스에 대한 내용을 포함하는 경우에는 다른 소프트웨어와 함께 묶이거나 재배포 혹은 판매가 가능합니다. 이는 독립 텍스트 파일과 가독성이 있는 헤더 혹은 유저가 용이하게 열람 가능한 이상 텍스트파일 혹은 이진파일 내 기계가 읽을 수 있는 메타데이터 형태를 모두 의미 합니다.  
+ 
+본 폰트 소프트웨어의 어떠한 수정본도 동일한 저작권자가 명시적 허가서를 부여하지 않는 한 저작권이 있는 폰트명을 사용해서는 안 됩니다. 본 제한 사항은 유저들에게 제공된 기존 폰트명을 뜻합니다.  
+ 
+본 폰트 소프트웨어의 저작권자 혹은 저자의 이름은 그들의 명시적 서면 허가가 있거나 또는 그들의 공헌을 인정하기 위한 경우를 제외하고는 수정본에 대한 사용을 유도,추천 혹은 광고하기 위한 목적으로 사용할 수 없습니다.  
+ 
+본 폰트 소프트웨어는 전체나 부분, 혹은 수정 여부에 상관없이 본 라이선스 하에 배포가 되어야 하며 기타 다른 라이선스 하에서는 배포를 할 수 없습니다. 폰트에 대한 요구조건은 이 라이선스 하에서만 유효하며 이 라이선스 하에 있기 위한 폰트에 대한 요구사항은 본 폰트 소프트웨어를 사용해 제작한 어떠한 문서에도 적용되지 않습니다.  
+ 
+ 
+계약의 종료  
+본 라이선스는 상기 조건 중 일부라도 부합되지 않으면 무효가 될 수 있습니다.  
+ 
+ 
+면책조항  
+본 폰트 소프트웨어는 저작권, 특허권, 상표권 및 기타 권리의 비침해성과 특정 목적에의 적합성 포함한 명시적, 묵시적인 어떠한 종류의 보증 없이 “있는 그대로” 제공됩니다. 어떠한 경우에도 저작권자는 본 폰트 소프트웨어의 사용 또는 이의 사용불가, 그밖에 폰트 소프트웨어의 취급과 관련하여 발생하는 모든 계약, 불법행위 혹은 다른 일로 하여금 발생하는 일반적, 특수적, 간접적, 부차적 혹은 필연적 손해를 포함하는 소송, 손해, 혹은 기타 책임에 대한 의무를 가지지 않습니다.
+Copyright ⓒ 2017, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM KIRANGHAERANG TTF, BM KIRANGHAERANG OTF  
+ 
+ 
+PREAMBLE  
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.  
+ 
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works. The fonts and derivatives, however, cannot be released under any other type of license.  
+ 
+The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.  
+ 
+ 
+ 
+PERMISSION & CONDITIONS  
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:  
+ 
+1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.  
+ 
+2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.  
+ 
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users. 
+ 
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.  
+ 
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.  
+ 
+ 
+ 
+TERMINATION  
+This license becomes null and void if any of the above conditions are not met.  
+ 
+ 
+ 
+DISCLAIMER  
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+
+KCC간판체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0215/0949/KCC-Ganpan.ttf
+© 2022 Korea Copyright Commission. All rights reserved.
+https://www.copyright.or.kr/customer-center/user-guide/policy/index.do
+
+KCC손기정체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0106/1143/KCC-Sonkeechung.ttf
+© 2022 Korea Copyright Commission. All rights reserved.
+https://www.copyright.or.kr/customer-center/user-guide/policy/index.do
+
+배달의 민족 연성체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1322/BMYEONSUNG_ttf.ttf
+®œ Copyright WOOWA BROTHERS Corp. All right reserved. Font Designed by Sandoll Communications Inc.
+Copyright ®œ 2016, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM YEONSUNG_TTF, BM YEONSUNGstd_OTF
+
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works. The fonts and derivatives, however, cannot be released under any other type of license.
+
+The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+
+
+
+TERMINATION
+This license becomes null and void if any of the above conditions are not met.
+
+
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+http://www.woowahan.com
+ⓒ Copyright WOOWA BROTHERS Corp. All right reserved. Font Designed by Sandoll Communications Inc.
+배달의민족 연성체의 지적 재산권은 ㈜우아한형제들에 있습니다.
+배달의민족 연성체는 개인 및 기업 사용자를 포함한 모든 사용자에게 무료로 제공되며 자유롭게 수정하고 재배포하실 수 있습니다.
+
+단, 글꼴 자체를 유료로 판매하는 것은 금지하며,
+배달의민족 연성체는 본 저작권 안내와 라이선스 전문을 포함해서 다른 소프트웨어와 번들하거나 재배포 또는 판매가 가능합니다.
+배달의민족 연성체 라이선스 전문을 포함하기 어려울 경우, 배달의민족 연성체의 출처 표기를 권장합니다.
+
+배달의민족 연성체를 사용한 인쇄물, 광고물(온라인 포함)의 이미지는 우아한형제들(배달의민족) 프로모션을 위해 활용될 수 있습니다.
+이를 원치 않는 사용자는 언제든지 당사에 요청하실 수 있습니다.
+정확한 사용 조건은 아래 배달의민족 연성체 라이선스 전문을 참고하시기 바랍니다.
+
+
+정의
+‘폰트 소프트웨어’는 본 라이선스에 입거해 저작권자가 배포하고 명확하게 같은 표시가 된 파일들의 집합을 뜻하며, 여기에는 소스 파일, 빌드 스크립트와 문서가 이에 포함됩니다.
+
+‘저작권이 있는 폰트명’은 저작권 정책에 따라서 지정된 이름을 말합니다.
+
+‘원본’은 저작권자가 배포한 폰트 소프트웨어 구성요소를 의미합니다.
+
+‘수정본’은 포맷의 변경이나 폰트 소프트웨어를 새로운 환경에 포팅시켜, 원본의 일부 혹은 전체에 추가, 삭제 대체해 만든 파생 저작물을 의미합니다. ‘저자’는 폰트 소프트웨어에 기여한 디자이너, 엔지니어, 프로그래머, 기술 전문가 등을 의미합니다.
+
+
+전문
+본 폰트 라이선스를 오픈 하는 것은(이하 OFL)는 전 세계 폰트 개발 프로젝트를 지원하고 학계와 언어 관련 학계의 폰트 개발을 위한 연구를 지지하기 위해서인 동시에, 폰트 제휴를 통해 폰트가 공유되고 개선될 수 있는 자유롭게 개방된 환경을 만들기 위해서 입니다.
+
+OFL은 라이선스를 취득한 폰트가 그 자체로 판매되지 않는 한 자유롭게 사용, 연구, 수정, 재배포 하는 것을 허가합니다. 수정된 폰트를 포함한 폰트는 저작권 명이 사용되지 않는 한 기타 소프트웨어와 함께 묶이거나 삽입, 재배포 할 수 있습니다. 단 폰트와 수정된 폰트는 기타 다른 라이선스에 포함되어 배포될 수는 없습니다. 이 라이선스 하에 있기 위한 폰트에 대한 요구사항은 본 폰트나 수정본을 사용하여 제작된 어떠한 문서에도 적용되지 않습니다.
+
+허가 및 조건
+본 폰트 소프트웨어를 사용하도록 허가 받은 개인/기업/단체 누구라도 다음 명시된 조건에 따라 폰트 소프트웨어의 수정 혹은 수정되지 않은 복사본을 무료로 사용, 연구, 복사, 통합, 삽입, 수정, 재배포할 수 있도록 허가합니다.
+
+원본이나 수정본의 폰트 소프트웨어 혹은 개별 구성요소인 폰트 자체가 판매되어서는 안됩니다.
+
+본 폰트 소프트웨어의 원본 혹은 수정본은 상기 저작권 안내와 본 라이선스에 대한 내용을 포함하는 경우에는 다른 소프트웨어와 함께 묶이거나 재배포 혹은 판매가 가능합니다. 이는 독립 텍스트 파일과 가독성이 있는 헤더 혹은 유저가 용이하게 열람 가능한 이상 텍스트파일 혹은 이진파일 내 기계가 읽을 수 있는 메타데이터 형태를 모두 의미 합니다.
+
+본 폰트 소프트웨어의 어떠한 수정본도 동일한 저작권자가 명시적 허가서를 부여하지 않는 한 저작권이 있는 폰트명을 사용해서는 안 됩니다. 본 제한 사항은 유저들에게 제공된 기존 폰트명을 뜻합니다.
+
+본 폰트 소프트웨어의 저작권자 혹은 저자의 이름은 그들의 명시적 서면 허가가 있거나 또는 그들의 공헌을 인정하기 위한 경우를 제외하고는 수정본에 대한 사용을 유도,추천 혹은 광고하기 위한 목적으로 사용할 수 없습니다.
+
+본 폰트 소프트웨어는 전체나 부분, 혹은 수정 여부에 상관없이 본 라이선스 하에 배포가 되어야 하며 기타 다른 라이선스 하에서는 배포를 할 수 없습니다. 폰트에 대한 요구조건은 이 라이선스 하에서만 유효하며 이 라이선스 하에 있기 위한 폰트에 대한 요구사항은 본 폰트 소프트웨어를 사용해 제작한 어떠한 문서에도 적용되지 않습니다.
+
+
+계약의 종료
+본 라이선스는 상기 조건 중 일부라도 부합되지 않으면 무효가 될 수 있습니다.
+
+
+면책조항
+본 폰트 소프트웨어는 저작권, 특허권, 상표권 및 기타 권리의 비침해성과 특정 목적에의 적합성 포함한 명시적, 묵시적인 어떠한 종류의 보증 없이 “있는 그대로” 제공됩니다. 어떠한 경우에도 저작권자는 본 폰트 소프트웨어의 사용 또는 이의 사용불가, 그밖에 폰트 소프트웨어의 취급과 관련하여 발생하는 모든 계약, 불법행위 혹은 다른 일로 하여금 발생하는 일반적, 특수적, 간접적, 부차적 혹은 필연적 손해를 포함하는 소송, 손해, 혹은 기타 책임에 대한 의무를 가지지 않습니다.
+Copyright ⓒ 2016, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM YEONSUNG_TTF, BM YEONSUNGstd_OTF
+
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works. The fonts and derivatives, however, cannot be released under any other type of license.
+
+The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+
+
+
+TERMINATION
+This license becomes null and void if any of the above conditions are not met.
+
+
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+
+배달의 민족 을지로체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1323/BMEULJIROTTF.ttf
+© Copyright WOOWA BROTHERS Corp. All right reserved. Font Designed by Sandoll Inc.
+Copyright © 2019, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM EULJIRO, BM EULJIRO TTF.
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works.
+
+The fonts and derivatives, however, cannot be released under any other type of license. The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+PERMISSION & CONDITIONS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+
+Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.
+
+Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+
+No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+
+The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to
+
+acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+
+TERMINATION
+
+This license becomes null and void if any of the above conditions are not met.
+
+DISCLAIMER
+
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT
+
+SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+www.woowahan.com
+www.woowahan.comm
+
+배달의 민족 도현체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1323/BMDOHYEON_ttf.ttf
+Copyright ®œ 2015 Sandoll Communications Inc. All rights reserved.
+Sandoll Communications Inc.
+http://www.sandoll.co.kr
+Copyright ⓒ 2015 Sandoll Communications Inc. All rights reserved.
+Copyright © 2015 Sandoll Communications Inc. All rights reserved.
+
+배달의 민족 주아체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1323/BMJUA_ttf.ttf
+Copyright (c) 2014 WOOWA BROTHERS Corporation(www.woowahan.com) with Reserved Font Name "BM JUA "
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+www.woowahan.com
+Copyright (c) 2014 WOOWA BROTHERS Corporation(www.woowahan.com) with Reserved Font Name "BM JUA"
+
+가비아 봄바람체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1320/gabia_bombaram.ttf
+Copyright 2015 Gabia. All rights reserved.
+
+가비아 납작블럭체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1320/gabia_napjakBlock.ttf
+Copyright 2015 Gabia. All rights reserved.
+
+가비아 솔미체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1319/gabia_solmee.ttf
+Copyright (c) 2015 by Gabia. All rights reserved.
+Copyright ⓒ 2015 Gabia All Rights Reserved.
+
+배달의 민족 한나체 Pro
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0214/2000/BMHANNAPro.ttf
+© Copyright WOOWA BROTHERS Corp. All right reserved. Font Designed by Sandoll Communications Inc.
+Copyright © 2018, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM HANNA Pro_TTF, BM HANNA Pro_OTF
+
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works.
+
+The fonts and derivatives, however, cannot be released under any other type of license. The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+
+PERMISSION & CONDITIONS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+
+ 1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.
+
+ 2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to
+
+acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+
+
+TERMINATION
+
+This license becomes null and void if any of the above conditions are not met.
+
+
+DISCLAIMER
+
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT
+
+SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+www.woowahan.com
+배달의민족 한나체 Pro의 지적 재산권은 ㈜우아한형제들에 있습니다.
+
+
+배달의민족 한나체 Pro는 개인 및 기업 사용자를 포함한 모든 사용자에게 무료로 제공되며
+
+자유롭게 수정하고 재배포하실 수 있습니다.
+
+
+Copyright © 2018, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM HANNA Pro_TTF, BM HANNA Pro_OTF
+
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works.
+
+The fonts and derivatives, however, cannot be released under any other type of license. The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+
+PERMISSION & CONDITIONS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+
+ 1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.
+
+ 2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to
+
+acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+
+
+TERMINATION
+
+This license becomes null and void if any of the above conditions are not met.
+
+
+DISCLAIMER
+
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT
+
+SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+www.woowahan.comm
+
+가나초콜릿체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1319/Ghanachocolate.ttf
+© 2020 by LOTTE CONFECTIONERY CO.LTD. All rights reserved.
+
+나눔고딕
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1451/NanumGothicLight.ttf
+Copyright © 2011 NHN Corporation. All rights reserved. Font designed by Sandoll Communications Inc.
+NHN Corporation
+http://www.nhncorp.com
+
+배달의 민족 한나는 열한살체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0214/1958/BMHANNA_11yrs_ttf.ttf
+WOOWA BROTHERS Corporation
+Woowa Brothers Corp.
+www.woowahan.com
+
+나눔스퀘어
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1414/NanumSquareR.ttf
+Copyright ®œ 2016 NAVER Corporation. All rights reserved. Font designed by Sandoll Communications Inc.
+NAVER Corporation
+www.navercorp.com
+Copyright ⓒ 2016 NAVER Corporation. All rights reserved. Font designed by Sandoll Communications Inc.
+
+Yoon 하이멜로디
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0908/1132/HiMelody-Regular.ttf
+Copyright (c) YoonDesign Inc. All Rights Reserved.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL
+http://scripts.sil.org/OFL
+
+서평원 꺾깍체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0911/1103/SLEIGothicTTF.ttf
+© Copyright Seoul Lifelong Education Institute. All rights reserved. Font designed by Leedotype.
+Copyright © 2020, Seoul Lifelong Education Institute (http://smile.seoul.kr), with Reserved Font Name SLEI Gothic TTF, SLEI Gothic OTF
+
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works.
+
+The fonts and derivatives, however, cannot be released under any other type of license. The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+
+PERMISSION & CONDITIONS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+
+ 1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.
+
+ 2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to
+
+acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+
+
+TERMINATION
+
+This license becomes null and void if any of the above conditions are not met.
+
+
+DISCLAIMER
+
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT
+
+SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+https://smile.seoul.kr
+
+Min Sans
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0911/1035/MinSans-Regular.ttf
+Copyright 2020
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software.
+http://scripts.sil.org/OFL
+
+Noto Sans KR
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0913/1147/NotoSansKR-Regular.ttf
+(c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+http://scripts.sil.org/OFL
+
+Noto Serif KR
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0913/1118/NotoSerifKR-Regular.ttf
+
+
+J개구쟁이
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0913/1401/J%EA%B0%9C%EA%B5%AC%EC%9F%81%EC%9D%B4-Medium.ttf
+
+
+J송명
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0913/1359/J%EC%86%A1%EB%AA%85-Regular.ttf
+
+
+J해바라기
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0913/1355/J%ED%95%B4%EB%B0%94%EB%9D%BC%EA%B8%B0-Medium.ttf
+
+
+카페24 모야모야
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1031/1112/Cafe24Moyamoya-Regular-v1.0.ttf
+https://fonts.cafe24.com
+Copyright ⓒ Cafe24 Corp. All Rights Reserved.
+
+엘리스 DX널리체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1005/1110/EliceDXNeolli-Medium.ttf
+Copyright (c) 2023 Elice Inc. All Rights Reserved.
+Elice Inc.
+https://elice.io/
+
+Orbit
+https://font-real.cdn.gov-ntruss.com/fnt/2023/1005/1101/Orbit-Regular.ttf
+Copyright 2022 The Orbit Project Authors (https://github.com/JAMO-TYPEFACE/Orbit)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+https://scripts.sil.org/OFL
+
+Intel One Mono
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0711/1210/intelone-mono-font-family-regular.ttf
+(C) 2023 Intel Corporation
+Licensed under the SIL Open Font License, Version 1.1
+https://github.com/intel/intel-one-mono/blob/main/license
+
+아이엠어플레이어체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1318/I%20AM%20A%20PLAYER.ttf
+Copyright (c) 2016 greenegg(www.greenegg.co.kr) with "I AM A PLAYER"
+Copyright (c) 2016 greenegg (www.greenegg.co.kr) with Reserved Font Name "I AM A PLAYER"
+www.greenegg.co.kr
+
+보케체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1153/BOKEH.ttf
+Copyright (c) 2015 greenegg(www.greenegg.co.kr) with "BOKEH"
+Copyright (c) 2015 greenegg (www.greenegg.co.kr) with Reserved Font Name "BOKEH"
+www.greenegg.co.kr
+
+크룩트체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1321/CROOKED.ttf
+Copyright (c) 2015 greenegg(www.greenegg.co.kr) with "CROOKED"
+Copyright (c) 2015 greenegg (www.greenegg.co.kr) with Reserved Font Name "CROOKED"
+www.greenegg.co.kr
+
+델타유니버스체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1321/Delta%20Universe.ttf
+Copyright (c) 2015 greenegg(www.greenegg.co.kr) with "Delta Universe"
+Copyright (c) 2015 greenegg (www.greenegg.co.kr) with Reserved Font Name "Delta Universe"
+www.greenegg.co.kr
+
+60‘S스트라이프체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1324/60sSTRIPE.ttf
+Copyright (c) 2015 greenegg(www.greenegg.co.kr) with "60sSTRIPE"
+Copyright (c) 2015 greenegg (www.greenegg.co.kr) with Reserved Font Name "60sSTRIPE"
+www.greenegg.co.kr
+
+동글
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0817/1900/Dongle-Regular.ttf
+Copyright 2021 The Dongle Project Authors (https://github.com/yangheeryu/Dongle)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+https://scripts.sil.org/OFL
+
+Interop
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0817/1729/Interop-Regular.ttf
+Copyright © 2021 Jang Haemin
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL
+http://scripts.sil.org/OFL
+
+엘리스 디지털 코딩체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0623/1510/EliceDigitalCodingverH_Regular.ttf
+Copyright (c) 2016-2021 elice. All rights reserved.
+Elice
+https://elice.io/
+
+엘리스 디지털 배움체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0623/1508/EliceDigitalBaeum_Regular.ttf
+Copyright (c) 2016-2021 elice. All rights reserved.
+Elice
+https://elice.io/
+
+스포카 한 산스 네오
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0621/1445/SpoqaHanSansNeo-Regular.ttf
+Copyright 2020 Spoqa (http://www.spoqa-han-sans.com)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software.
+http://scripts.sil.org/OFL
+
+둥근모꼴
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0615/1643/DungGeunMo.ttf
+Public Domain
+
+함렡
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0615/1622/Hahmlet-Black.ttf
+Copyright 2020 The Hahmlet Project Authors (https://github.com/hyper-type/hahmlet)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://scripts.sil.org/OFL
+https://scripts.sil.org/OFL
+
+Tlab신영복체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0920/Tlab%EC%8B%A0%EC%98%81%EB%B3%B5%EC%B2%B4.ttf
+Copyright (C) 2017 PYJ&TYPOLAB Inc. All rights reserved.
+http://www.typolab.co.kr/front/html/license
+
+KCC은영체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0946/KCC%EC%9D%80%EC%98%81%EC%B2%B4.ttf
+© 2017 Korea Copyright Commission. All rights reserved.
+
+KCC안중근체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1000/KCCAhnjunggeun.ttf
+© 2019 Korea Copyright Commission. All rights reserved.
+
+KCC무럭무럭체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0948/KCCMurukmuruk%20%281%29.ttf
+© 2017 Korea Copyright Commission. All rights reserved.
+
+KCC도담도담체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0954/KCCDodamdodam.ttf
+COPYRIGHT ®œ 2004-2018 by Korea Copyright Commission. All rights reserved. Font designed by Type4Design Group CO., LTD.TypoDesign Lab
+TypoDesign lab.inc.
+www.typodesign.co.kr
+COPYRIGHT ⓒ 2004-2018 by 한국저작권위원회 All rights reserved. Font designed by (주)타입포디자인그룹.타이포디자인연구소
+COPYRIGHT ⓒ 2004-2018 by Korea Copyright Commission. All rights reserved. Font designed by Type4Design Group CO., LTD.TypoDesign Lab
+
+KCC김훈체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0947/KCC%EA%B9%80%ED%9B%88%EC%B2%B4.ttf
+© 2017 Korea Copyright Commission. All rights reserved.
+
+배달의 민족 한나체 Air
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1305/BMHANNAAir_ttf.ttf
+© Copyright WOOWA BROTHERS Corp. All right reserved. Font Designed by Sandoll Communications Inc.
+Copyright © 2018, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM HANNA Air_TTF, BM HANNA Air_OTF
+
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works.
+
+The fonts and derivatives, however, cannot be released under any other type of license. The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+
+PERMISSION & CONDITIONS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+
+ 1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.
+
+ 2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to
+
+acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+
+
+TERMINATION
+
+This license becomes null and void if any of the above conditions are not met.
+
+
+DISCLAIMER
+
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT
+
+SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+www.woowahan.com
+배달의민족 한나체 Air의 지적 재산권은 ㈜우아한형제들에 있습니다.
+
+
+배달의민족 한나체 Air는 개인 및 기업 사용자를 포함한 모든 사용자에게 무료로 제공되며
+
+자유롭게 수정하고 재배포하실 수 있습니다.
+
+
+Copyright © 2018, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM HANNA Air_TTF, BM HANNA Air_OTF
+
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works.
+
+The fonts and derivatives, however, cannot be released under any other type of license. The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+
+PERMISSION & CONDITIONS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+
+ 1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.
+
+ 2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to
+
+acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+
+
+TERMINATION
+
+This license becomes null and void if any of the above conditions are not met.
+
+
+DISCLAIMER
+
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT
+
+SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+www.woowahan.comm
+배달의민족 한나체 Air의 지적 재산권은 ㈜우아한형제들에 있습니다.
+
+
+배달의민족 한나체 Air는 개인 및 기업 사용자를 포함한 모든 사용자에게 무료로 제공되며
+
+자유롭게 수정하고 재배포하실 수 있습니다.
+
+
+CCopyright © 2018, Woowa Brothers Corporation (http://www.woowahan.com), with Reserved Font Name BM HANNA Air_TTF, BM HANNA Air_OTF
+
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works.
+
+The fonts and derivatives, however, cannot be released under any other type of license. The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+
+PERMISSION & CONDITIONS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of the Font Software, to use, study, copy, merge, embed, modify, redistribute, and sell modified and unmodified copies of the Font Software, subject to the following conditions:
+
+ 1) Neither the Font Software nor any of its individual components,in Original or Modified Versions, may be sold by itself.
+
+ 2) Original or Modified Versions of the Font Software may be bundled, redistributed and/or sold with any software, provided that each copy contains the above copyright notice and this license. These can be included either as stand-alone text files, human-readable headers or in the appropriate machine-readable metadata fields within text or binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font Name(s) unless explicit written permission is granted by the corresponding Copyright Holder. This restriction only applies to the primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font Software shall not be used to promote, endorse or advertise any Modified Version, except to
+
+acknowledge the contribution(s) of the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+5) The Font Software, modified or unmodified, in part or in whole, must be distributed entirely under this license, and must not be distributed any other license. The requirement for fonts to remain under this license does not apply to any document created using the Font Software.
+
+
+TERMINATION
+
+This license becomes null and void if any of the above conditions are not met.
+
+
+DISCLAIMER
+
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE THE FONT
+
+SOFTWARE OR FROM OTHER DEALINGS IN THE FONT SOFTWARE.
+
+야놀자 야체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1309/%EC%95%BC%EB%86%80%EC%9E%90%20%EC%95%BC%EC%B2%B4%20Regular.ttf
+Copyright (c) 2015 Yanolja. All rights reserved. Font designed by FONTRIX Inc.
+
+나눔손글씨 펜체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0911/NanumPen.ttf
+Copyright © 2010 NHN Corporation. All rights reserved. Font designed by Sandoll Communications Inc.
+NHN Corporation
+http://www.nhncorp.com
+
+나눔스퀘어 라운드
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1410/NanumSquareRoundR.ttf
+Copyright ®œ 2017 NAVER Corporation. All rights reserved. Font designed by Sandoll Communications Inc.
+NAVER Corporation
+http://www.navercorp.com
+Copyright ⓒ 2017 NAVER Corporation. All rights reserved. Font designed by Sandoll Communications Inc.
+
+나눔손글씨 붓체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0922/%EB%82%98%EB%88%94%EC%86%90%EA%B8%80%EC%94%A8%EB%B6%93.ttf
+Copyright © 2010 NHN Corporation. All rights reserved. Font designed by Sandoll Communications Inc.
+NHN Corporation
+http://www.nhncorp.com
+
+유앤피플 고딕체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1308/%EC%9C%A0%EC%95%A4%ED%94%BC%ED%94%8C%20%EA%B3%A0%EB%94%95%20UNI.ttf
+
+
+KCC임권택체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0952/KCCImkwontaek.ttf
+?2020 Korea Copyright Commission. All rights reserved.
+© 2020 Korea Copyright Commission. All rights reserved.
+
+KCC차쌤체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0959/KCCChassam.ttf
+?2020 Korea Copyright Commission. All rights reserved.
+© 2020 Korea Copyright Commission. All rights reserved.
+
+솔뫼 김대건체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1309/%EC%86%94%EB%AB%BC%20%EA%B9%80%EB%8C%80%EA%B1%B4%20Medium.ttf
+COPYRIGHT (C) SUMMITDESIGN ALL RIGHT RESERVED.
+
+KCC김환기체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0949/KCC-Kimhwanki.ttf
+(c) 2021 Korea Copyright Commission. All rights reserved.
+© 2021 Korea Copyright Commission. All rights reserved.
+
+KCC정범체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0950/KCC-Jeongbeom.ttf
+(c) 2021 Korea Copyright Commission. All rights reserved.
+© 2021 Korea Copyright Commission. All rights reserved.
+
+박용준투사회보체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/0915/Pak_Yong_jun.ttf
+광주로, 광주YWCA, (사)들불열사기념사업회
+
+김정철_명조체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0106/1427/KimjungchulMyungjo-Light.ttf
+Copyright © 2022 Junglim Architecture co.,ltd. All right reserved.
+http://www.YoonDesign.com
+
+김정철_고딕체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0106/1328/KimjungchulGothic-Light.ttf
+Copyright © 2022 Junglim Architecture co.,ltd. All right reserved.
+http://www.YoonDesign.com
+
+김정철 _손글씨체
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0106/1033/KimjungchulScript-Light.ttf
+Copyright ?2022 Junglim Architecture co.,ltd. All right reserved.
+http://www.YoonDesign.com
+Copyright © 2022 Junglim Architecture co.,ltd. All right reserved.
+
+한글재민체
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1318/Jaemin.ttf
+Copyright (c) 2020 by Jae-gahb Park, Min Kim, Kyusun Lee. All rights reserved.
+
+한글재민체2.0
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0117/1357/Jaemin_v2.ttf
+Copyright (c) 2020 by Jae-gahb Park, Min Kim, Kyusun Lee. All rights reserved.
+
+한글재민체3.0
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0117/1358/Jaemin3-Regular.ttf
+Copyright (c) 2022 by Jae-gahb Park, Min Kim, Kyusun Lee. All rights reserved.
+
+스포카 한 산스
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1200/Spoqa%20Han%20Sans%20Regular.ttf
+Copyright  2015 Spoqa (http://www.spoqa-han-sans.com)
+This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software.
+http://scripts.sil.org/OFL
+
+나눔바른펜
+https://font-real.cdn.gov-ntruss.com/fnt/2023/0516/1610/NanumBarunpenR.ttf
+Copyright © 2014 NHN Corporation. All rights reserved. Font designed by YoonDesign Inc.
+NHN Corporation
+http://www.nhncorp.com/license
+
+나눔바른고딕
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1430/NanumBarunGothic.ttf
+Copyright (c) 2013 NHN Corporation. All rights reserved. Font designed by FONTRIX Inc.
+NHN Corporation
+http://www.nhncorp.com
+Copyright ⓒ 2013 NHN Corporation. All rights reserved. Font designed by FONTRIX Inc.
+
+나눔명조
+https://font-real.cdn.gov-ntruss.com/fnt/2022/1028/1445/NanumMyeongjo.ttf
+Copyright © 2010 NHN Corporation. All rights reserved. Font designed by FONTRIX.
+NHN Corporation
+http://www.nhncorp.com

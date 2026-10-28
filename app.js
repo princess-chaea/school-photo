@@ -13,7 +13,7 @@ import { icon, labelButton } from './icons.js';
 const $ = id => document.getElementById(id);
 const canvas = $('preview'), ctx = canvas.getContext('2d');
 const titles = ['어디에 사용할 사진인가요?', '어떤 프레임에 담을까요?', '준비됐나요? 하나, 둘, 셋.', '우리답게, 조금 더 특별하게.', '이 순간을 간직해요.'];
-const descriptions = ['사진을 사용할 용도를 선택한 뒤 다음으로 넘어가세요.', '컷 수와 방향, 프레임 디자인을 선택하세요.', '사진을 찍거나 기기에 있는 사진을 골라주세요.', '사진 위에 스티커와 문구를 자유롭게 놓아보세요.', '완성 이미지는 내 기기에만 저장돼요.'];
+const descriptions = ['용도와 컷 수, 가로·세로 배치를 선택하세요.', '사진을 감쌀 색상이나 행사에 준비된 콜라보·특별 프레임을 선택하세요.', '사진을 찍거나 기기에 있는 사진을 골라주세요.', '사진 위에 스티커와 문구를 자유롭게 놓아보세요.', '완성 이미지는 내 기기에만 저장돼요.'];
 const nextLabels = ['프레임 선택으로', '촬영 시작', '꾸미기로', '저장·공유로'];
 let state = { step: 0, count: 4, frame: 0, orientation: 'portrait', photos: Array(4).fill(null), selectedPhoto: 0, selectedDeco: null, filter: 'original', decorations: [], event: structuredClone(DEFAULT_EVENT) };
 let stream = null, facing = 'user', busy = false, starting = false, cameraEpoch = 0, captureEpoch = 0, toastTimeout, downloadURL;
@@ -73,7 +73,7 @@ function renderChoices() {
     button.append(sample, label); $('frame-options').append(button);
   });
   $('frame-name').textContent = state.event.frames[state.frame].name;
-  $('chosen-purpose').textContent = '선택한 용도: '+$('export-format').selectedOptions[0].textContent;
+  $('chosen-purpose').textContent = $('export-format').selectedOptions[0].textContent+' · '+state.count+'컷 · '+(state.orientation==='landscape'?'가로 배치':'세로 배치');
   renderFilterChoices();
   $('sticker-options').replaceChildren();
   [...STICKER_PRESETS,...state.event.stickers.filter(s=>!STICKER_PRESETS.some(p=>p.id===s.id))].forEach(sticker => {
@@ -449,7 +449,7 @@ canvas.addEventListener('clear-selection',()=>{state.selectedDeco=null;updateAdj
 canvas.addEventListener('pointerdown', pointerDown); canvas.addEventListener('pointermove', pointerMove); for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(event, pointerEnd);
 
 $('expand-preview').addEventListener('click', () => {if(state.step===4)go(3);openEditorTool();});
-$('change-layout').addEventListener('click', () => go(1));
+$('change-layout').addEventListener('click', () => go(0));
 document.querySelectorAll('[data-open-tool]').forEach(b => b.addEventListener('click', () => openEditorTool(b.dataset.openTool)));
 document.querySelectorAll('[data-editor-tool]').forEach(b => b.addEventListener('click', () => selectEditorTool(b.dataset.editorTool)));
 $('close-edit').addEventListener('click', closeEditor);

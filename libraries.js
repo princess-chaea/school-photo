@@ -31,7 +31,7 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
   function render() {
     const own = getAssets(), shared = getShared().filter(a => a.active);
     const frames = [...DEFAULT_FRAMES.map(f => ({ ...f, kind: 'palette', base: true })), ...shared.filter(a => a.kind === 'frame'), ...own.filter(a => ['frame','palette'].includes(a.kind))];
-    const designs = [...DEFAULT_STICKERS.filter(s => s.url).map(s => ({ ...s, kind: 'sticker', base: true })), ...shared.filter(a => a.kind === 'sticker'), ...own.filter(a => ['logo','sticker'].includes(a.kind))];
+    const designs = [...DEFAULT_STICKERS.filter(s => s.url).map(s => ({ ...s, kind: 'sticker', base: true })), ...shared.filter(a => a.kind === 'sticker'), ...own.filter(a => a.kind === 'sticker')];
     $('frame-count').textContent = frames.length; $('asset-count').textContent = designs.length;
     $('frame-library').replaceChildren(...frames.map(a => assetCard(a))); $('asset-library').replaceChildren(...designs.filter(a=>a.kind===$('asset-kind').value).map(a => assetCard(a)));
     $('shared-library').replaceChildren(...getShared().filter(a=>a.kind===$('shared-kind').value).map(a => assetCard(a, true)));
