@@ -9,7 +9,7 @@ import * as cloud from './cloud.js';
 const $ = id => document.getElementById(id);
 const LABELS = { frame: '프레임', palette: '단색 프레임', sticker: '꾸미기 이미지', logo: '학교 로고' };
 export function createLibraries({ getAssets, getShared, getUser, demo, run, added, sharedAdded, sharedChanged, removePrivate, toast }) {
-  const frameUpload=createFrameUpload();
+  const frameUpload=createFrameUpload(), drafts=new WeakMap();
   function element(tag, value, className = '') { const el = document.createElement(tag); el.textContent = value; el.className = className; return el; }
   function isAdmin() { return cloud.isSiteAdmin(getUser()); }
   function showAsset(asset) {
@@ -21,8 +21,8 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
     const card = element('article', '', 'asset-card'), image = element('button', '', 'asset-image library-image'); image.type = 'button'; image.setAttribute('aria-label', `${asset.name} 크게 보기`);
     if (asset.url) { const img = new Image(); img.src = asset.url; img.alt = asset.name; image.append(img); image.addEventListener('click', () => showAsset(asset)); }
     else { const sample=document.createElement('canvas'); sample.className='palette-preview'; sample.setAttribute('aria-label',asset.name+' 4컷 예시'); image.append(sample); paintFramePreview(sample,{title:'',school:'',logo:'',schedule:'',frames:[asset]}); image.disabled=true; }
-    const info = element('div', '', 'asset-info'); info.append(element('span', asset.base ? '기본' : asset.shared ? (asset.active ? '공용' : '공용 · 노출 중지') : '내 자료', `library-source ${asset.shared ? 'public' : ''}`), element('strong', asset.name), element('p', `${LABELS[asset.kind]}${asset.layoutCount ? ` · ${asset.layoutCount}컷 전용` : ''}`));
-    if (asset.layoutCount) { const g = templateGeometry(asset.layoutCount, asset.orientation,asset.frameFormat); info.append(element('p', `제작 규격 ${g.width} × ${g.height}px`)); }
+    const info = element('div', '', 'asset-info'); info.append(element('span', asset.base ? '기본' : asset.shared ? (asset.active ? '공용' : '공용 · 노출 중지') : '내 자료', `library-source ${asset.shared ? 'public' : ''}`), element('strong', asset.name), element('p', `${LABELS[asset.kind]}${asset.layoutCount ? ` · ${asset.layoutCount}컷 전용` : asset.preserveAspect ? ' · 모든 컷·배치' : ''}`));
+    if (asset.layoutCount || asset.preserveAspect) { const g = templateGeometry(asset.layoutCount || 4, asset.orientation,asset.frameFormat); info.append(element('p', `제작 규격 ${g.width} × ${g.height}px`)); }
     if (asset.optimizedBytes) info.append(element('p', `WebP · ${formatBytes(asset.optimizedBytes)}`));
     if (manage && isAdmin()) { const b = element('button', asset.active ? '공용 노출 중지' : '공용 다시 표시', 'text-button'); b.type = 'button'; b.addEventListener('click', () => run(async () => { await cloud.setSharedActive(asset.id, !asset.active); sharedChanged(asset.id, !asset.active); toast(asset.active ? '새 선택 목록에서 숨겼어요. 기존 행사의 파일은 유지돼요.' : '다시 공용 목록에 표시했어요.'); })); info.append(b); }
     else if (!asset.base && !asset.shared) { const b = element('button', '삭제', 'text-button danger'); b.type = 'button'; b.addEventListener('click', () => run(() => removePrivate(asset))); info.append(b); }
@@ -43,18 +43,36 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
     const name = $(shared ? 'shared-name' : 'frame-upload-name').value.trim(), input = $(shared ? 'shared-file' : 'frame-upload-file'), file = input.files[0];
     if (!file || !name) throw new Error('이름과 이미지를 선택해 주세요.');
     if (shared && !isAdmin()) throw new Error('운영자 전용입니다.');
-    let layoutCount = kind === 'frame' ? Number($(shared ? 'shared-count' : 'frame-upload-count').value) : 0;
-    let orientation=$(shared ? 'shared-orientation' : 'frame-upload-orientation').value; let prepared=file, photoSlots,frameFormat=$(shared?'shared-format':'frame-upload-format').value;
-    if(kind==='frame'){try { const result=await frameUpload.edit(file,{count:layoutCount,orientation,frameFormat});prepared=result.file;layoutCount=result.count;orientation=result.orientation;photoSlots=result.photoSlots;frameFormat=result.frameFormat; } catch(error) {if(error.name==='AbortError')return;throw error;}}
+    let prepared=file, metadata={};
+    if(kind==='frame'){
+      let draft=drafts.get(form);
+      if(!draft || draft.source!==file){await prepareFrame(form,shared);draft=drafts.get(form);}
+      if(!draft)return;
+      prepared=draft.file;metadata=draft;
+    }
     const button = $(shared ? 'upload-shared' : 'upload-frame'); labelButton(button, 'refresh', 'WebP로 최적화 중…');
     try {
-      const optimized = await optimizeDesign(prepared, kind, { layoutCount, orientation, frameFormat, photoSlots });
+      const optimized = await optimizeDesign(prepared, kind, metadata);
       let asset;
       if (demo) { const url = await new Promise((resolve,reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(optimized.file); }); asset = { id: crypto.randomUUID(), name, kind, url, ...optimized.metadata }; }
       else asset = shared ? await cloud.uploadSharedAsset(optimized.file, kind, name, optimized.metadata) : await cloud.uploadAsset(getUser().uid, optimized.file, kind, name, optimized.metadata);
-      shared ? sharedAdded(asset) : added(asset); const selectedKind=$('shared-kind').value;form.reset();if(shared)$('shared-kind').value=selectedKind;render();$('shared-count-wrap').hidden = $('shared-kind').value !== 'frame';
+      drafts.delete(form);shared ? sharedAdded(asset) : added(asset); const selectedKind=$('shared-kind').value;form.reset();if(shared)$('shared-kind').value=selectedKind;render();$('shared-count-wrap').hidden = $('shared-kind').value !== 'frame';
       toast(`${formatBytes(file.size)} → ${formatBytes(optimized.file.size)} WebP로 ${shared ? '공용 자료' : demo ? '탭 임시 보관함' : '내 프레임'}에 추가했어요.`);
     } finally { labelButton(button, 'upload', shared ? '최적화 후 공용으로 등록' : '최적화 후 내 프레임 추가'); }
+  }
+  async function prepareFrame(form,shared){
+    const input=$(shared?'shared-file':'frame-upload-file'),file=input.files[0],previous=drafts.get(form);drafts.delete(form);
+    if(!file)return;
+    try{const result=await frameUpload.edit(file,{frameFormat:$(shared?'shared-format':'frame-upload-format').value,placement:previous?.source===file?previous.placement:undefined});drafts.set(form,{...result,source:file});toast('배치를 적용했어요. 이름을 확인하고 등록해 주세요.');}
+    catch(error){if(error.name!=='AbortError')throw error;if(previous?.source===file)drafts.set(form,previous);else input.value='';}
+  }
+  for(const shared of [false,true]){
+    const form=$(shared?'shared-form':'frame-form'),input=$(shared?'shared-file':'frame-upload-file'),format=$(shared?'shared-format':'frame-upload-format');
+    input.addEventListener('change',()=>{if(!shared||$('shared-kind').value==='frame')run(()=>prepareFrame(form,shared));});
+    format.addEventListener('change',()=>{drafts.delete(form);if(input.files[0])run(()=>prepareFrame(form,shared));});
+    const preview=element('button','위치 다시 조절','text-button');preview.type='button';preview.onclick=()=>run(()=>prepareFrame(form,shared));input.parentElement.append(preview);
+    if(shared)document.querySelectorAll('[data-library-target="shared-kind"]').forEach(tab=>tab.addEventListener('click',()=>{preview.hidden=$('shared-kind').value!=='frame';drafts.delete(form);}));
+    preview.hidden=shared&&$('shared-kind').value!=='frame';
   }
   async function template(count, guide) {
     await document.fonts.ready; const g = templateGeometry(count, $('template-orientation').value,$('template-format').value), c = document.createElement('canvas'); c.width = g.width; c.height = g.height; const ctx = c.getContext('2d'); ctx.fillStyle = '#fffdf6'; ctx.fillRect(0,0,c.width,c.height);

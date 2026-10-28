@@ -168,3 +168,14 @@ test('집계의 초기 원자 증가와 동시 증가가 수신한 횟수를 잃
  const {Timestamp,increment}=await import('firebase/firestore'),{usageDay,USAGE_KEYS}=await import('../usage-data.js');const a=env.authenticatedContext('teacher-a').firestore(),guest=env.unauthenticatedContext().firestore(),admin=env.authenticatedContext('operator',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore();await setDoc(doc(a,'events','parallel'),config(true));const day=usageDay(),reference=doc(guest,'usageDaily','parallel_'+day+'_2');
  const send=()=>setDoc(reference,{eventId:'parallel',shard:2,day:Timestamp.fromMillis(day),...Object.fromEntries(USAGE_KEYS.map(key=>[key,increment(key==='photoImports'?1:0)])),updatedAt:serverTimestamp()},{merge:true});await assertSucceeds(send());await assertSucceeds(Promise.all(Array.from({length:6},send)));assert.equal((await getDoc(doc(admin,'usageDaily',reference.id))).data().photoImports,7);
 });
+
+test('컷 제한 없는 프레임은 보존 모드만 허용하고 임의 모드와 스티커의 프레임 속성을 차단한다',async()=>{
+ const a=env.authenticatedContext('teacher-a').firestore();
+ const frame={name:'범용 프레임',kind:'frame',path:'users/teacher-a/assets/universal',url:'https://example.com/frame.webp',layoutCount:0,orientation:'portrait',frameFormat:'square',preserveAspect:true,clearPhotoSlots:true};
+ await assertSucceeds(setDoc(doc(a,'users/teacher-a/assets/universal'),frame));
+ for(const patch of [{preserveAspect:false},{clearPhotoSlots:'yes'},{kind:'sticker'}])await assertFails(setDoc(doc(a,'users/teacher-a/assets/universal'),{...frame,...patch}));
+ const admin=env.authenticatedContext('operator',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore();
+ const shared={...frame,path:'shared/assets/universal',active:true};
+ await assertSucceeds(setDoc(doc(admin,'sharedAssets/universal'),shared));
+ await assertFails(setDoc(doc(a,'sharedAssets/universal'),shared));
+});

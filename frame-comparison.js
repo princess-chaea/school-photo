@@ -20,7 +20,7 @@ export function createFrameComparison({getEvent,getSelection}){
     const canvas=$('comparison-'+orientation),empty=$('comparison-'+orientation+'-unavailable'),info=$('comparison-'+orientation+'-info');
     const available=compatibleFrame(frame,count,orientation);canvas.hidden=!available;empty.hidden=available;
     if(!available){info.textContent='제작 방향 전용 이미지 프레임';empty.textContent=`이 프레임은 ${frame.orientation==='landscape'?'가로':'세로'} 배치 전용이에요. 반대 방향으로 사용할 이미지 프레임을 행사에 추가해 주세요.`;return;}
-    empty.textContent='';const fixedOutput=Boolean(frame.layoutCount&&preset.width),source=fixedOutput?document.createElement('canvas'):canvas;
+    empty.textContent='';const fixedOutput=Boolean((frame.layoutCount||frame.preserveAspect)&&preset.width),source=fixedOutput?document.createElement('canvas'):canvas;
     const result=await paintFramePreview(source,event,{count,frameIndex,orientation,preset});if(!result||ticket!==version||!dialog.open)return;
     let dimensions=result.geometry;if(fixedOutput)dimensions=paintExport(source,canvas,preset.id,frame.bg);
     info.textContent=`${count}컷 · ${result.geometry.cols} × ${result.geometry.rows} 배치 · ${dimensions.width} × ${dimensions.height}px`;

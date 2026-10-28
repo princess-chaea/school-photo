@@ -1,3 +1,4 @@
+import {drawFrameOverlay} from './frame-overlay.js';
 import {createUsageTracker} from './usage-data.js';
 import {createTextStyleControls} from './text-style-controls.js';
 import {textColorSettings,paintColoredText,measureStyledText} from './text-colors.js';
@@ -40,7 +41,7 @@ const studentTextStyles=createTextStyleControls($('student-text-style'),{
  getState:()=>{const d=state.decorations[state.selectedDeco];return d?.type==='text'?{key:d.id,label:'문구',text:d.text,settings:{...d,...textColorSettings(d.text,d)},baseSize:.055,minSize:.015,maxSize:.35,ink:'#ffffff'}:null;},
  onChange:part=>{const d=state.decorations[state.selectedDeco];if(d?.type==='text'){Object.assign(d,part);updateAdjustment();render();}}
 });
-function outputFormat(){return state.event.frames[state.frame]?.layoutCount ? $('export-format').value : 'original';}
+function outputFormat(){return (state.event.frames[state.frame]?.layoutCount || state.event.frames[state.frame]?.preserveAspect) ? $('export-format').value : 'original';}
 
 function toast(message) { $('toast').textContent = message; $('toast').classList.add('visible'); clearTimeout(toastTimeout); toastTimeout = setTimeout(() => $('toast').classList.remove('visible'), 4500); }
 function createButton(className, text, handler) { const el = document.createElement('button'); el.className = className; el.textContent = text; el.type = 'button'; el.addEventListener('click', handler); return el; }
@@ -171,7 +172,7 @@ function decorationBox(d, g) {
 function geometryFor(preset, count=state.count, frame=state.event.frames[state.frame]) {
   return layout(count,state.event,{frame,orientation:state.orientation,width:preset.width,height:preset.height,padding:preset.padding,caption:Boolean($('caption').value.trim()),captureDate:$('show-date').checked});
 }
-function spaceGeometryFor(preset,count=state.count,frame=state.event.frames[state.frame]) { const g=geometryFor(preset,count,frame);return frame?.layoutCount?fitLayoutGuide(g,preset):g; }
+function spaceGeometryFor(preset,count=state.count,frame=state.event.frames[state.frame]) { const g=geometryFor(preset,count,frame);return (frame?.layoutCount || frame?.preserveAspect)?fitLayoutGuide(g,preset):g; }
 function currentGeometry() { return geometryFor(EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{}); }
 function render(exporting = false) {
   const g = currentGeometry(), frame = state.event.frames[state.frame];
@@ -179,7 +180,7 @@ function render(exporting = false) {
   drawLayoutGuide($('layout-space-preview'),space,{background:frame.bg,ink:frame.ink});
   const slot=space.slots[state.selectedPhoto]||space.slots[0],photoArea=space.slots.reduce((sum,s)=>sum+s.w*s.h,0)/(space.width*space.height);
   $('layout-space-summary').textContent=`전체 ${space.width} × ${space.height}px · ${state.count}컷 · 사진 칸 약 ${Math.round(slot.w)} × ${Math.round(slot.h)}px · 사진 영역 ${Math.round(photoArea*100)}%`;
-  $('export-format-note').textContent=frame.layoutCount?'이미지 프레임은 원래 디자인을 보존해 선택한 용도에 맞춰 저장해요.':'선택한 용도에 맞춰 처음부터 사진을 크게 배치해요.';
+  $('export-format-note').textContent=(frame.layoutCount || frame.preserveAspect)?'이미지 프레임은 원래 디자인을 보존해 선택한 용도에 맞춰 저장해요.':'선택한 용도에 맞춰 처음부터 사진을 크게 배치해요.';
   if (canvas.width !== g.width || canvas.height !== g.height) { canvas.width = g.width; canvas.height = g.height; }
   ctx.filter = 'none'; ctx.fillStyle = frame.bg; ctx.fillRect(0, 0, g.width, g.height);
   g.slots.forEach((slot, i) => {
@@ -195,7 +196,7 @@ function render(exporting = false) {
     }
     ctx.restore();
   });
-  const overlay = assetImages.get(frame.overlay); if (overlay) ctx.drawImage(overlay, 0, 0, g.width, g.height);
+  const overlay = assetImages.get(frame.overlay); if (overlay) drawFrameOverlay(ctx,overlay,frame,g);
   branding(g, frame);
   fitText($('caption').value || ' ', g.width / 2, g.footerY + 48, g.width - 80, 23, frame.ink, '700',$('caption-font').value);
   if ($('show-date').checked) fitText(photoDate.toLocaleDateString('sv-SE').replaceAll('-', '. '), g.width / 2, g.footerY + 82, g.width - 80, 13, frame.ink);

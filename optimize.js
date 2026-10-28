@@ -10,7 +10,7 @@ async function encodeFallback(image, quality) {
     worker.postMessage({ image, quality }, [image.data.buffer]);
   });
 }
-export async function optimizeDesign(file, kind, { forceWasm = false, layoutCount = 0, orientation = 'portrait', frameFormat='print-4x6', photoSlots } = {}) {
+export async function optimizeDesign(file, kind, { forceWasm = false, layoutCount = 0, orientation = 'portrait', frameFormat='print-4x6', photoSlots, preserveAspect=false, clearPhotoSlots=false } = {}) {
   if (!MAX_DIMENSION[kind]) throw new Error('올바른 디자인 종류를 선택해 주세요.');
   if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 20 * 1024 * 1024) throw new Error('20MB 이하 PNG·JPG·WebP 파일을 선택해 주세요.');
   const sourceURL = URL.createObjectURL(file);
@@ -28,6 +28,6 @@ export async function optimizeDesign(file, kind, { forceWasm = false, layoutCoun
   // 투명도는 유지하고 사진 EXIF/GPS 등 원본 메타데이터는 전달하지 않습니다.
   if (blob.size >= 4 * 1024 * 1024) blob = await encodeFallback(ctx.getImageData(0, 0, canvas.width, canvas.height), 70);
   if (blob.size >= 4 * 1024 * 1024) throw new Error('변환 후에도 4MB를 넘어요. 이미지 크기를 더 줄여 주세요.');
-  return { file: new File([blob], `${file.name.replace(/\.[^.]+$/, '')}.webp`, { type: 'image/webp' }), metadata: { originalBytes: file.size, optimizedBytes: blob.size, width: canvas.width, height: canvas.height, format: 'webp', ...(kind === 'frame' ? { layoutCount, orientation, frameFormat, ...(photoSlots ? {photoSlots} : {}) } : {}) } };
+  return { file: new File([blob], `${file.name.replace(/\.[^.]+$/, '')}.webp`, { type: 'image/webp' }), metadata: { originalBytes: file.size, optimizedBytes: blob.size, width: canvas.width, height: canvas.height, format: 'webp', ...(kind === 'frame' ? { layoutCount, orientation, frameFormat, ...(preserveAspect ? {preserveAspect,clearPhotoSlots} : {}), ...(photoSlots ? {photoSlots} : {}) } : {}) } };
 }
 export function formatBytes(n) { return n < 1024 * 1024 ? `${(n / 1024).toFixed(0)}KB` : `${(n / 1024 / 1024).toFixed(2)}MB`; }

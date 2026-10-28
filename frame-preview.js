@@ -1,3 +1,4 @@
+import {drawFrameOverlay} from './frame-overlay.js';
 import {loadFont} from './fonts.js';
 import { layout, imageFromURL, brandingModel, brandEntries } from './core.js';
 import { drawBranding } from './branding.js';
@@ -12,7 +13,7 @@ export async function paintFramePreview(canvas, event, { count = 4, frameIndex =
   canvas.width = g.width; canvas.height = g.height; const ctx = canvas.getContext('2d');
   ctx.fillStyle = frame.bg; ctx.fillRect(0, 0, canvas.width, canvas.height);
   for (const [i, slot] of g.slots.entries()) { ctx.fillStyle = ['#dce5d0', '#e8d6ca', '#d9e3ee', '#e2d9eb'][i % 4]; ctx.fillRect(slot.x, slot.y, slot.w, slot.h); ctx.fillStyle = '#9eaf8b'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `${slot.w * .12}px KerisBaeum, Arial`; ctx.fillText(['✿', '☺', '✧', '♡'][i % 4], slot.x + slot.w / 2, slot.y + slot.h / 2); }
-  if (images.has(frame.overlay)) ctx.drawImage(images.get(frame.overlay), 0, 0, g.width, g.height);
+  if (images.has(frame.overlay)) drawFrameOverlay(ctx,images.get(frame.overlay),frame,g);
   if (guides && g.brandH) { ctx.save(); ctx.strokeStyle = '#85a85e'; ctx.lineWidth = 2; ctx.setLineDash([8, 6]); for (const key of ['top', 'bottom']) { const area = g.brandAreas[key]; if (area.h) ctx.strokeRect(g.pad / 2, area.y, g.width - g.pad, area.h); } ctx.restore(); }
   const items = drawBranding(ctx, event, g, images, frame.ink);
   ctx.fillStyle = frame.ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';

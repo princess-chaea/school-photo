@@ -73,13 +73,13 @@ export function normalizeSlots(slots, count) {
 export function layout(count, event = DEFAULT_EVENT, options = {}) {
   if (![2,4,6,8].includes(count)) throw new Error('지원하지 않는 컷 수');
   const orientation = options.orientation || (options.frame?.layoutCount ? options.frame.orientation : event.orientation) || 'portrait';
-  const landscape = orientation === 'landscape', fixed = Boolean(options.frame?.layoutCount);
-  const dimensions=frameSize(options.frame?.frameFormat,orientation);
-  const width = !fixed && options.width || dimensions.width, height = !fixed && options.height || dimensions.height;
-  const pad = fixed ? 48 : Math.round(Math.min(width,height) * Math.max(.02, options.padding || 0)), gap = fixed ? 24 : Math.round(Math.min(width,height) * .015), cols = landscape ? ({2:2,4:2,6:3,8:4}[count]) : count === 2 ? 1 : 2, rows = count / cols;
+  const landscape = orientation === 'landscape', fixed = Boolean(options.frame?.layoutCount), preserve = options.frame?.preserveAspect === true;
+  const dimensions=frameSize(options.frame?.frameFormat,preserve ? options.frame.orientation : orientation);
+  const width = !fixed && !preserve && options.width || dimensions.width, height = !fixed && !preserve && options.height || dimensions.height;
+  const pad = fixed ? 48 : Math.round(Math.min(width,height) * Math.max(.02, preserve ? 0 : options.padding || 0)), gap = fixed ? 24 : Math.round(Math.min(width,height) * .015), cols = landscape ? ({2:2,4:2,6:3,8:4}[count]) : count === 2 ? 1 : 2, rows = count / cols;
   const branding = brandingModel(event);
   // Always start with the teacher's canvas, even when the student changes orientation.
-  const brandReference = !fixed && options.brandReference !== false && (options.width || options.height || options.padding || orientation !== (event.orientation || 'portrait'))
+  const brandReference = !fixed && !preserve && options.brandReference !== false && (options.width || options.height || options.padding || orientation !== (event.orientation || 'portrait'))
     ? layout(count,event,{...options,orientation:event.orientation || 'portrait',width:undefined,height:undefined,padding:undefined,brandReference:false}) : null;
   const footerH = options.caption || options.captureDate ? 100 : 0;
   const bandCount = Number(branding.hasTop) + Number(branding.hasBottom);
@@ -111,7 +111,7 @@ export function normalizeEvent(value) {
   const text = (v, max) => typeof v === 'string' ? v.slice(0, max) : '';
   const color = (v, fallback) => /^#[0-9a-f]{6}$/i.test(v || '') ? v : fallback;
   const safeURL = v => typeof v === 'string' && (/^https:\/\//.test(v) || /^data:image\/(png|jpeg|webp);base64,/.test(v) || /^\/stickers\/[a-z-]+\.(?:webp|svg)$/.test(v)) ? v : '';
-  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', frameFormat:normalizeFrameFormat(f.frameFormat), ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
+  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', frameFormat:normalizeFrameFormat(f.frameFormat), ...(f.preserveAspect === true ? {preserveAspect:true,clearPhotoSlots:f.clearPhotoSlots === true} : {}), ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
   const stickers = Array.isArray(value.stickers) ? value.stickers.slice(0, 64).map((s, i) => ({ id: text(s.id, 100) || `sticker-${i}`, name: text(s.name, 40), text: text(s.text, 8), url: safeURL(s.url) })).filter(s => s.url) : [];
   const event = { title: text(value.title, 80) || DEFAULT_EVENT.title, school: text(value.school, 60), schedule: text(value.schedule, 100), logo: safeURL(value.logo), logoPosition: value.logoPosition === 'bottom' ? 'bottom' : 'top', orientation: value.orientation === 'landscape' ? 'landscape' : 'portrait', frames: frames.length ? frames : DEFAULT_FRAMES, stickers };
   const { hasContent, hasTop, hasBottom, ...branding } = brandingModel({ ...event, branding: value.branding });

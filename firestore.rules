@@ -5,6 +5,7 @@ service cloud.firestore {
     function siteAdmin() { return signedIn() && request.auth.token.email == 'dltjdrms320@gmail.com' && request.auth.token.email_verified == true; }
     function owns(data) { return signedIn() && data.ownerId == request.auth.uid; }
     function validPhotoRect(s) { return s is map && s.keys().hasOnly(['x','y','w','h']) && s.x is number && s.y is number && s.w is number && s.h is number && s.x >= 0 && s.y >= 0 && s.w >= 0.025 && s.h >= 0.025 && s.x+s.w <= 1.000001 && s.y+s.h <= 1.000001; }
+    function validFrameMode(d) { return (!('preserveAspect' in d) || (d.kind == 'frame' && d.preserveAspect is bool)) && (!('clearPhotoSlots' in d) || (d.kind == 'frame' && d.clearPhotoSlots is bool)) && (!('layoutCount' in d) || d.layoutCount != 0 || ('preserveAspect' in d && d.preserveAspect == true)); }
     function validPhotoSlots(d) { return !('photoSlots' in d) || (d.kind == 'frame' && d.photoSlots is list && d.photoSlots.size() == d.layoutCount && d.photoSlots.size() in [2,4,6,8] && (d.photoSlots.size() <= 0 || validPhotoRect(d.photoSlots[0])) && (d.photoSlots.size() <= 1 || validPhotoRect(d.photoSlots[1])) && (d.photoSlots.size() <= 2 || validPhotoRect(d.photoSlots[2])) && (d.photoSlots.size() <= 3 || validPhotoRect(d.photoSlots[3])) && (d.photoSlots.size() <= 4 || validPhotoRect(d.photoSlots[4])) && (d.photoSlots.size() <= 5 || validPhotoRect(d.photoSlots[5])) && (d.photoSlots.size() <= 6 || validPhotoRect(d.photoSlots[6])) && (d.photoSlots.size() <= 7 || validPhotoRect(d.photoSlots[7]))); }
     function validBrandPart(p, min, max) {
       return p.keys().hasOnly(['visible','position','x','y','size','color','font','anchor','styledText','letterColors','letterSizes'])
@@ -124,13 +125,13 @@ service cloud.firestore {
     match /users/{uid}/assets/{assetId} {
       function owner() { return signedIn() && request.auth.uid == uid; }
       function validAsset(d) {
-        return validPhotoSlots(d) && d.keys().hasAll(['name', 'kind']) && d.name is string && d.name.size() > 0 && d.name.size() <= 60
+        return validPhotoSlots(d) && validFrameMode(d) && d.keys().hasAll(['name', 'kind']) && d.name is string && d.name.size() > 0 && d.name.size() <= 60
           && ((d.kind == 'palette' && d.keys().hasOnly(['name', 'kind', 'bg', 'ink'])
             && d.bg is string && d.bg.matches('#[0-9a-fA-F]{6}') && d.ink is string && d.ink.matches('#[0-9a-fA-F]{6}'))
-          || (d.kind in ['logo', 'frame', 'sticker'] && d.keys().hasOnly(['name', 'kind', 'url', 'path', 'originalBytes', 'optimizedBytes', 'width', 'height', 'format', 'layoutCount', 'orientation', 'photoSlots','frameFormat'])
+          || (d.kind in ['logo', 'frame', 'sticker'] && d.keys().hasOnly(['name', 'kind', 'url', 'path', 'originalBytes', 'optimizedBytes', 'width', 'height', 'format', 'layoutCount', 'orientation', 'photoSlots','frameFormat','preserveAspect','clearPhotoSlots'])
             && (!('frameFormat' in d) || d.frameFormat in ['print-4x6','print-3x5','print-5x7','square','feed','story','a4','screen'])
             && (!('orientation' in d) || d.orientation in ['portrait','landscape'])
-            && (!('layoutCount' in d) || (d.kind == 'frame' && d.layoutCount in [2,4,6,8]))
+            && (!('layoutCount' in d) || (d.kind == 'frame' && d.layoutCount in [0,2,4,6,8]))
             && d.url is string && d.url.size() <= 4096 && d.path is string && d.path == 'users/' + uid + '/assets/' + assetId));
       }
       allow read: if owner();
@@ -148,13 +149,13 @@ service cloud.firestore {
     }
     match /sharedAssets/{assetId} {
       function validShared(d) {
-        return validPhotoSlots(d) && d.keys().hasAll(['name','kind','url','path','active'])
-          && d.keys().hasOnly(['name','kind','url','path','active','originalBytes','optimizedBytes','width','height','format','layoutCount','orientation','photoSlots','frameFormat'])
+        return validPhotoSlots(d) && validFrameMode(d) && d.keys().hasAll(['name','kind','url','path','active'])
+          && d.keys().hasOnly(['name','kind','url','path','active','originalBytes','optimizedBytes','width','height','format','layoutCount','orientation','photoSlots','frameFormat','preserveAspect','clearPhotoSlots'])
           && d.name is string && d.name.size() > 0 && d.name.size() <= 60
           && (!('frameFormat' in d) || d.frameFormat in ['print-4x6','print-3x5','print-5x7','square','feed','story','a4','screen'])
           && d.kind in ['frame','sticker'] && d.url is string && d.url.size() <= 4096
           && d.path == 'shared/assets/' + assetId && d.active is bool
-          && (d.kind != 'frame' || (d.layoutCount in [2,4,6,8]));
+          && (d.kind != 'frame' || (d.layoutCount in [0,2,4,6,8]));
       }
       allow read: if true;
       allow create: if siteAdmin() && validShared(request.resource.data);
