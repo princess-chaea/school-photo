@@ -13,4 +13,5 @@ assert(!files.some(name=>/^(admin|cloud|frame-editor|frame-upload|webp-worker)[-
 const html=await readFile(new URL('../dist/student/index.html',import.meta.url),'utf8');
 assert(html.includes('행사 QR로 참여해 주세요.'));assert(!html.includes('google-login'));assert(!html.includes('admin.js'));
 await readFile(new URL('../dist/admin/index.html',import.meta.url));
+const cors=await read('storage.cors.json');assert(cors.some(rule=>rule.origin.includes('https://teacher-student-photo-students.web.app')&&rule.method.includes('GET')));
 console.log('PASS: 관리자·학생 Hosting 대상, 행사 경로, 학생 기본 안내, 관리자 번들 분리');

@@ -1,3 +1,21 @@
 [
-  { "origin": ["https://teacher-student-photo.web.app", "https://teacher-student-photo.firebaseapp.com", "http://localhost:5173", "http://localhost:5174"], "method": ["GET", "HEAD"], "responseHeader": ["Content-Type", "Access-Control-Allow-Origin"], "maxAgeSeconds": 3600 }
+  {
+    "origin": [
+      "https://teacher-student-photo.web.app",
+      "https://teacher-student-photo.firebaseapp.com",
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://teacher-student-photo-students.web.app",
+      "https://teacher-student-photo-students.firebaseapp.com"
+    ],
+    "method": [
+      "GET",
+      "HEAD"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "Access-Control-Allow-Origin"
+    ],
+    "maxAgeSeconds": 3600
+  }
 ]
