@@ -43,11 +43,11 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
     if (!file || !name) throw new Error('이름과 이미지를 선택해 주세요.');
     if (shared && !isAdmin()) throw new Error('운영자 전용입니다.');
     let layoutCount = kind === 'frame' ? Number($(shared ? 'shared-count' : 'frame-upload-count').value) : 0;
-    let orientation=$(shared ? 'shared-orientation' : 'frame-upload-orientation').value; let prepared=file;
-    if(kind==='frame'){try { const result=await frameUpload.edit(file,{count:layoutCount,orientation});prepared=result.file;layoutCount=result.count;orientation=result.orientation; } catch(error) {if(error.name==='AbortError')return;throw error;}}
+    let orientation=$(shared ? 'shared-orientation' : 'frame-upload-orientation').value; let prepared=file, photoSlots;
+    if(kind==='frame'){try { const result=await frameUpload.edit(file,{count:layoutCount,orientation});prepared=result.file;layoutCount=result.count;orientation=result.orientation;photoSlots=result.photoSlots; } catch(error) {if(error.name==='AbortError')return;throw error;}}
     const button = $(shared ? 'upload-shared' : 'upload-frame'); labelButton(button, 'refresh', 'WebP로 최적화 중…');
     try {
-      const optimized = await optimizeDesign(prepared, kind, { layoutCount, orientation });
+      const optimized = await optimizeDesign(prepared, kind, { layoutCount, orientation, photoSlots });
       let asset;
       if (demo) { const url = await new Promise((resolve,reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(optimized.file); }); asset = { id: crypto.randomUUID(), name, kind, url, ...optimized.metadata }; }
       else asset = shared ? await cloud.uploadSharedAsset(optimized.file, kind, name, optimized.metadata) : await cloud.uploadAsset(getUser().uid, optimized.file, kind, name, optimized.metadata);

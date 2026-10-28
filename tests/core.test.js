@@ -44,3 +44,17 @@ test('업로드 프레임의 제작 규격과 사진 칸은 정보 표시 설정
   }
   for (const count of [2,4,6,8]) for (const orientation of ['portrait','landscape']) { const g=templateGeometry(count,orientation); assert.equal(g.width,orientation==='portrait'?1200:1800); assert.equal(g.height,orientation==='portrait'?1800:1200); assert.equal(g.slots.length,count); assert(g.slots.every(s=>s.w>0&&s.h>0&&s.y+s.h<g.height)); }
 });
+test('사용자 지정 사진 칸은 저장 정규화 후에도 동일하게 렌더링하고 잘못된 칸은 기본 배치로 복구한다', () => {
+  for (const orientation of ['portrait','landscape']) {
+    const frame={id:'custom',layoutCount:2,orientation,photoSlots:[{x:.07,y:.11,w:.73,h:.29},{x:.16,y:.61,w:.55,h:.32}]};
+    const event=normalizeEvent({...DEFAULT_EVENT,frames:[frame]});const g=layout(2,event,{frame:event.frames[0]});
+    assert.deepEqual(event.frames[0].photoSlots,frame.photoSlots);
+    for(let i=0;i<2;i++){assert.equal(g.slots[i].x,frame.photoSlots[i].x*g.width);assert.equal(g.slots[i].h,frame.photoSlots[i].h*g.height);}
+    const invalid=normalizeEvent({...DEFAULT_EVENT,frames:[{...frame,photoSlots:[{x:NaN,y:0,w:2,h:-1}]}]});assert.equal(invalid.frames[0].photoSlots,undefined);
+    assert.deepEqual(layout(2,invalid,{frame:invalid.frames[0]}).slots,templateGeometry(2,orientation).slots);
+  }
+});
+import { EXPORT_FORMATS, exportGeometry } from '../export-formats.js';
+test('용도별 저장은 프레임 전체를 유지하고 출력 범위를 넘지 않는다',()=>{
+ for(const f of EXPORT_FORMATS)for(const [w,h] of [[1200,1800],[1800,1200]]){const g=exportGeometry(w,h,f.id);assert(g.x>=0&&g.y>=0);assert(g.x+g.w<=g.width+.001);assert(g.y+g.h<=g.height+.001);assert(Math.abs(g.w/g.h-w/h)<.00001);if(f.width){assert.equal(g.width,f.width);assert.equal(g.height,f.height);}}
+});

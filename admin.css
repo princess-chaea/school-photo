@@ -11,3 +11,4 @@
 .palette-preview{height:100%;max-width:100%;object-fit:contain}.asset-card .asset-image{height:180px}
 .frame-guide-details{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:18px}.frame-guide-details summary{cursor:pointer;font-weight:700;font-size:13px}.frame-guide-details .template-guide-grid{margin-top:16px}
 .frame-maker{max-width:min(900px,94vw)}.frame-upload-editor{max-width:min(760px,96vw)}.frame-upload-stage{background:#e7ecdf}.frame-upload-stage canvas{background:repeating-conic-gradient(#e4e7de 0% 25%,#f7f7f1 0% 50%) 0/20px 20px;outline:1px solid #94a582}
+.frame-upload-editor [aria-pressed="true"]{background:#e6f2d5;border-color:#719348}.frame-upload-editor [data-slot-controls]{padding:14px;background:#eff3e8;border-radius:12px;margin:12px 0}.frame-upload-editor [data-slot-controls] input{width:100%;min-height:42px}

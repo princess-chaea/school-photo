@@ -1,3 +1,5 @@
+import { EXPORT_FORMATS, paintExport, createExportPicker } from './export-formats.js';
+import { createEditorView } from './editor-view.js';
 import { printPNG } from './print-png.js';
 import { DEFAULT_EVENT, FILTERS, layout, crop, clamp, normalizeEvent, imageFromURL, downloadBlob, brandingModel, compatibleFrame } from './core.js';
 import { drawBranding } from './branding.js';
@@ -18,6 +20,11 @@ let blocked = false, assetReady = Promise.resolve();
 const editDialog = $('edit-dialog'), previewHome = canvas.parentElement, toolsHome = $('decoration-tools').parentElement;
 const cropCanvas = $('crop-preview'), cropPointers = new Map();
 let cropGesture = null;
+const editorView=createEditorView(editDialog,canvas);
+const saveCanvas=$('save-preview');
+for(const group of [...new Set(EXPORT_FORMATS.map(f=>f.group))]){const optgroup=document.createElement('optgroup');optgroup.label=group;for(const f of EXPORT_FORMATS.filter(f=>f.group===group))optgroup.append(Object.assign(document.createElement('option'),{value:f.id,textContent:f.name}));$('export-format').append(optgroup);}
+$('export-format').addEventListener('change',()=>render());
+const exportPicker=createExportPicker(()=>canvas,()=>render());
 
 function toast(message) { $('toast').textContent = message; $('toast').classList.add('visible'); clearTimeout(toastTimeout); toastTimeout = setTimeout(() => $('toast').classList.remove('visible'), 4500); }
 function createButton(className, text, handler) { const el = document.createElement('button'); el.className = className; el.textContent = text; el.type = 'button'; el.addEventListener('click', handler); return el; }
@@ -89,7 +96,7 @@ function renderSteps() {
   $('step-title').textContent = titles[state.step]; $('step-kicker').textContent = `STEP ${String(state.step + 1).padStart(2, '0')} / ${['LAYOUT', 'FRAME', 'CAPTURE', 'DECORATE', 'KEEP'][state.step]}`;
   $('step-description').textContent = descriptions[state.step]; $('step-counter').textContent = `${state.step + 1} / 5`;
   $('back').hidden = state.step === 0; $('next').hidden = state.step === 4;
-  $('expand-preview').hidden = state.step !== 3;
+  $('expand-preview').hidden = state.step !== 3 && state.step !== 4;
   $('change-layout').hidden = state.step !== 3;
   labelButton($('next'), ['frame', 'camera', 'sticker', 'check'][state.step] || 'check', nextLabels[state.step] || '', true);
   $('preview-hint').textContent = state.step === 3 ? '사진 선택 · 드래그 이동 · 모서리 / 두 손가락으로 확대' : state.step === 4 ? '오늘의 우리, 오래 간직해요' : '나만의 한 장이 만들어지는 중';
@@ -152,6 +159,8 @@ function render(exporting = false) {
     else { const s = g.slots[state.selectedPhoto]; ctx.strokeStyle = '#98bb63'; ctx.lineWidth = 5; ctx.strokeRect(s.x + 2, s.y + 2, s.w - 4, s.h - 4); }
   }
   $('preview-layout').textContent = `${state.count} CUTS · ${state.orientation === 'landscape' ? '가로' : '세로'} 4×6`; $('output-size').textContent = `${g.width} × ${g.height}px · 300dpi`;
+  if (!editDialog.open) {canvas.hidden=state.step===4;saveCanvas.hidden=state.step!==4;}
+  if(state.step===4){exportPicker.refresh();const output=paintExport(canvas,saveCanvas,$('export-format').value,frame.bg);$('output-size').textContent=output.width+' × '+output.height+'px · 300dpi';$('export-format-note').textContent=output.width+' × '+output.height+'px · 사진을 자르지 않고 여백을 넣어요.';}
   if (editDialog.open && editDialog.dataset.tool === 'photo') renderCrop();
 }
 function stopCamera() {
@@ -211,18 +220,18 @@ function selectEditorTool(tool) {
   editDialog.dataset.tool = tool;
   canvas.hidden = tool === 'photo'; cropCanvas.hidden = tool !== 'photo';
   $('edit-title').textContent = { stickers: '스티커로 꾸미기', text: '마음을 적어요', photo: '사진을 크게 보고 조정해요', filter: '오늘의 분위기' }[tool];
-  $('edit-help').textContent = tool === 'photo' ? '아래에서 사진을 고르고, 끌어서 구도를 바꾸거나 두 손가락으로 확대해요.' : '스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.';
+  $('edit-help').textContent = tool === 'photo' ? '아래에서 사진을 고르고, 끌어서 구도를 바꾸거나 두 손가락으로 확대해요.' : '보기 확대 후 세밀하게 꾸며요. ‘화면 이동’을 켜면 프레임을 끌거나 두 손가락으로 확대할 수 있어요.';
   document.querySelectorAll('[data-editor-tool]').forEach(b => { b.classList.toggle('selected', b.dataset.editorTool === tool); b.setAttribute('aria-pressed', String(b.dataset.editorTool === tool)); });
-  renderPhotoPicker(); updateAdjustment(); render();
+  renderPhotoPicker(); updateAdjustment(); render(); editorView.refresh();
 }
 function openEditorTool(tool = 'stickers') {
   if (state.step !== 3) return;
-  if (!editDialog.open) { $('expanded-stage').prepend(canvas); $('expanded-tools').append($('decoration-tools')); document.body.classList.add('modal-open'); editDialog.showModal(); }
+  if (!editDialog.open) { $('editor-viewport').prepend(canvas); $('expanded-tools').append($('decoration-tools')); document.body.classList.add('modal-open'); editDialog.showModal(); editorView.reset(); }
   selectEditorTool(tool);
 }
 function closeEditor() {
   if (editDialog.open) editDialog.close();
-  canvas.hidden = false; previewHome.prepend(canvas); toolsHome.append($('decoration-tools')); document.body.classList.remove('modal-open'); pointers.clear(); cropPointers.clear(); gesture = null; cropGesture = null; render();
+  editorView.clear(); canvas.hidden = false; previewHome.prepend(canvas); toolsHome.append($('decoration-tools')); document.body.classList.remove('modal-open'); pointers.clear(); cropPointers.clear(); gesture = null; cropGesture = null; render();
 }
 function renderCrop() {
   const photo = state.photos[state.selectedPhoto]; if (!photo) return;
@@ -275,7 +284,7 @@ async function exportImage() {
   const required = [state.event.frames[state.frame].overlay, ...(brandingModel(state.event).logo.visible ? [state.event.logo] : []), ...state.decorations.filter(d => d.type === 'image').map(d => d.url)].filter(Boolean);
   if (required.some(url => failedAssets.has(url))) throw new Error('선택한 디자인을 불러오지 못했어요. 다른 프레임을 선택하거나 네트워크를 확인해 주세요.');
   render(true);
-  try { const blob = await new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('이미지를 생성하지 못했어요.')), 'image/png')); return await printPNG(blob); }
+  try { const outputCanvas=document.createElement('canvas');paintExport(canvas,outputCanvas,$('export-format').value,state.event.frames[state.frame].bg); const blob = await new Promise((resolve, reject) => outputCanvas.toBlob(b => b ? resolve(b) : reject(new Error('이미지를 생성하지 못했어요.')), 'image/png')); return await printPNG(blob); }
   finally { render(); }
 }
 async function loadAssets() {
@@ -330,14 +339,14 @@ $('decoration-color').addEventListener('input', e => { const d = state.decoratio
 $('delete-decoration').addEventListener('click', () => { if (state.selectedDeco === null) return; state.decorations.splice(state.selectedDeco, 1); state.selectedDeco = null; updateAdjustment(); render(); });
 canvas.addEventListener('pointerdown', pointerDown); canvas.addEventListener('pointermove', pointerMove); for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(event, pointerEnd);
 canvas.addEventListener('click', e => { if (state.step !== 3 || editDialog.open) return; const p = point(e), g = currentGeometry(); const i = g.slots.findIndex(s => p.x >= s.x && p.x <= s.x + s.w && p.y >= s.y && p.y <= s.y + s.h); if (i >= 0) state.selectedPhoto = i; openEditorTool(i >= 0 ? 'photo' : 'stickers'); });
-$('expand-preview').addEventListener('click', () => openEditorTool());
+$('expand-preview').addEventListener('click', () => {if(state.step===4)go(3);openEditorTool();});
 $('change-layout').addEventListener('click', () => go(0));
 document.querySelectorAll('[data-open-tool]').forEach(b => b.addEventListener('click', () => openEditorTool(b.dataset.openTool)));
 document.querySelectorAll('[data-editor-tool]').forEach(b => b.addEventListener('click', () => selectEditorTool(b.dataset.editorTool)));
 $('close-edit').addEventListener('click', closeEditor);
 editDialog.addEventListener('cancel', e => { e.preventDefault(); closeEditor(); });
 canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
-$('download').addEventListener('click', async () => { try { downloadBlob(await exportImage(), `moment-${photoDate.toISOString().slice(0, 10)}.png`); toast('이미지를 만들었어요. 기기의 다운로드를 확인해 주세요.'); } catch (error) { toast(`저장 실패: ${error.message}`); } });
+$('download').addEventListener('click', async () => { try { downloadBlob(await exportImage(), `moment-${$('export-format').value}-${photoDate.toISOString().slice(0, 10)}.png`); toast('이미지를 만들었어요. 기기의 다운로드를 확인해 주세요.'); } catch (error) { toast(`저장 실패: ${error.message}`); } });
 $('share').addEventListener('click', async () => { try { const blob = await exportImage(), file = new File([blob], 'moment.png', { type: 'image/png' }); if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: state.event.title }); else { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: downloadURL, target: '_blank', rel: 'noopener' }); link.click(); toast('이미지를 길게 눌러 저장하거나 PNG 저장 버튼을 이용해 주세요.'); } } catch (error) { if (error.name !== 'AbortError') toast('공유하지 못했어요. PNG 저장 버튼을 이용해 주세요.'); } });
 $('restart').addEventListener('click', () => { if (!confirm('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return; stopCamera(); state.photos = Array(state.count).fill(null); state.decorations = []; state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopCamera(); }); window.addEventListener('pagehide', stopCamera);

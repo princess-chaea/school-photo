@@ -83,3 +83,12 @@ test('공용 Storage 업로드도 일반 교사와 미인증 운영자를 차단
   const unverified = env.authenticatedContext('unverified',{email:'dltjdrms320@gmail.com',email_verified:false}).storage();
   await assertFails(uploadBytes(ref(unverified,'shared/assets/blocked'),new Uint8Array([1]),{contentType:'image/webp'}));
 });
+test('교사·공용 프레임의 사용자 지정 사진 칸 저장과 범위 검증', async () => {
+  const a=env.authenticatedContext('teacher-a').firestore(),admin=env.authenticatedContext('admin',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore();
+  const photoSlots=[{x:.08,y:.12,w:.36,h:.3},{x:.5,y:.5,w:.42,h:.4}];
+  const asset={name:'맞춤 2컷',kind:'frame',url:'https://example.com/frame.webp',path:'users/teacher-a/assets/custom',layoutCount:2,orientation:'portrait',photoSlots};
+  await assertSucceeds(setDoc(doc(a,'users','teacher-a','assets','custom'),asset));
+  assert.deepEqual((await getDoc(doc(a,'users','teacher-a','assets','custom'))).data().photoSlots,photoSlots);
+  await assertSucceeds(setDoc(doc(admin,'sharedAssets','custom'),{...asset,path:'shared/assets/custom',active:true}));
+  await assertFails(setDoc(doc(a,'users','teacher-a','assets','bad'),{...asset,path:'users/teacher-a/assets/bad',photoSlots:[{x:.8,y:0,w:.4,h:.3},photoSlots[1]]}));
+});

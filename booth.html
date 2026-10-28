@@ -89,7 +89,7 @@
 
         <div class="step-content" data-step="4" hidden>
           <div class="ready-card"><span>✳</span><h3>오늘의 순간이 완성됐어요.</h3><p>이 작은 한 장이, 오래 남는 기억이 되길.</p></div>
-          <button class="button lime download-button" id="download">↓ PNG 이미지 저장</button>
+          <div class="export-format-field"><label class="field-label" for="export-format">어디에 사용할까요?</label><select id="export-format" aria-label="저장 용도" hidden></select><button type="button" id="choose-export-format" aria-describedby="export-format-note" aria-haspopup="dialog"></button><p class="small muted" id="export-format-note">사진을 자르지 않고 용도에 맞춰 여백을 넣어요.</p></div><button class="button lime download-button" id="download">↓ PNG 이미지 저장</button>
           <button class="button share-button" id="share">↗ 이미지 공유 / 기기에 저장</button>
           <p class="small muted">기기에 따라 파일 앱의 다운로드 폴더에 저장될 수 있어요. 공유 화면에서 ‘이미지 저장’을 선택하면 사진첩에 담을 수 있어요.</p>
           <div class="save-facts"><span>고화질 PNG</span><span id="output-size"></span><span>워터마크 없음</span></div>
@@ -101,7 +101,7 @@
 
       <aside class="preview-panel">
         <div class="preview-top"><span class="eyebrow">YOUR MOMENT</span><span id="preview-layout">04 CUTS · STRIP</span><button class="expand-preview" id="change-layout" hidden>컷 변경</button><button class="expand-preview" id="expand-preview" hidden>⤢ 크게 편집</button></div>
-        <div class="preview-stage"><canvas id="preview" width="600" height="1700" aria-label="완성 사진 미리보기"></canvas><span class="stage-spark spark-one" aria-hidden="true">✳</span><span class="stage-spark spark-two" aria-hidden="true">✧</span></div>
+        <div class="preview-stage"><canvas id="preview" width="600" height="1700" aria-label="완성 사진 미리보기"></canvas><canvas id="save-preview" aria-label="선택한 저장 용도 미리보기" hidden></canvas><span class="stage-spark spark-one" aria-hidden="true">✳</span><span class="stage-spark spark-two" aria-hidden="true">✧</span></div>
         <div class="preview-bottom"><span class="live-dot"></span><span id="preview-hint">나만의 한 장이 만들어지는 중</span></div>
       </aside>
     </div>
@@ -111,10 +111,10 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <dialog id="edit-dialog" data-tool="stickers" aria-label="사진 크게 꾸미기">
     <header class="edit-header"><button class="text-button" id="close-edit">돌아가기</button><strong id="edit-title">사진 꾸미기</strong><span class="edit-header-space" aria-hidden="true"></span></header>
-    <section class="expanded-stage" id="expanded-stage"><canvas id="crop-preview" width="1000" height="750" aria-label="선택한 사진 구도 조정" hidden></canvas></section>
+    <div id="editor-view-controls" class="editor-view-controls"><button id="editor-view-minus" aria-label="프레임 보기 축소">−</button><label>보기 확대<input id="editor-view-zoom" type="range" min="1" max="4" step=".05" value="1"></label><output id="editor-view-value">100%</output><button id="editor-view-plus" aria-label="프레임 보기 확대">+</button><button id="editor-view-fit">전체</button><button id="editor-view-pan" aria-pressed="false">화면 이동</button></div><section class="expanded-stage" id="expanded-stage"><div id="editor-viewport"><canvas id="crop-preview" width="1000" height="750" aria-label="선택한 사진 구도 조정" hidden></canvas></div></section>
     <p class="edit-help" id="edit-help">스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.</p>
     <nav class="edit-tool-tabs" aria-label="꾸미기 도구"><button data-editor-tool="stickers">✿ 스티커</button><button data-editor-tool="text">가 문구</button><button data-editor-tool="photo">⤢ 사진 구도</button><button data-editor-tool="filter">◐ 필터</button></nav>
     <section class="expanded-tools" id="expanded-tools"></section>
   </dialog>
-</body>
+<dialog id="export-format-dialog" class="export-format-dialog" aria-label="저장 규격 선택"><header><h2>어디에 사용할까요?</h2><button type="button" class="text-button" id="close-export-format">돌아가기</button></header><p class="small muted">사각형으로 비율을 비교하고 선택하세요. 사진은 자르지 않고 여백으로 맞춰요.</p><div id="export-format-options"></div></dialog></body>
 </html>

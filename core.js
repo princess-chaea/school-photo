@@ -44,6 +44,11 @@ export function brandingModel(event = DEFAULT_EVENT) {
   model.hasBottom = visible.some(key => position(key) === 'bottom');
   return model;
 }
+export function normalizeSlots(slots, count) {
+  if (!Array.isArray(slots) || slots.length !== count) return null;
+  if (!slots.every(s => s && ['x','y','w','h'].every(k => Number.isFinite(s[k])) && s.x >= 0 && s.y >= 0 && s.w >= .025 && s.h >= .025 && s.x + s.w <= 1.000001 && s.y + s.h <= 1.000001)) return null;
+  return slots.map(({x,y,w,h}) => ({x,y,w,h}));
+}
 export function layout(count, event = DEFAULT_EVENT, options = {}) {
   if (![2,4,6,8].includes(count)) throw new Error('지원하지 않는 컷 수');
   const orientation = options.orientation || (options.frame?.layoutCount ? options.frame.orientation : event.orientation) || 'portrait';
@@ -53,7 +58,7 @@ export function layout(count, event = DEFAULT_EVENT, options = {}) {
   const brandH = Math.round(height * (fixed ? .14 : branding.height));
   const photoW = (width - pad * 2 - gap * (cols - 1)) / cols, photoH = (height - pad * 2 - brandH * 2 - gap * (rows - 1)) / rows;
   const top = pad + brandH, bottomY = height - pad - brandH;
-  return { width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH:100, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:brandH},bottom:{y:bottomY,h:brandH},free:{y:0,h:height}}, footerY:height-pad-100, slots:Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
+  return { width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH:100, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:brandH},bottom:{y:bottomY,h:brandH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoSlots,count)?.map(s=>({x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
 }
 export function templateGeometry(count, orientation = 'portrait') { return layout(count, DEFAULT_EVENT, { frame: { layoutCount: count, orientation }, orientation }); }
 export function compatibleFrame(frame, count, orientation) { return !frame.layoutCount || (frame.layoutCount === count && (!orientation || (frame.orientation || 'portrait') === orientation)); }
@@ -75,7 +80,7 @@ export function normalizeEvent(value) {
   const text = (v, max) => typeof v === 'string' ? v.slice(0, max) : '';
   const color = (v, fallback) => /^#[0-9a-f]{6}$/i.test(v || '') ? v : fallback;
   const safeURL = v => typeof v === 'string' && (/^https:\/\//.test(v) || /^data:image\/(png|jpeg|webp);base64,/.test(v) || /^\/stickers\/[a-z-]+\.webp$/.test(v)) ? v : '';
-  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait' })) : [];
+  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
   const stickers = Array.isArray(value.stickers) ? value.stickers.slice(0, 64).map((s, i) => ({ id: text(s.id, 100) || `sticker-${i}`, name: text(s.name, 40), text: text(s.text, 8), url: safeURL(s.url) })).filter(s => s.text || s.url) : [];
   const event = { title: text(value.title, 80) || DEFAULT_EVENT.title, school: text(value.school, 60), schedule: text(value.schedule, 100), logo: safeURL(value.logo), logoPosition: value.logoPosition === 'bottom' ? 'bottom' : 'top', orientation: value.orientation === 'landscape' ? 'landscape' : 'portrait', frames: frames.length ? frames : DEFAULT_FRAMES, stickers };
   const { hasContent, hasTop, hasBottom, ...branding } = brandingModel({ ...event, branding: value.branding });
