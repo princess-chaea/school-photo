@@ -6,7 +6,7 @@ export async function paintFramePreview(canvas, event, { count = 4, frameIndex =
   const version = (versions.get(canvas) || 0) + 1; versions.set(canvas, version);
   const frame = event.frames[Math.min(frameIndex, event.frames.length - 1)];
   if (frame.layoutCount) count = frame.layoutCount;
-  const g = layout(count, event, { frame });
+  const g = layout(count, event, { frame, captureDate: brandingModel(event).captureDate });
   await Promise.all([load(event.logo), load(frame.overlay)]); if (versions.get(canvas) !== version) return null;
   canvas.width = g.width; canvas.height = g.height; const ctx = canvas.getContext('2d');
   ctx.fillStyle = frame.bg; ctx.fillRect(0, 0, canvas.width, canvas.height);

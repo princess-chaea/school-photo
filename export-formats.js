@@ -1,3 +1,4 @@
+import { drawLayoutGuide } from './layout-guide.js';
 export const EXPORT_FORMATS=[
  {id:'original',name:'선택한 프레임 그대로 · 원본',group:'기본'},
  {id:'print-4x6',name:'4×6인치 인화용 · 세로 2:3',width:1200,height:1800,group:'인화·출력용'},
@@ -23,9 +24,9 @@ export function exportGeometry(sourceW,sourceH,id='original'){
 export function paintExport(source,target,id,background='#fffdf6'){
  const g=exportGeometry(source.width,source.height,id);if(target.width!==g.width||target.height!==g.height){target.width=g.width;target.height=g.height;}const ctx=target.getContext('2d');ctx.fillStyle=background;ctx.fillRect(0,0,g.width,g.height);ctx.imageSmoothingQuality='high';ctx.drawImage(source,g.x,g.y,g.w,g.h);return g;
 }
-export function createExportPicker(getSource,onChange){
+export function createExportPicker(getSource,onChange,getGeometry){
  const select=document.getElementById('export-format'),button=document.getElementById('choose-export-format'),dialog=document.getElementById('export-format-dialog'),list=document.getElementById('export-format-options');
- function shape(f){const source=getSource(),w=f.width||source.width,h=f.height||source.height,box=document.createElement('span');box.className='format-shape-box';const rect=document.createElement('span');rect.className='format-shape';const scale=36/Math.max(w,h);rect.style.width=w*scale+'px';rect.style.height=h*scale+'px';box.append(rect);box.setAttribute('aria-hidden','true');return box;}
+ function shape(f){const box=document.createElement('span');box.className='format-shape-box';box.setAttribute('aria-hidden','true');if(getGeometry){const canvas=document.createElement('canvas');canvas.width=72;canvas.height=64;drawLayoutGuide(canvas,getGeometry(f));box.append(canvas);}return box;}
  function refresh(){const f=EXPORT_FORMATS.find(f=>f.id===select.value)||EXPORT_FORMATS[0],label=document.createElement('span');label.textContent=f.name;button.replaceChildren(shape(f),label);}
  function open(){list.replaceChildren();for(const group of ['대표 비율·SNS용','인화·출력용','기본']){const heading=document.createElement('h3');heading.textContent=group;const grid=document.createElement('div');grid.className='format-preset-grid';for(const f of EXPORT_FORMATS.filter(f=>f.group===group)){const b=document.createElement('button');b.type='button';b.className='format-preset';b.setAttribute('aria-pressed',String(select.value===f.id));const name=document.createElement('strong');name.textContent=f.name;const dimensions=document.createElement('small'),source=getSource();dimensions.textContent=(f.width||source.width)+' × '+(f.height||source.height)+'px';b.append(shape(f),name,dimensions);b.onclick=()=>{select.value=f.id;dialog.close();refresh();onChange();};grid.append(b);}list.append(heading,grid);}dialog.showModal();}
  button.onclick=open;document.getElementById('close-export-format').onclick=()=>dialog.close();refresh();return {refresh};

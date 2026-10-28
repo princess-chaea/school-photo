@@ -13,6 +13,6 @@ if(config.projectId!=='teacher-student-photo')throw new Error('예상한 Firebas
 const fields={VITE_FIREBASE_API_KEY:'apiKey',VITE_FIREBASE_AUTH_DOMAIN:'authDomain',VITE_FIREBASE_PROJECT_ID:'projectId',VITE_FIREBASE_STORAGE_BUCKET:'storageBucket',VITE_FIREBASE_MESSAGING_SENDER_ID:'messagingSenderId',VITE_FIREBASE_APP_ID:'appId'};
 const lines=['# 공개 Firebase 클라이언트 설정입니다. 인증 토큰·서비스 계정 키가 아닙니다.'];
 for(const [env,key] of Object.entries(fields)){if(typeof config[key]!=='string'||!config[key]||/[\r\n]/.test(config[key]))throw new Error('Firebase 설정 필드가 올바르지 않습니다: '+key);lines.push(env+'='+JSON.stringify(config[key]));}
-lines.push('VITE_PUBLIC_BASE_URL=https://teacher-student-photo.web.app/','');
+lines.push('VITE_STUDENT_BASE_URL=https://teacher-student-photo-students.web.app/','');
 await writeFile(destination,lines.join('\n'),{flag:'wx'});
 console.log('.env.local을 공개 웹 설정으로 만들었습니다. npm run dev로 실행하세요.');

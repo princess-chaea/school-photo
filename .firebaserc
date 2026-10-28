@@ -1,1 +1,17 @@
-{"projects":{"default":"teacher-student-photo"}}
+{
+  "projects": {
+    "default": "teacher-student-photo"
+  },
+  "targets": {
+    "teacher-student-photo": {
+      "hosting": {
+        "admin": [
+          "teacher-student-photo"
+        ],
+        "student": [
+          "teacher-student-photo-students"
+        ]
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import {normalizeSharing,validateSharing,parsePadletDetails,callCollectionRelay} from './sharing.js';
 import QRCode from 'qrcode';
 import { DEFAULT_EVENT, DEFAULT_FRAMES, DEFAULT_STICKERS, normalizeEvent, imageFromURL, downloadBlob, eventURL, brandingModel, BRAND_KEYS } from './core.js';
 import * as cloud from './cloud.js';
@@ -50,7 +51,7 @@ function openEditor(event) {
   editing = event ? structuredClone(event) : { ...structuredClone(DEFAULT_EVENT), id: crypto.randomUUID(), published: false, title: '', school: school.school, logo: school.logo, schedule: '' };
   $('event-title').value = editing.title; $('event-school').value = editing.school; $('event-schedule').value = editing.schedule; $('logo-position').value = editing.logoPosition; $('event-orientation').value = editing.orientation || 'portrait';
   $('editor-title').textContent = editing.title || '새 행사 만들기'; $('event-editor').hidden = false; dirty = false;
-  renderEditorChoices(); updatePreview(); $('event-editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  renderSharingSettings();renderEditorChoices(); updatePreview(); $('event-editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function renderEditorChoices() {
   if (!editing) return;
@@ -83,7 +84,7 @@ function renderEditorChoices() {
 function readEditor() {
   if (!editing) throw new Error('행사를 먼저 선택해 주세요.');
   const title = $('event-title').value.trim(); if (!title) { $('event-title').focus(); throw new Error('행사명을 입력해 주세요.'); }
-  return { ...editing, ...normalizeEvent({ ...editing, title, school: $('event-school').value.trim(), schedule: $('event-schedule').value.trim(), logo: $('event-logo').value, orientation: $('event-orientation').value, logoPosition: $('logo-position').value }) };
+  return { ...editing, ...normalizeEvent({ ...editing, sharing:readSharingSettings(), title, school: $('event-school').value.trim(), schedule: $('event-schedule').value.trim(), logo: $('event-logo').value, orientation: $('event-orientation').value, logoPosition: $('logo-position').value }) };
 }
 async function storeEvent(id, event, published) {
   const saved = demo ? normalizeEvent(event) : await cloud.saveEvent(user.uid, id, event, published);
@@ -92,7 +93,7 @@ async function storeEvent(id, event, published) {
   if (editing?.id === id) { editing = structuredClone(result); dirty = false; $('editor-title').textContent = result.title; renderEditorChoices(); }
   return result;
 }
-async function saveEditor(publish) { const event = readEditor(); const saved = await storeEvent(event.id, event, publish || event.published); toast(demo ? '이 탭에 체험 행사를 저장했어요. 클라우드에는 저장되지 않아요.' : saved.published ? '행사를 저장하고 게시했어요.' : '비공개로 저장했어요.'); if (publish && !demo) await showQR(saved); }
+async function saveEditor(publish) { const event = readEditor(); if(publish&&!demo&&['drive','padlet'].includes(event.sharing?.mode))await callCollectionRelay(event.sharing.relayUrl,{action:'verify',eventId:event.id,idToken:await user.getIdToken()}); const saved = await storeEvent(event.id, event, publish || event.published); toast(demo ? '이 탭에 체험 행사를 저장했어요. 클라우드에는 저장되지 않아요.' : saved.published ? '행사를 저장하고 게시했어요.' : '비공개로 저장했어요.'); if (publish && !demo) await showQR(saved); }
 function previewEvent() { return editing ? { ...editing, title: $('event-title').value || '행사 이름', school: $('event-school').value, schedule: $('event-schedule').value, logo: $('event-logo').value, orientation: $('event-orientation').value, logoPosition: $('logo-position').value } : null; }
 async function updatePreview() { const event = previewEvent(); if (!event) return; frameEditor?.refresh(); await paintFramePreview($('admin-preview'), event); }
 function renderAssets() { libraries?.render(); }
@@ -131,20 +132,39 @@ async function directLogo(file, target) {
 }
 async function showQR(event) {
   qrEvent = event; $('qr-title').textContent = event.title;
-  $('public-base').value = import.meta.env.VITE_PUBLIC_BASE_URL || new URL('./', location.href).href;
+  $('public-base').value = import.meta.env.VITE_STUDENT_BASE_URL || (import.meta.env.DEV ? new URL('./', location.href).href : 'https://teacher-student-photo-students.web.app/');
   await refreshQR(); if (!$('qr-dialog').open) $('qr-dialog').showModal();
 }
 async function refreshQR() {
   const url = eventURL($('public-base').value.trim(), qrEvent.id); const u = new URL(url);
+  if(!import.meta.env.DEV&&u.origin===location.origin)throw new Error('관리자 주소와 다른 학생 전용 사이트 주소를 입력해 주세요.');
   await QRCode.toCanvas($('qr-canvas'), url, { width: 260, margin: 3, errorCorrectionLevel: 'M', color: { dark: '#252820', light: '#ffffff' } });
   $('qr-url').value = url; $('open-event').href = url;
-  $('qr-note').textContent = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(u.hostname) || u.protocol !== 'https:' ? '현재 주소는 다른 기기에서 촬영하기에 적합하지 않아요. 배포한 HTTPS 웹앱 주소를 넣어 주세요.' : '실제 휴대폰으로 QR을 스캔해 행사 접속과 카메라를 확인해 주세요.';
+  $('qr-note').textContent = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)$/.test(u.hostname) || u.protocol !== 'https:' ? '현재 주소는 다른 기기에서 촬영하기에 적합하지 않아요. 배포한 HTTPS 웹앱 주소를 넣어 주세요.' : '학생 배포용 주소입니다. 기본 주소에는 관리자 화면이 없어요. 실제 휴대폰으로 행사 접속을 확인해 주세요.';
 }
 
 $('google-login').addEventListener('click', () => run(() => cloud.login())); $('redirect-login').addEventListener('click', () => run(() => cloud.login(true)));
 $('sign-out').addEventListener('click', () => run(async () => { if ((dirty || profileDirty) && !confirm('저장하지 않은 변경이 있어요. 로그아웃할까요?')) return; await cloud.logout(); }));
 $('events-tab').addEventListener('click', () => switchTab('events')); $('assets-tab').addEventListener('click', () => switchTab('assets')); $('school-tab').addEventListener('click', () => switchTab('school'));
 $('frames-tab').addEventListener('click', () => switchTab('frames')); $('shared-tab').addEventListener('click', () => switchTab('shared'));
+function readSharingSettings(){
+  return validateSharing({mode:$('event-sharing-mode').value,url:$('event-sharing-url').value.trim(),relayUrl:$('event-sharing-relay').value.trim(),boardId:$('event-padlet-board').value.trim(),submissionKey:editing?.sharing?.submissionKey||crypto.randomUUID()});
+}
+function refreshSharingFields(){const mode=$('event-sharing-mode').value;$('sharing-link-fields').hidden=mode==='none';$('sharing-auto-fields').hidden=!['drive','padlet'].includes(mode);$('sharing-padlet-fields').hidden=mode!=='padlet';}
+function renderSharingSettings(){const s=normalizeSharing(editing?.sharing);$('event-sharing-mode').value=s.mode;$('event-sharing-url').value=s.url;$('event-sharing-relay').value=s.relayUrl;$('event-padlet-board').value=s.boardId;$('event-padlet-key').value='';$('event-sharing-folder').value='';$('padlet-paste').value='';$('event-public-attachment').checked=false;$('collection-connection-status').textContent='';refreshSharingFields();}
+for(const id of ['event-sharing-mode','event-sharing-url','event-sharing-relay','event-padlet-board'])$(id).oninput=()=>{dirty=true;refreshSharingFields();};
+$('sharing-help').onclick=()=>$('sharing-help-dialog').showModal();$('close-sharing-help').onclick=()=>$('sharing-help-dialog').close();
+$('parse-padlet').onclick=()=>{const parsed=parsePadletDetails($('padlet-paste').value);if(parsed.boardId)$('event-padlet-board').value=parsed.boardId;if(parsed.apiKey)$('event-padlet-key').value=parsed.apiKey;$('padlet-paste').value='';dirty=true;toast(parsed.boardId?'게시판 ID를 찾아 넣었어요. API 키도 확인해 주세요.':'개발자 메뉴의 URL·cURL·JS를 복사해 붙여 주세요.');};
+$('copy-collection-owner').onclick=()=>run(async()=>{if(!user)throw new Error('실제 Google 로그인 후 사용할 수 있어요.');await navigator.clipboard.writeText(user.uid);toast('내 UID를 복사했어요. 수합 도우미의 OWNER_UID에 넣어 주세요.');});
+$('connect-collection').onclick=()=>run(async()=>{
+  if(demo)throw new Error('실제 Google 로그인과 교사 소유 수합 도우미가 필요해요.');
+  const event=readEditor(),sharing=event.sharing;
+  if(!['drive','padlet'].includes(sharing.mode))throw new Error('자동 수합 방식을 선택해 주세요.');
+  await storeEvent(event.id,event,event.published);
+  const result=await callCollectionRelay(sharing.relayUrl,{action:'configure',eventId:event.id,idToken:await user.getIdToken(),boardId:sharing.boardId,apiKey:$('event-padlet-key').value.trim(),folderId:$('event-sharing-folder').value.trim(),publicAttachment:$('event-public-attachment').checked});
+  $('event-padlet-key').value='';$('collection-connection-status').textContent=result.message||'수합 연결을 확인했어요. 게시 후 학생 제출을 받을 수 있어요.';
+});
+
 $('new-event').addEventListener('click', () => openEditor()); $('close-editor').addEventListener('click', () => { if (dirty && !confirm('저장하지 않은 변경을 버릴까요?')) return; dirty = false; editing = null; $('event-editor').hidden = true; });
 for (const [id, key] of [['event-orientation', 'orientation'], ['event-title', 'title'], ['event-school', 'school'], ['event-schedule', 'schedule'], ['event-logo', 'logo'], ['logo-position', 'logoPosition']]) $(id).addEventListener('input', e => { dirty = true; if (editing) { editing[key] = e.target.value; if (key === 'logoPosition') { const { hasContent, hasTop, hasBottom, ...model } = brandingModel(editing); for (const part of BRAND_KEYS) model[part].position = e.target.value; editing.branding = model; } } if (key === 'logo') renderLogoPreview('event', e.target.value); updatePreview(); });
 $('school-name').addEventListener('input', e => { school.school = e.target.value; profileDirty = true; });

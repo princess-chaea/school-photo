@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f5f4ef">
-  <meta name="description" content="지금의 우리를 담는 작은 포토부스. 사진은 서버 전송 없이 내 브라우저에서만 처리됩니다.">
+  <meta name="description" content="지금의 우리를 담는 작은 포토부스. 사진은 기기에서 만들며, 선택한 완성 이미지만 행사에 제출할 수 있습니다.">
   <title>사제동행 찰칵! 포토</title>
-  <meta property="og:type" content="website"><meta property="og:site_name" content="사제동행 찰칵! 포토"><meta property="og:title" content="사제동행 찰칵! 포토"><meta property="og:description" content="QR로 바로 참여하고 우리 행사만의 사진을 남겨요. 사진은 내 기기에서만 처리돼요."><meta property="og:image" content="https://teacher-student-photo.web.app/og-image.png"><meta property="og:image:secure_url" content="https://teacher-student-photo.web.app/og-image.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="사제동행 찰칵 포토 로고"><meta property="og:locale" content="ko_KR"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="사제동행 찰칵! 포토"><meta name="twitter:image" content="https://teacher-student-photo.web.app/og-image.png"><meta name="application-name" content="사제동행 찰칵! 포토"><meta name="apple-mobile-web-app-title" content="찰칵! 포토"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="사제동행 찰칵! 포토"><meta property="og:title" content="사제동행 찰칵! 포토"><meta property="og:description" content="QR로 바로 참여하고 우리 행사만의 사진을 남겨요. 사진은 기기에서 만들고 제출은 선택할 수 있어요."><meta property="og:image" content="https://teacher-student-photo-students.web.app/og-image.png"><meta property="og:image:secure_url" content="https://teacher-student-photo-students.web.app/og-image.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="사제동행 찰칵 포토 로고"><meta property="og:locale" content="ko_KR"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="사제동행 찰칵! 포토"><meta name="twitter:image" content="https://teacher-student-photo-students.web.app/og-image.png"><meta name="application-name" content="사제동행 찰칵! 포토"><meta name="apple-mobile-web-app-title" content="찰칵! 포토"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="icon" href="/icons/icon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/icons/icon-48.png" type="image/png" sizes="48x48"><link rel="apple-touch-icon" href="/icons/icon-180.png" sizes="180x180"><link rel="manifest" href="/booth.webmanifest">
-  <link rel="stylesheet" href="./style.css">
-  <link rel="stylesheet" href="./mobile.css">
-  <script src="./app.js" type="module"></script>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/mobile.css">
+  <script src="/app.js" type="module"></script>
 </head>
 <body class="booth-app">
   <header class="topbar">
@@ -31,24 +31,27 @@
         <p class="section-copy" id="step-description"></p>
 
         <div class="step-content" data-step="0">
+          <div class="export-format-field"><label class="field-label" for="export-format">어디에 사용할까요?</label><select id="export-format" aria-label="저장 용도" hidden></select><button type="button" id="choose-export-format" aria-describedby="export-format-note" aria-haspopup="dialog"></button><p class="small muted" id="export-format-note">선택한 용도에 맞춰 처음부터 사진을 크게 배치해요.</p></div>
           <div class="cut-grid" id="cut-options"></div>
-          <div class="orientation-options" id="orientation-options" aria-label="4×6 인화 방향"></div>
-          <div class="note-card"><span class="note-icon">▧</span><div><strong>4×6인치 인화에 딱 맞게.</strong><p>세로 1200×1800 · 가로 1800×1200px로 저장돼요.</p></div></div>
-          <div class="detail-line"><span>로그인 없이 바로 시작</span><span>사진 업로드 없음</span></div>
-        </div>
-
-        <div class="step-content" data-step="1" hidden>
-          <p class="field-label">프레임 컬러 <span id="frame-name"></span></p>
+          <div class="layout-space-card"><canvas id="layout-space-preview" width="240" height="180" aria-label="선택한 규격의 실제 사진 영역"></canvas><div><strong>이만큼 사진이 들어가요</strong><p id="layout-space-summary" aria-live="polite"></p><p class="small muted">숫자가 표시된 칸이 실제 사진 공간이에요.</p></div></div>
+          <div class="orientation-options" id="orientation-options" aria-label="프레임 방향"></div>
+          <div class="note-card"><span class="note-icon">▧</span><div><strong>용도를 고르고 사진을 크게 담아요.</strong><p>직접 만든 이미지 프레임은 디자인 보존을 위해 원래 비율로 맞춰요.</p></div></div>
+          <details class="optional-frame"><summary>프레임·한마디 바꾸기 (선택)</summary>          <p class="field-label">프레임 컬러 <span id="frame-name"></span></p>
           <div class="frame-grid" id="frame-options"></div>
           <label class="field-label" for="caption">아래에 남길 한마디</label>
           <input id="caption" maxlength="32" placeholder="원할 때만 한마디를 남겨요 (32자 이내)">
-          <label class="switch-row"><span>오늘 날짜 넣기</span><input id="show-date" type="checkbox" checked></label>
+          <label class="switch-row"><span>오늘 날짜 넣기</span><input id="show-date" type="checkbox" checked></label></details>
+          <div class="detail-line"><span>로그인 없이 바로 시작</span><span>제출은 내가 선택</span></div>
+        </div>
+
+        <div class="step-content" data-step="1" hidden>
+
         </div>
 
         <div class="step-content" data-step="2" hidden>
-          <div class="capture-methods" aria-label="촬영 방법"><button type="button" id="native-mode" aria-pressed="true">기본 카메라</button><button type="button" id="web-mode" aria-pressed="false">앱 안에서 촬영</button></div>
-<div id="native-capture-area" class="native-capture-area"><span class="native-camera-symbol" aria-hidden="true">◎</span><strong>카메라 앱으로 크게 찍어요</strong><p>촬영 후 ‘사진 사용’을 누르면<br>선택한 칸에 바로 등록돼요.</p><button type="button" class="button lime" id="native-capture">기본 카메라로 촬영</button><input type="file" id="native-photo" accept="image/*" capture hidden><span id="native-capture-status" role="status">1번 컷 촬영 준비</span><p class="native-camera-note">기기에 따라 카메라 선택창이 먼저 표시될 수 있어요.</p></div>
-<div id="web-capture-area" hidden><div class="camera-shell" id="camera-shell">
+          <div class="capture-methods" aria-label="촬영 방법"><button type="button" id="native-mode" aria-pressed="false">기본 카메라</button><button type="button" id="web-mode" aria-pressed="true">앱 안에서 연속 촬영</button></div>
+<div id="native-capture-area" class="native-capture-area" hidden><span class="native-camera-symbol" aria-hidden="true">◎</span><strong>카메라 앱으로 크게 찍어요</strong><p>촬영 후 ‘사진 사용’을 누르면<br>선택한 칸에 바로 등록돼요.</p><button type="button" class="button lime" id="native-capture">기본 카메라로 촬영</button><input type="file" id="native-photo" accept="image/*" capture hidden><span id="native-capture-status" role="status">1번 컷 촬영 준비</span><p class="native-camera-note">기본 카메라는 한 장씩 등록돼요. 여러 컷을 계속 찍으려면 앱 안에서 연속 촬영을 선택하세요.</p></div>
+<div id="web-capture-area"><div class="camera-shell" id="camera-shell">
             <video id="video" autoplay playsinline muted aria-label="카메라 미리보기"></video>
             <div class="camera-placeholder" id="camera-placeholder"><span class="camera-symbol">◎</span><strong>여기가 오늘의 작은 스튜디오</strong><p>카메라를 켜고 가장 나다운 표정을 지어봐요.</p><button class="button lime" id="camera-start">카메라 켜기</button></div>
             <span class="camera-live" id="camera-live" hidden>● LIVE</span>
@@ -56,10 +59,10 @@
             <div class="camera-flash" id="camera-flash"></div>
           </div>
           <p id="web-capture-guide" class="web-capture-guide">사진 칸과 같은 비율로 촬영돼요.</p><div class="camera-settings"><label>타이머 <select id="timer"><option value="3">3초</option><option value="5">5초</option><option value="0">바로 촬영</option></select></label><button class="text-button" id="camera-flip">↺ 카메라 전환</button></div>
-          <div class="capture-row"><span id="capture-progress">0 / 4</span><button class="shutter" id="capture" disabled aria-label="사진 한 장 촬영"><span></span></button><button class="text-button" id="auto-capture" disabled>연속 촬영</button></div>
+          <div class="capture-row"><span id="capture-progress">0 / 4</span><button class="shutter" id="capture" disabled aria-label="사진 한 장 촬영"><span></span></button><button class="text-button" id="auto-capture" disabled>남은 컷 한 번에 촬영</button></div>
           <button class="button cancel-button" id="cancel-capture" hidden>촬영 취소</button>
           </div><div class="divider"><span>또는</span></div>
-          <label class="button upload-button">내 사진으로 채우기<input type="file" id="photo-upload" accept="image/*" multiple hidden></label>
+          <label class="button upload-button">사진 여러 장 한 번에 선택<input type="file" id="photo-upload" accept="image/*" multiple hidden></label>
           <p class="small muted">선택한 칸부터 채워져요. 아래 썸네일을 눌러 재촬영할 수 있어요.</p>
           <div class="thumbnails" id="thumbnails"></div>
           <button class="text-button demo-button" id="demo">카메라 없이 샘플로 체험하기 ↗</button>
@@ -75,7 +78,7 @@
           <div class="tool-group" data-tool="photo">
           <div class="photo-picker" id="photo-picker" aria-label="조정할 사진 선택"></div>
           <p class="field-label">사진 조정 <span>미리보기에서 사진을 선택해요</span></p>
-          <div class="adjust-controls"><label>확대<input id="zoom" type="range" min="1" max="2.5" step="0.01" value="1"></label><label>좌우<input id="pan-x" type="range" min="-1" max="1" step="0.01" value="0"></label><label>상하<input id="pan-y" type="range" min="-1" max="1" step="0.01" value="0"></label></div>
+          <div class="photo-actions" aria-label="사진 구도 조절"><button class="icon-button" id="photo-zoom-out" aria-label="사진 축소" title="사진 축소">−</button><output id="photo-zoom-value">100%</output><button class="icon-button" id="photo-zoom-in" aria-label="사진 확대" title="사진 확대">+</button><button class="text-button" id="photo-reset">구도 초기화</button></div>
           </div>
           <div class="tool-group" data-tool="stickers">
           <p class="field-label">스티커 <span>추가하고 손가락으로 옮겨요</span></p>
@@ -85,17 +88,16 @@
           <label class="field-label" for="decoration-text">한 줄 더, 마음 한 스푼</label>
           <div class="input-row"><input id="decoration-text" maxlength="24" placeholder="하고 싶은 말 (24자 이내)"><button class="button" id="add-text">추가</button></div>
           </div>
-          <div class="decoration-edit" id="decoration-edit" hidden><label>크기<input id="decoration-size" type="range" min="0.03" max="0.22" step="0.005"></label><label>색상<input type="color" id="decoration-color" value="#ffffff"></label><button class="text-button danger" id="delete-decoration">선택 삭제</button></div>
-          </div>
-        </div>
-
-        <div class="step-content" data-step="4" hidden>
-          <div class="ready-card"><span>✳</span><h3>오늘의 순간이 완성됐어요.</h3><p>이 작은 한 장이, 오래 남는 기억이 되길.</p></div>
-          <div class="export-format-field"><label class="field-label" for="export-format">어디에 사용할까요?</label><select id="export-format" aria-label="저장 용도" hidden></select><button type="button" id="choose-export-format" aria-describedby="export-format-note" aria-haspopup="dialog"></button><p class="small muted" id="export-format-note">사진을 자르지 않고 용도에 맞춰 여백을 넣어요.</p></div><button class="button lime download-button" id="download">↓ PNG 이미지 저장</button>
+          <div class="decoration-edit" id="decoration-edit" hidden><label>색상<input type="color" id="decoration-color" value="#ffffff"></label><output id="rotation-value">0°</output><span class="small muted">이동 · 모서리/두 손가락으로 크기 · 동그라미로 회전</span></div>
+          </div><div class="result-actions" id="result-actions"><div id="event-collection" hidden><button type="button" class="button primary" id="submit-result"></button><p class="small muted" id="collection-note"></p><p id="collection-status" role="status" aria-live="polite"></p></div><button class="button lime download-button" id="download">↓ PNG 이미지 저장</button>
           <button class="button share-button" id="share">↗ 이미지 공유 / 기기에 저장</button>
           <p class="small muted">기기에 따라 파일 앱의 다운로드 폴더에 저장될 수 있어요. 공유 화면에서 ‘이미지 저장’을 선택하면 사진첩에 담을 수 있어요.</p>
           <div class="save-facts"><span>고화질 PNG</span><span id="output-size"></span><span>워터마크 없음</span></div>
-          <button class="text-button restart-button" id="restart">새로운 순간 담기 ↗</button>
+          <button class="text-button restart-button" id="restart">새로운 순간 담기 ↗</button></div>
+        </div>
+
+        <div class="step-content" data-step="4" hidden>
+
         </div>
 
         <div class="navigation"><button class="button back-button" id="back">← 이전</button><button class="button primary" id="next">프레임 고르기 <span>→</span></button></div>
@@ -107,16 +109,16 @@
         <div class="preview-bottom"><span class="live-dot"></span><span id="preview-hint">나만의 한 장이 만들어지는 중</span></div>
       </aside>
     </div>
-    <div class="privacy-note"><span>◈</span><p><strong>여기서 만든 사진은, 여기서만.</strong> 사진은 서버로 전송되지 않아요. 저장 전에 페이지를 닫거나 새로고침하면 작업이 사라져요.</p></div>
+    <div class="privacy-note"><span>◈</span><p><strong>사진 제출은 내가 선택해요.</strong> 저장·꾸미기는 기기에서 처리하며, 제출 버튼을 누른 완성 이미지만 선생님의 수합 공간으로 보내요. 저장 전에 페이지를 닫거나 새로고침하면 작업이 사라져요.</p></div>
   </main>
   <footer><span class="footer-brand">사제동행 찰칵! 포토</span><span>TOGETHER IN EVERY FRAME.</span><span>함께 찍고, 오래 기억해요.</span></footer>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <dialog id="edit-dialog" data-tool="stickers" aria-label="사진 크게 꾸미기">
-    <header class="edit-header"><button class="text-button" id="close-edit">돌아가기</button><strong id="edit-title">사진 꾸미기</strong><span class="edit-header-space" aria-hidden="true"></span></header>
-    <div id="editor-view-controls" class="editor-view-controls"><button id="editor-view-minus" aria-label="프레임 보기 축소">−</button><label>보기 확대<input id="editor-view-zoom" type="range" min="1" max="4" step=".05" value="1"></label><output id="editor-view-value">100%</output><button id="editor-view-plus" aria-label="프레임 보기 확대">+</button><button id="editor-view-fit">전체</button><button id="editor-view-pan" aria-pressed="false">화면 이동</button></div><section class="expanded-stage" id="expanded-stage"><div id="editor-viewport"><canvas id="crop-preview" width="1000" height="750" aria-label="선택한 사진 구도 조정" hidden></canvas></div></section>
-    <p class="edit-help" id="edit-help">스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.</p>
+    <header class="edit-header"><button class="text-button" id="close-edit">돌아가기</button><strong id="edit-title">사진 꾸미기</strong><div class="editor-selection-actions"><button class="icon-button" id="undo-decoration" aria-label="스티커·문구 삭제 되돌리기" title="삭제 되돌리기" disabled></button><button class="icon-button" id="rotate-decoration" aria-label="선택한 요소 15도 회전" title="15도 회전" disabled></button><button class="icon-button danger" id="delete-decoration" aria-label="선택한 스티커·문구 삭제" title="선택한 스티커·문구 삭제" disabled></button></div></header>
+    <div id="editor-view-controls" class="editor-view-controls"><button id="editor-view-minus" aria-label="프레임 보기 축소">−</button><span class="view-label">보기</span><output id="editor-view-value">100%</output><button id="editor-view-plus" aria-label="프레임 보기 확대">+</button><button id="editor-view-fit">전체</button><button id="editor-view-pan" aria-pressed="false">화면 이동</button></div><section class="expanded-stage" id="expanded-stage"><div id="editor-viewport"><canvas id="crop-preview" width="1000" height="750" aria-label="선택한 사진 구도 조정" hidden></canvas></div></section>
+    <div class="editor-quick-row"><button class="text-button" id="editor-download">이미지 저장</button><button type="button" class="tool-tray-toggle" id="toggle-editor-tools" aria-expanded="true" aria-controls="expanded-tools">도구 접기 ⌄</button></div><p class="edit-help" id="edit-help">스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.</p>
     <nav class="edit-tool-tabs" aria-label="꾸미기 도구"><button data-editor-tool="stickers">✿ 스티커</button><button data-editor-tool="text">가 문구</button><button data-editor-tool="photo">⤢ 사진 구도</button><button data-editor-tool="filter">◐ 필터</button></nav>
     <section class="expanded-tools" id="expanded-tools"></section>
   </dialog>
-<dialog id="export-format-dialog" class="export-format-dialog" aria-label="저장 규격 선택"><header><h2>어디에 사용할까요?</h2><button type="button" class="text-button" id="close-export-format">돌아가기</button></header><p class="small muted">사각형으로 비율을 비교하고 선택하세요. 사진은 자르지 않고 여백으로 맞춰요.</p><div id="export-format-options"></div></dialog></body>
+<dialog id="export-format-dialog" class="export-format-dialog" aria-label="저장 규격 선택"><header><h2>어디에 사용할까요?</h2><button type="button" class="text-button" id="close-export-format">돌아가기</button></header><p class="small muted">사용할 용도를 먼저 고르세요. 선택한 비율로 촬영과 꾸미기를 진행해요.</p><div id="export-format-options"></div></dialog></body>
 </html>

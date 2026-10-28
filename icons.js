@@ -15,6 +15,10 @@ const paths = {
   flip: ['M8 5h11l-3-3M19 5l-3 3', 'M16 19H5l3 3M5 19l3-3', 'M3 9v6M21 9v6'],
   upload: ['M12 16V4M8 8l4-4 4 4', 'M4 15v6h16v-6'],
   close: ['M6 6l12 12M18 6 6 18'],
+  trash: ['M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7'],
+  undo: ['M9 4 4 9l5 5M4 9h10a6 6 0 0 1 0 12'],
+  minus: ['M4 12h16'],
+  duplicate: ['M8 8h13v13H8ZM16 8V3H3v13h5'],
   plus: ['M12 4v16M4 12h16'],
   qr: ['M3 3h6v6H3ZM15 3h6v6h-6ZM3 15h6v6H3Z', 'M15 15h3v3h3v3h-6v-3M21 12v2M12 12h3M12 18v3'],
 };

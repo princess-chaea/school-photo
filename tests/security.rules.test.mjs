@@ -92,3 +92,12 @@ test('교사·공용 프레임의 사용자 지정 사진 칸 저장과 범위 �
   await assertSucceeds(setDoc(doc(admin,'sharedAssets','custom'),{...asset,path:'shared/assets/custom',active:true}));
   await assertFails(setDoc(doc(a,'users','teacher-a','assets','bad'),{...asset,path:'users/teacher-a/assets/bad',photoSlots:[{x:.8,y:0,w:.4,h:.3},photoSlots[1]]}));
 });
+
+test('행사 공유 설정은 저장하되 API 키·학생 사진·임의 수합 서버는 차단한다',async()=>{
+ const a=env.authenticatedContext('teacher-a').firestore();
+ const sharing={mode:'padlet',url:'https://padlet.com/example/board',relayUrl:'https://script.google.com/macros/s/relay/exec',boardId:'board123',submissionKey:'a'.repeat(24)};
+ await assertSucceeds(setDoc(doc(a,'events','sharing'),{...config(),sharing}));
+ await assertFails(setDoc(doc(a,'events','key'),{...config(),sharing:{...sharing,apiKey:'secret'}}));
+ await assertFails(setDoc(doc(a,'events','relay'),{...config(),sharing:{...sharing,relayUrl:'https://evil.test/collect'}}));
+ await assertFails(setDoc(doc(a,'events','data'),{...config(),sharing:{...sharing,photos:['private']}}));
+});

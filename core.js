@@ -1,3 +1,4 @@
+import { normalizeSharing } from './sharing.js';
 export const DEFAULT_FRAMES = [
   { id: 'ivory', name: '밀크 아이보리', bg: '#fffdf6', ink: '#34372f' },
   { id: 'black', name: '클래식 블랙', bg: '#242622', ink: '#fffdf6' },
@@ -52,13 +53,17 @@ export function normalizeSlots(slots, count) {
 export function layout(count, event = DEFAULT_EVENT, options = {}) {
   if (![2,4,6,8].includes(count)) throw new Error('지원하지 않는 컷 수');
   const orientation = options.orientation || (options.frame?.layoutCount ? options.frame.orientation : event.orientation) || 'portrait';
-  const landscape = orientation === 'landscape', width = landscape ? 1800 : 1200, height = landscape ? 1200 : 1800;
-  const pad = 48, gap = 24, cols = landscape ? ({2:2,4:2,6:3,8:4}[count]) : count === 2 ? 1 : 2, rows = count / cols;
-  const branding = brandingModel(event), fixed = Boolean(options.frame?.layoutCount);
+  const landscape = orientation === 'landscape', fixed = Boolean(options.frame?.layoutCount);
+  const width = !fixed && options.width || (landscape ? 1800 : 1200), height = !fixed && options.height || (landscape ? 1200 : 1800);
+  const pad = fixed ? 48 : Math.round(Math.min(width,height) * Math.max(.02, options.padding || 0)), gap = fixed ? 24 : Math.round(Math.min(width,height) * .015), cols = landscape ? ({2:2,4:2,6:3,8:4}[count]) : count === 2 ? 1 : 2, rows = count / cols;
+  const branding = brandingModel(event);
   const brandH = Math.round(height * (fixed ? .14 : branding.height));
-  const photoW = (width - pad * 2 - gap * (cols - 1)) / cols, photoH = (height - pad * 2 - brandH * 2 - gap * (rows - 1)) / rows;
-  const top = pad + brandH, bottomY = height - pad - brandH;
-  return { width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH:100, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:brandH},bottom:{y:bottomY,h:brandH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoSlots,count)?.map(s=>({x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
+  const footerH = options.caption || options.captureDate ? 100 : 0;
+  const topH = fixed || branding.hasTop ? brandH : 0, bottomH = fixed || branding.hasBottom ? brandH : 0;
+  const bottomSpace = fixed ? brandH : bottomH + footerH;
+  const photoW = (width - pad * 2 - gap * (cols - 1)) / cols, photoH = (height - pad * 2 - topH - bottomSpace - gap * (rows - 1)) / rows;
+  const top = pad + topH, bottomY = height - pad - bottomSpace;
+  return { width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:topH},bottom:{y:bottomY,h:bottomH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoSlots,count)?.map(s=>({x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
 }
 export function templateGeometry(count, orientation = 'portrait') { return layout(count, DEFAULT_EVENT, { frame: { layoutCount: count, orientation }, orientation }); }
 export function compatibleFrame(frame, count, orientation) { return !frame.layoutCount || (frame.layoutCount === count && (!orientation || (frame.orientation || 'portrait') === orientation)); }
@@ -72,8 +77,8 @@ export function eventURL(base, id) {
   if (!['https:', 'http:'].includes(url.protocol)) throw new Error('올바른 웹 주소를 입력해 주세요.');
   url.pathname = url.pathname.replace(/(?:admin|index|booth)\.html$/, '');
   if (!url.pathname.endsWith('/')) url.pathname += '/';
-  url.pathname += 'booth.html';
-  url.search = ''; url.hash = ''; url.searchParams.set('event', id);
+  url.pathname += 'e/' + encodeURIComponent(id);
+  url.search = ''; url.hash = '';
   return url.href;
 }
 export function normalizeEvent(value) {
@@ -84,7 +89,7 @@ export function normalizeEvent(value) {
   const stickers = Array.isArray(value.stickers) ? value.stickers.slice(0, 64).map((s, i) => ({ id: text(s.id, 100) || `sticker-${i}`, name: text(s.name, 40), text: text(s.text, 8), url: safeURL(s.url) })).filter(s => s.text || s.url) : [];
   const event = { title: text(value.title, 80) || DEFAULT_EVENT.title, school: text(value.school, 60), schedule: text(value.schedule, 100), logo: safeURL(value.logo), logoPosition: value.logoPosition === 'bottom' ? 'bottom' : 'top', orientation: value.orientation === 'landscape' ? 'landscape' : 'portrait', frames: frames.length ? frames : DEFAULT_FRAMES, stickers };
   const { hasContent, hasTop, hasBottom, ...branding } = brandingModel({ ...event, branding: value.branding });
-  return { ...event, branding };
+  return { ...event, branding, sharing:normalizeSharing(value.sharing) };
 }
 export function imageFromURL(url) {
   return new Promise((resolve, reject) => { const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => resolve(img); img.onerror = () => reject(new Error('이미지를 불러오지 못했어요.')); img.src = url; });

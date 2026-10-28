@@ -39,7 +39,7 @@ Firebase 권한 테스트는 Java 21 이상과 Firebase CLI를 사용할 수 있
 npx --yes --package firebase-tools firebase emulators:exec --project demo-school-photo --only firestore,storage "node --test tests/security.rules.test.mjs"
 ```
 
-현재 기능 테스트 8개, Firebase 규칙 테스트 10개입니다. 기기 기본 카메라 호출, 실제 카메라 미리보기와 촬영 결과, 터치·두 손가락 조작, 사진첩 공유 및 실물 프린터 출력은 실기기 검수가 필요합니다.
+현재 기능 테스트 20개, Firebase 규칙 테스트 11개입니다. 기기 기본 카메라 호출, 실제 카메라 미리보기와 촬영 결과, 터치·두 손가락 조작, 사진첩 공유 및 실물 프린터 출력은 실기기 검수가 필요합니다.
 
 ## 운영에 배포하기
 
@@ -48,17 +48,27 @@ npx --yes --package firebase-tools firebase emulators:exec --project demo-school
 ```sh
 npx --yes --package firebase-tools firebase login
 npm run build
+# 최초 한 번: 학생 전용 Hosting 사이트 생성
+npx --yes --package firebase-tools firebase hosting:sites:create teacher-student-photo-students --project teacher-student-photo
+npm run check:hosting
 npx --yes --package firebase-tools firebase deploy --project teacher-student-photo --only hosting,firestore,storage
 ```
+
+관리자 Hosting은 `teacher-student-photo`, 학생 Hosting은 `teacher-student-photo-students`입니다. `npm run build`는 각각 `dist/admin`, `dist/student`를 생성합니다. 학생 사이트의 루트에는 QR 안내만 있고, `/e/행사ID`는 촬영 화면으로 연결됩니다. QR 생성은 `VITE_STUDENT_BASE_URL`을 사용하며 기본값은 `https://teacher-student-photo-students.web.app/`입니다. 사이트 ID를 변경하면 `.firebaserc` student 대상과 환경변수를 함께 바꾸세요. 학생용 사이트를 생성·배포하기 전 새 QR을 배포하지 마세요. 기존 `/booth.html?event=...`는 유지합니다.
 
 GitHub에 push하는 것만으로는 Firebase에 자동 배포되지 않습니다. 이미 생성된 Firestore·Storage·Google 로그인 설정은 그대로 사용합니다. 새 도메인을 추가할 때만 Auth 승인 도메인과 Storage CORS를 검토합니다.
 
 ## 현재 설계와 파일 위치
 
-- `booth.html`, `app.js`: 학생 단계별 UI, 기본 카메라/앱 안 촬영, 사진 편집·저장. 사진은 브라우저 메모리에서만 처리합니다.
+- `booth.html`, `app.js`: 학생 3단계 UI(용도·프레임 → 촬영 → 꾸미기·저장), 연속 촬영 완료 후 자동 이동, 회전 손잡이·두 손가락 크기·회전, 선택형 제출과 기존 저장·공유.
+- `decoration-geometry.js`: 회전 좌표·선택 판정·각도 변화.
+- `sharing.js`: 공유 설정 정규화, 공개 필드 제한, 개발자 정보 붙여넣기 추출, 선택형 수합 요청.
+- `collection-setup.html`, `integrations/google-collection/`: 교사 소유 Google Apps Script 수합 도우미와 설치 안내. API 키는 Script Properties, 학생 이미지는 교사의 Drive에만 저장합니다.
 - `core.js`: 컷 수·프레임·사용자 지정 `photoSlots` 정규화와 공통 좌표 계산.
 - `frame-upload.js`: 프레임 이미지 배치, 사진 칸별 이동·모서리/두 손가락 크기 조절·좌표 입력.
 - `editor-view.js`: 학생 꾸미기 화면 100~400% 보기 확대·화면 이동. 출력 크기와 독립적입니다.
+- `layout-guide.js`: 공통 layout 좌표로 용도·컷 수·프레임 카드와 사진 공간 안내를 렌더링합니다.
+- `scripts/check-hosting.mjs`: 두 Hosting 대상과 학생 빌드의 관리자 모듈 분리를 검사합니다.
 - `export-formats.js`: 사각형 비율 선택 카드, 카톡·인스타·인화·A4·대표 비율과 여백 맞춤 저장.
 - `admin.js`, `libraries.js`, `frame-editor.js`, `frame-preview.js`, `branding.js`: 교사 행사·보관함·학교 설정·로고/문구 위치 편집.
 - `cloud.js`: 운영자 Firebase Auth/Firestore/Storage. `public-event.js`: 로그인 없는 학생의 게시 행사 단건 읽기.
@@ -68,7 +78,7 @@ GitHub에 push하는 것만으로는 Firebase에 자동 배포되지 않습니�
 
 ## 반드시 유지할 조건
 
-1. 학생 사진·완성 이미지는 Firebase나 다른 서버로 업로드하지 않습니다. 체험 사진도 동일합니다.
+1. 학생 사진·완성 이미지는 Firebase/앱 서버에 저장하지 않습니다. 기본 촬영·꾸미기는 기기에서 처리하고, 학생이 명시적으로 제출한 완성 이미지 한 장만 교사 소유 수합 도우미를 거쳐 교사의 Drive·선택한 Padlet에 전송할 수 있습니다. 자동 수합은 교사 Apps Script 설치와 키 연결 후 사용합니다. API 키는 공개 행사·학생 코드에 포함하지 않습니다.
 2. 공식 `/`는 운영자 페이지, 학생은 행사별 `/booth.html?event=...`로 들어옵니다. 학생 화면에는 운영자 이동 버튼을 넣지 않습니다.
 3. 일반 교사의 탭은 내 행사·활동 / 프레임 보관함 / 디자인 보관함 / 내 학교. 인증된 `dltjdrms320@gmail.com`만 공용 자료 관리 탭에서 공용 이미지·프레임을 등록합니다. UI와 서버 규칙 모두 권한을 검사합니다.
 4. 교사 업로드 디자인과 선택한 사진 칸 좌표는 계정별 또는 공용 자료로 저장합니다. 행사에는 선택한 디자인과 좌표가 복사됩니다.
@@ -78,3 +88,5 @@ GitHub에 push하는 것만으로는 Firebase에 자동 배포되지 않습니�
 새 컴퓨터의 코딩 도구에는 다음처럼 요청하면 됩니다.
 
 > 이 저장소의 AGENTS.md, README.md, docs/HANDOFF.md를 먼저 읽고 기존 Firebase 프로젝트와 사진 브라우저 처리 원칙을 유지하며 작업을 이어가 주세요.
+
+수합·공유 검증: `npm test`에는 수합 도우미 모의 서비스 검증(소유권, 제출 동의, 중복, 비공개 Drive, Padlet 부분 실패)도 포함됩니다. 실제 Padlet 게시와 Drive 권한·Apps Script CORS는 해당 교사 계정의 배포 URL·게시판 연결 후 실서비스 검수가 필요합니다.

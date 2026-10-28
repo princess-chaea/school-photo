@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build --mode admin && vite build --mode student",
     "preview": "vite preview --host 0.0.0.0",
     "test": "node --test tests/*.test.js",
-    "setup": "node scripts/setup-env.mjs"
+    "setup": "node scripts/setup-env.mjs",
+    "preview:student": "vite preview --mode student --host 0.0.0.0",
+    "check:hosting": "node scripts/check-hosting.mjs"
   },
   "dependencies": {
     "@jsquash/webp": "^1.5.0",

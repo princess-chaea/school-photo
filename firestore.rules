@@ -22,10 +22,20 @@ service cloud.firestore {
         && validBrandPart(b.logo,0.035,0.35) && validBrandPart(b.school,0.012,0.10)
         && validBrandPart(b.title,0.012,0.10) && validBrandPart(b.schedule,0.012,0.10);
     }
+    function validSharing(s) {
+      return s is map && s.keys().hasAll(['mode','url','relayUrl','boardId','submissionKey'])
+        && s.keys().hasOnly(['mode','url','relayUrl','boardId','submissionKey'])
+        && s.mode in ['none','link','drive','padlet']
+        && s.url is string && s.url.size() <= 2048 && (s.url == '' || s.url.matches('https://[^ @]+'))
+        && s.relayUrl is string && (s.relayUrl == '' || s.relayUrl.matches('https://script[.]google[.]com/macros/s/[a-zA-Z0-9_-]+/exec'))
+        && s.boardId is string && s.boardId.size() <= 100 && (s.boardId == '' || s.boardId.matches('[a-zA-Z0-9_-]+'))
+        && s.submissionKey is string && s.submissionKey.size() <= 100 && (s.submissionKey == '' || s.submissionKey.matches('[a-zA-Z0-9_-]{20,100}'));
+    }
     function validEvent(d) {
       return d.keys().hasAll(['ownerId', 'published', 'title', 'school', 'schedule', 'logo', 'logoPosition', 'frames', 'stickers', 'updatedAt'])
-        && d.keys().hasOnly(['ownerId', 'published', 'title', 'school', 'schedule', 'logo', 'logoPosition', 'frames', 'stickers', 'updatedAt', 'branding', 'orientation'])
+        && d.keys().hasOnly(['ownerId', 'published', 'title', 'school', 'schedule', 'logo', 'logoPosition', 'frames', 'stickers', 'updatedAt', 'branding', 'orientation', 'sharing'])
         && (!('branding' in d) || validBranding(d.branding))
+        && (!('sharing' in d) || validSharing(d.sharing))
         && d.ownerId is string && d.published is bool
         && d.title is string && d.title.size() > 0 && d.title.size() <= 80
         && d.school is string && d.school.size() <= 60

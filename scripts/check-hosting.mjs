@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import { readFile, readdir } from 'node:fs/promises';
+const read=async path=>JSON.parse(await readFile(new URL('../'+path,import.meta.url),'utf8'));
+const config=await read('firebase.json'),targets=await read('.firebaserc');
+const student=config.hosting.find(h=>h.target==='student'),admin=config.hosting.find(h=>h.target==='admin');
+assert.equal(student.public,'dist/student');assert.equal(admin.public,'dist/admin');
+assert.notDeepEqual(targets.targets['teacher-student-photo'].hosting.student,targets.targets['teacher-student-photo'].hosting.admin);
+assert(student.rewrites.some(r=>r.source==='/e/**'&&r.destination==='/booth.html'));
+const manifest=await read('dist/student/.vite/manifest.json');
+assert(manifest['booth.html']?.isEntry);assert.deepEqual(Object.values(manifest).filter(entry=>entry.isEntry).map(entry=>entry.src),['booth.html']);assert(!manifest['index.html']);
+const files=await readdir(new URL('../dist/student/assets/',import.meta.url));
+assert(!files.some(name=>/^(admin|cloud|frame-editor|frame-upload|webp-worker)[-.]/.test(name)));
+const html=await readFile(new URL('../dist/student/index.html',import.meta.url),'utf8');
+assert(html.includes('행사 QR로 참여해 주세요.'));assert(!html.includes('google-login'));assert(!html.includes('admin.js'));
+await readFile(new URL('../dist/admin/index.html',import.meta.url));
+console.log('PASS: 관리자·학생 Hosting 대상, 행사 경로, 학생 기본 안내, 관리자 번들 분리');

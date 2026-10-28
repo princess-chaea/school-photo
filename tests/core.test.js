@@ -27,8 +27,8 @@ test('세로·가로 사진의 확대 및 이동은 원본 경계를 넘지 않�
   }
 });
 test('QR은 관리 화면이 아닌 행사 URL을 가리킨다', () => {
-  assert.equal(eventURL('https://school.web.app/admin.html?old=1#top', 'spring-2026'), 'https://school.web.app/booth.html?event=spring-2026');
-  assert.equal(eventURL('https://example.com/booth/index.html', 'abc'), 'https://example.com/booth/booth.html?event=abc');
+  assert.equal(eventURL('https://school.web.app/admin.html?old=1#top', 'spring-2026'), 'https://school.web.app/e/spring-2026');
+  assert.equal(eventURL('https://example.com/booth/index.html', 'abc'), 'https://example.com/booth/e/abc');
   assert.throws(() => eventURL('javascript:alert(1)', 'x'));
 });
 test('외부 행사 데이터에서 실행 가능한 URL과 잘못된 색상을 제거한다', () => {
@@ -57,4 +57,39 @@ test('사용자 지정 사진 칸은 저장 정규화 후에도 동일하게 렌
 import { EXPORT_FORMATS, exportGeometry } from '../export-formats.js';
 test('용도별 저장은 프레임 전체를 유지하고 출력 범위를 넘지 않는다',()=>{
  for(const f of EXPORT_FORMATS)for(const [w,h] of [[1200,1800],[1800,1200]]){const g=exportGeometry(w,h,f.id);assert(g.x>=0&&g.y>=0);assert(g.x+g.w<=g.width+.001);assert(g.y+g.h<=g.height+.001);assert(Math.abs(g.w/g.h-w/h)<.00001);if(f.width){assert.equal(g.width,f.width);assert.equal(g.height,f.height);}}
+});
+
+test('기본 프레임은 처음 선택한 용도의 규격과 정보가 있는 쪽만 확보한다', () => {
+  for (const preset of EXPORT_FORMATS.filter(f => f.width)) for (const count of [2,4,6,8]) {
+    const options = { width:preset.width, height:preset.height, padding:preset.padding };
+    const empty = layout(count, DEFAULT_EVENT, options);
+    assert.equal(empty.width,preset.width); assert.equal(empty.height,preset.height);
+    assert.equal(empty.slots[0].y,empty.pad);
+    assert.equal(empty.slots.at(-1).y+empty.photoH,empty.height-empty.pad);
+    for (const position of ['top','bottom']) {
+      const g=layout(count,{...DEFAULT_EVENT,school:'우리학교',logoPosition:position},options);
+      assert.equal(g.brandAreas[position].h,g.brandH);
+      assert.equal(g.brandAreas[position==='top'?'bottom':'top'].h,0);
+      assert(g.photoH<empty.photoH);
+      assert(g.slots.every(s=>s.w>0&&s.h>0&&s.x>=0&&s.y>=0&&s.x+s.w<=g.width+.001&&s.y+s.h<=g.height+.001));
+      const footer=layout(count,{...DEFAULT_EVENT,school:'우리학교',logoPosition:position},{...options,caption:true,captureDate:true});
+      assert(footer.slots.at(-1).y+footer.photoH<=footer.footerY+.001);
+      if(position==='bottom')assert(footer.brandAreas.bottom.y+footer.brandAreas.bottom.h<=footer.footerY+.001);
+    }
+  }
+});
+
+import { fitLayoutGuide } from '../layout-guide.js';
+test('업로드 프레임의 사진 공간 안내는 실제 저장 여백과 위치·크기가 일치한다',()=>{
+  const source=templateGeometry(4);
+  for(const preset of EXPORT_FORMATS){
+    const guide=fitLayoutGuide(source,preset),output=exportGeometry(source.width,source.height,preset.id);
+    assert.equal(guide.width,output.width);assert.equal(guide.height,output.height);
+    for(const [i,s] of source.slots.entries()){
+      const slot=guide.slots[i];assert(Math.abs(slot.x-(output.x+s.x*output.w/source.width))<.00001);
+      assert(Math.abs(slot.y-(output.y+s.y*output.h/source.height))<.00001);
+      assert(Math.abs(slot.w-s.w*output.w/source.width)<.00001);
+      assert(Math.abs(slot.h-s.h*output.h/source.height)<.00001);
+    }
+  }
 });
