@@ -4,7 +4,7 @@ import {createStickerSelector} from './sticker-selector.js';
 import {createExtraTextEditor} from './extra-text-editor.js';
 import {createTextStyleControls} from './text-style-controls.js';
 import {confirmAction} from './app-dialog.js';
-import {fillFontSelect,loadFont,fontFamily} from './fonts.js';
+import {fillFontSelect,refreshFontSelect,loadFont,fontFamily} from './fonts.js';
 import {createOperations} from './operations.js';
 import {normalizeSharing,validateSharing,parsePadletDetails,callCollectionRelay} from './sharing.js';
 import QRCode from 'qrcode';
@@ -103,7 +103,7 @@ async function storeEvent(id, event, published) {
 }
 async function saveEditor(publish) { const event = readEditor(); if(publish&&!demo&&['drive','padlet'].includes(event.sharing?.mode))await callCollectionRelay(event.sharing.relayUrl,{action:'verify',eventId:event.id,idToken:await user.getIdToken()}); const saved = await storeEvent(event.id, event, publish || event.published); toast(demo ? '이 탭에 체험 행사를 저장했어요. 클라우드에는 저장되지 않아요.' : saved.published ? '행사를 저장하고 게시했어요.' : '비공개로 저장했어요.'); if (publish && !demo) await showQR(saved); }
 function previewEvent() { return editing ? { ...editing, title: $('event-title').value || '행사 이름', school: $('event-school').value, schedule: $('event-schedule').value, logo: $('event-logo').value, logoPosition: $('logo-position').value } : null; }
-async function updatePreview() { const event = previewEvent(); if (!event) return; for(const key of ['title','school','schedule']){const select=$(`event-${key}-font`);select.value=brandingModel(event)[key].font;select.style.fontFamily=fontFamily(select.value);$(`event-${key}`).style.fontFamily=fontFamily(select.value);} for(const controls of textStyleControls)controls.refresh();extraTextEditor?.refresh(); frameEditor?.refresh(); await paintFramePreview($('admin-preview'), event); }
+async function updatePreview() { const event = previewEvent(); if (!event) return; for(const key of ['title','school','schedule']){const select=$(`event-${key}-font`);select.value=brandingModel(event)[key].font;refreshFontSelect(select);select.style.fontFamily=fontFamily(select.value);$(`event-${key}`).style.fontFamily=fontFamily(select.value);} for(const controls of textStyleControls)controls.refresh();extraTextEditor?.refresh(); frameEditor?.refresh(); await paintFramePreview($('admin-preview'), event); }
 function renderAssets() { libraries?.render(); }
 async function removePrivateAsset(asset) {
   if (events.some(e => usesAsset(e, asset)) || (editing && usesAsset(editing, asset)) || (asset.url && school.logo === asset.url)) return toast('행사나 학교 설정에서 사용 중인 자료예요. 먼저 해제하고 저장해 주세요.');

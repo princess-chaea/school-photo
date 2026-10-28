@@ -1,7 +1,7 @@
 import {createFrameComparison} from './frame-comparison.js';
 import {createTextStyleControls} from './text-style-controls.js';
 import {confirmAction} from './app-dialog.js';
-import {fillFontSelect,loadFont} from './fonts.js';
+import {fillFontSelect,refreshFontSelect,loadFont} from './fonts.js';
 import { brandingModel, brandEntries, brandPart, changeBrandPart, BRAND_KEYS, BRAND_LABELS, BRAND_SIZES, clamp, compatibleFrame } from './core.js';
 import { paintFramePreview } from './frame-preview.js';
 import { labelButton } from './icons.js';
@@ -31,7 +31,7 @@ export function createFrameEditor({ getEvent, onChange, onSave }) {
     for (const {key,label,settings,content} of brandEntries(event)) { const option = document.createElement('option'); option.value = key; option.textContent = label; option.disabled = !settings.visible || !content; $('frame-selected').append(option); }
     if(selected&&(!brandPart(event,selected)?.content||!brandPart(event,selected)?.settings.visible))selected=brandEntries(event).find(item=>item.content&&item.settings.visible)?.key||null;
     $('frame-selected').value = selected || ''; $('frame-item-controls').hidden = !selected; $('frame-no-selection').hidden = Boolean(selected);
-    if (selected) { const item = brandPart(event,selected).settings;$('frame-element-font').value=item.font;$('frame-element-font').disabled=selected==='logo'; $('frame-size-value').textContent = `${Math.round(item.size / (BRAND_SIZES[selected]||BRAND_SIZES.title) * 100)}%`; }
+    if (selected) { const item = brandPart(event,selected).settings;$('frame-element-font').value=item.font;$('frame-element-font').disabled=selected==='logo';refreshFontSelect($('frame-element-font')); $('frame-size-value').textContent = `${Math.round(item.size / (BRAND_SIZES[selected]||BRAND_SIZES.title) * 100)}%`; }
     textStyles.refresh();
     const height=String(Math.round(model.height*100));if(![...$('frame-brand-height').options].some(o=>o.value===height))$('frame-brand-height').append(Object.assign(document.createElement('option'),{value:height,textContent:height+'%'}));$('frame-brand-height').value=height; $('frame-brand-height').disabled = Boolean(event.frames[frameIndex]?.layoutCount);
     $('frame-example').replaceChildren(...event.frames.flatMap((frame, i) => compatibleFrame(frame,count) ? [Object.assign(document.createElement('option'), { value: i, textContent: frame.name })] : []));
@@ -54,7 +54,7 @@ export function createFrameEditor({ getEvent, onChange, onSave }) {
   $('open-frame-editor').addEventListener('click', open); $('admin-preview').addEventListener('click', open);
   $('close-frame-editor').addEventListener('click', close); dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
   $('reset-frame-branding').addEventListener('click', async () => {if(await confirmAction('로고·문구의 위치와 크기를 초기화할까요? 현재 배치는 사라집니다.'))onChange(null);});
-  fillFontSelect($('frame-element-font'));$('frame-element-font').onchange=async e=>{const key=selected,id=e.target.value,request=++fontRequest;$('save-frame-editor').disabled=true;try{await loadFont(id);if(request===fontRequest&&key)changePart(key,{font:id});}catch(error){if(request===fontRequest){$('frame-save-status').textContent=error.message;$('frame-element-font').value=brandPart(getEvent(),key)?.settings.font||'baeum';}}finally{if(request===fontRequest)$('save-frame-editor').disabled=false;}};
+  fillFontSelect($('frame-element-font'));$('frame-element-font').onchange=async e=>{const key=selected,id=e.target.value,request=++fontRequest;$('save-frame-editor').disabled=true;try{await loadFont(id);if(request===fontRequest&&key)changePart(key,{font:id});}catch(error){if(request===fontRequest){$('frame-save-status').textContent=error.message;$('frame-element-font').value=brandPart(getEvent(),key)?.settings.font||'baeum';refreshFontSelect($('frame-element-font'));}}finally{if(request===fontRequest)$('save-frame-editor').disabled=false;}};
   $('save-frame-editor').onclick=async()=>{const button=$('save-frame-editor');button.disabled=true;$('frame-save-status').textContent='저장 중…';try{await onSave();$('frame-save-status').textContent='';close();}catch(error){$('frame-save-status').textContent=error.message;}finally{button.disabled=false;}};
   $('frame-selected').addEventListener('change', e => { selected = e.target.value; focusSelection = true; refresh(); });
   $('frame-example').addEventListener('change', e => { frameIndex = Number(e.target.value); refresh(); });

@@ -1,3 +1,5 @@
+import {enhanceFontSelect,refreshFontSelect} from './font-picker.js';
+export {refreshFontSelect};
 import {SCHOOL_FONTS} from './school-font-catalog.js';
 export const FONTS=[{id:'baeum',name:'케리스 배움체',family:'KerisBaeum'},...[
  ['night','학교안심 밤하늘'],['round','학교안심 덩덩이'],['edge','학교안심 엣지'],['poster','학교안심 포스터'],['marker','학교안심 보드마카']
@@ -25,4 +27,5 @@ export function fillFontSelect(select){
   for(const font of fonts){const option=document.createElement('option');option.value=font.id;option.textContent=font.name;group.append(option);}
   select.append(group);
  }
+ enhanceFontSelect(select,{fonts:FONTS,loadFont});
 }

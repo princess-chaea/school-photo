@@ -2,3 +2,5 @@
 .admin-page .editor-actions .button>span{font-size:inherit}
 .admin-page .sticker-picker-grid .design-choice>span{word-break:keep-all;overflow-wrap:normal}
 @media(max-width:370px){.admin-page .sticker-picker-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* Keep the setup notice in the document flow on short login/demo screens. */
+body.admin-page:not(.signed-in){height:auto;min-height:100dvh;overflow-y:auto}body.admin-page:not(.signed-in) .admin-main{height:auto;min-height:80dvh;flex-direction:column;gap:16px;padding:20px 18px}body.admin-page:not(.signed-in) .setup-banner{position:static;order:1;flex:none;width:min(100%,600px);margin:0 auto}
