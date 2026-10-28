@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function siteAdmin() { return signedIn() && request.auth.token.email == 'dltjdrms320@gmail.com' && request.auth.token.email_verified == true; }
+    function owns(data) { return signedIn() && data.ownerId == request.auth.uid; }
+    function validBrandPart(p, min, max) {
+      return p is map && p.keys().hasAll(['visible','position','x','y','size','color'])
+        && p.keys().hasOnly(['visible','position','x','y','size','color'])
+        && p.visible is bool && p.position in ['top','bottom','free']
+        && p.x is number && p.x >= 0.05 && p.x <= 0.95
+        && p.y is number && p.y >= 0 && p.y <= 1
+        && p.size is number && p.size >= min && p.size <= max
+        && p.color is string && (p.color == '' || p.color.matches('#[0-9a-fA-F]{6}'));
+    }
+    function validBranding(b) {
+      return b is map && b.keys().hasAll(['height','captureDate','logo','school','title','schedule'])
+        && b.keys().hasOnly(['height','captureDate','logo','school','title','schedule'])
+        && b.height is number && b.height >= 0.08 && b.height <= 0.60 && b.captureDate is bool
+        && validBrandPart(b.logo,0.035,0.35) && validBrandPart(b.school,0.012,0.10)
+        && validBrandPart(b.title,0.012,0.10) && validBrandPart(b.schedule,0.012,0.10);
+    }
+    function validEvent(d) {
+      return d.keys().hasAll(['ownerId', 'published', 'title', 'school', 'schedule', 'logo', 'logoPosition', 'frames', 'stickers', 'updatedAt'])
+        && d.keys().hasOnly(['ownerId', 'published', 'title', 'school', 'schedule', 'logo', 'logoPosition', 'frames', 'stickers', 'updatedAt', 'branding', 'orientation'])
+        && (!('branding' in d) || validBranding(d.branding))
+        && d.ownerId is string && d.published is bool
+        && d.title is string && d.title.size() > 0 && d.title.size() <= 80
+        && d.school is string && d.school.size() <= 60
+        && d.schedule is string && d.schedule.size() <= 100
+        && d.logo is string && d.logo.size() <= 4096
+        && (!('orientation' in d) || d.orientation in ['portrait','landscape'])
+        && d.logoPosition in ['top', 'bottom']
+        && d.frames is list && d.frames.size() > 0 && d.frames.size() <= 32
+        && d.stickers is list && d.stickers.size() <= 64
+        && d.updatedAt == request.time;
+    }
+    match /events/{eventId} {
+      // 참가자는 QR에 적힌 게시 행사 한 건만 읽습니다. 전체 공개 목록은 허용하지 않습니다.
+      allow get: if resource.data.published == true || owns(resource.data);
+      allow list: if owns(resource.data);
+      allow create: if owns(request.resource.data) && validEvent(request.resource.data);
+      allow update: if owns(resource.data) && request.resource.data.ownerId == resource.data.ownerId && validEvent(request.resource.data);
+      allow delete: if owns(resource.data);
+    }
+    match /users/{uid}/assets/{assetId} {
+      function owner() { return signedIn() && request.auth.uid == uid; }
+      function validAsset(d) {
+        return d.keys().hasAll(['name', 'kind']) && d.name is string && d.name.size() > 0 && d.name.size() <= 60
+          && ((d.kind == 'palette' && d.keys().hasOnly(['name', 'kind', 'bg', 'ink'])
+            && d.bg is string && d.bg.matches('#[0-9a-fA-F]{6}') && d.ink is string && d.ink.matches('#[0-9a-fA-F]{6}'))
+          || (d.kind in ['logo', 'frame', 'sticker'] && d.keys().hasOnly(['name', 'kind', 'url', 'path', 'originalBytes', 'optimizedBytes', 'width', 'height', 'format', 'layoutCount', 'orientation'])
+            && (!('orientation' in d) || d.orientation in ['portrait','landscape'])
+            && (!('layoutCount' in d) || (d.kind == 'frame' && d.layoutCount in [2,4,6,8]))
+            && d.url is string && d.url.size() <= 4096 && d.path is string && d.path == 'users/' + uid + '/assets/' + assetId));
+      }
+      allow read: if owner();
+      allow create: if owner() && validAsset(request.resource.data);
+      allow delete: if owner();
+      allow update: if false;
+    }
+    match /users/{uid}/profile/school {
+      allow read, delete: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['school', 'logo', 'updatedAt'])
+        && request.resource.data.school is string && request.resource.data.school.size() <= 60
+        && request.resource.data.logo is string && request.resource.data.logo.size() <= 4096
+        && request.resource.data.updatedAt == request.time;
+    }
+    match /sharedAssets/{assetId} {
+      function validShared(d) {
+        return d.keys().hasAll(['name','kind','url','path','active'])
+          && d.keys().hasOnly(['name','kind','url','path','active','originalBytes','optimizedBytes','width','height','format','layoutCount','orientation'])
+          && d.name is string && d.name.size() > 0 && d.name.size() <= 60
+          && d.kind in ['frame','sticker'] && d.url is string && d.url.size() <= 4096
+          && d.path == 'shared/assets/' + assetId && d.active is bool
+          && (d.kind != 'frame' || (d.layoutCount in [2,4,6,8]));
+      }
+      allow read: if true;
+      allow create: if siteAdmin() && validShared(request.resource.data);
+      allow update: if siteAdmin() && validShared(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['active']);
+      allow delete: if false;
+    }
+    // 참가자 사진이나 완성 이미지를 저장하는 컬렉션은 없습니다.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

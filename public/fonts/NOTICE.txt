@@ -1,0 +1,7 @@
+케리스 배움체 (KERIS Baeum)
+Copyright: 한국교육학술정보원(KERIS). 제작: 투게더그룹.
+배포 원본: 사용자가 제공한 케리스 배움체.zip. 글리프·폰트 이름을 유지하고 WOFF2 형식으로 압축했습니다.
+라이선스: SIL Open Font License (OFL), Version 1.1.
+공식 학교 안심폰트 안내: https://copyright.keris.or.kr/wft/fntDwnldMain
+라이선스 전문: https://openfontlicense.org/open-font-license-official-text/
+폰트 자체를 단독으로 판매할 수 없습니다. 폰트 저작권 및 라이선스를 유지해야 합니다.

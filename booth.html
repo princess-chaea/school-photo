@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f4ef">
+  <meta name="description" content="지금의 우리를 담는 작은 포토부스. 사진은 서버 전송 없이 내 브라우저에서만 처리됩니다.">
+  <title>사제동행 찰칵! 포토</title>
+  <meta property="og:type" content="website"><meta property="og:site_name" content="사제동행 찰칵! 포토"><meta property="og:title" content="사제동행 찰칵! 포토"><meta property="og:description" content="QR로 바로 참여하고 우리 행사만의 사진을 남겨요. 사진은 내 기기에서만 처리돼요."><meta property="og:image" content="https://teacher-student-photo.web.app/og-image.png"><meta property="og:image:secure_url" content="https://teacher-student-photo.web.app/og-image.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="사제동행 찰칵 포토 로고"><meta property="og:locale" content="ko_KR"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="사제동행 찰칵! 포토"><meta name="twitter:image" content="https://teacher-student-photo.web.app/og-image.png"><meta name="application-name" content="사제동행 찰칵! 포토"><meta name="apple-mobile-web-app-title" content="찰칵! 포토"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="icon" href="/icons/icon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/icons/icon-48.png" type="image/png" sizes="48x48"><link rel="apple-touch-icon" href="/icons/icon-180.png" sizes="180x180"><link rel="manifest" href="/booth.webmanifest">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./mobile.css">
+  <script src="./app.js" type="module"></script>
+</head>
+<body class="booth-app">
+  <header class="topbar">
+    <div class="wordmark school-wordmark" aria-label="사제동행 찰칵! 포토"><img src="/school-booth-logo.webp" alt="선생님과 학생이 함께 포즈를 취하는 포토부스"><span><small>사제동행</small>찰칵! 포토</span></div>
+    <span class="private-badge"><span></span> 내 기기에서만</span>
+  </header>
+  <main>
+    <section class="intro" id="event-intro" hidden>
+      <h1></h1>
+      <p class="intro-copy"></p>
+    </section>
+    <nav class="steps" aria-label="제작 단계">
+      <ol id="step-list"></ol>
+    </nav>
+    <div class="workspace">
+      <section class="control-panel" aria-label="포토부스 설정">
+        <div class="section-heading"><div><p class="eyebrow" id="step-kicker"></p><h2 id="step-title" tabindex="-1"></h2></div><span class="step-counter" id="step-counter"></span></div>
+        <p class="section-copy" id="step-description"></p>
+
+        <div class="step-content" data-step="0">
+          <div class="cut-grid" id="cut-options"></div>
+          <div class="orientation-options" id="orientation-options" aria-label="4×6 인화 방향"></div>
+          <div class="note-card"><span class="note-icon">▧</span><div><strong>4×6인치 인화에 딱 맞게.</strong><p>세로 1200×1800 · 가로 1800×1200px로 저장돼요.</p></div></div>
+          <div class="detail-line"><span>로그인 없이 바로 시작</span><span>사진 업로드 없음</span></div>
+        </div>
+
+        <div class="step-content" data-step="1" hidden>
+          <p class="field-label">프레임 컬러 <span id="frame-name"></span></p>
+          <div class="frame-grid" id="frame-options"></div>
+          <label class="field-label" for="caption">아래에 남길 한마디</label>
+          <input id="caption" maxlength="32" placeholder="원할 때만 한마디를 남겨요 (32자 이내)">
+          <label class="switch-row"><span>오늘 날짜 넣기</span><input id="show-date" type="checkbox" checked></label>
+        </div>
+
+        <div class="step-content" data-step="2" hidden>
+          <div class="camera-shell" id="camera-shell">
+            <video id="video" autoplay playsinline muted aria-label="카메라 미리보기"></video>
+            <div class="camera-placeholder" id="camera-placeholder"><span class="camera-symbol">◎</span><strong>여기가 오늘의 작은 스튜디오</strong><p>카메라를 켜고 가장 나다운 표정을 지어봐요.</p><button class="button lime" id="camera-start">카메라 켜기</button></div>
+            <span class="camera-live" id="camera-live" hidden>● LIVE</span>
+            <div id="countdown" class="countdown" aria-live="assertive"></div>
+            <div class="camera-flash" id="camera-flash"></div>
+          </div>
+          <div class="camera-settings"><label>타이머 <select id="timer"><option value="3">3초</option><option value="5">5초</option><option value="0">바로 촬영</option></select></label><button class="text-button" id="camera-flip">↺ 카메라 전환</button></div>
+          <div class="capture-row"><span id="capture-progress">0 / 4</span><button class="shutter" id="capture" disabled aria-label="사진 한 장 촬영"><span></span></button><button class="text-button" id="auto-capture" disabled>연속 촬영</button></div>
+          <button class="button cancel-button" id="cancel-capture" hidden>촬영 취소</button>
+          <div class="divider"><span>또는</span></div>
+          <label class="button upload-button">내 사진으로 채우기<input type="file" id="photo-upload" accept="image/*" multiple hidden></label>
+          <p class="small muted">선택한 칸부터 채워져요. 아래 썸네일을 눌러 재촬영할 수 있어요.</p>
+          <div class="thumbnails" id="thumbnails"></div>
+          <button class="text-button demo-button" id="demo">카메라 없이 샘플로 체험하기 ↗</button>
+        </div>
+
+        <div class="step-content" data-step="3" hidden>
+          <div class="editor-launchers"><button class="tool-launch" data-open-tool="stickers"><span>✿</span>스티커</button><button class="tool-launch" data-open-tool="text"><span>가</span>문구</button><button class="tool-launch" data-open-tool="photo"><span>⤢</span>사진 구도</button><button class="tool-launch" data-open-tool="filter"><span>◐</span>필터</button></div>
+          <div id="decoration-tools">
+          <div class="tool-group" data-tool="filter">
+          <p class="field-label">사진 분위기</p>
+          <div class="filter-options" id="filter-options"></div>
+          </div>
+          <div class="tool-group" data-tool="photo">
+          <div class="photo-picker" id="photo-picker" aria-label="조정할 사진 선택"></div>
+          <p class="field-label">사진 조정 <span>미리보기에서 사진을 선택해요</span></p>
+          <div class="adjust-controls"><label>확대<input id="zoom" type="range" min="1" max="2.5" step="0.01" value="1"></label><label>좌우<input id="pan-x" type="range" min="-1" max="1" step="0.01" value="0"></label><label>상하<input id="pan-y" type="range" min="-1" max="1" step="0.01" value="0"></label></div>
+          </div>
+          <div class="tool-group" data-tool="stickers">
+          <p class="field-label">스티커 <span>추가하고 손가락으로 옮겨요</span></p>
+          <div class="stickers" id="sticker-options"></div>
+          </div>
+          <div class="tool-group" data-tool="text">
+          <label class="field-label" for="decoration-text">한 줄 더, 마음 한 스푼</label>
+          <div class="input-row"><input id="decoration-text" maxlength="24" placeholder="하고 싶은 말 (24자 이내)"><button class="button" id="add-text">추가</button></div>
+          </div>
+          <div class="decoration-edit" id="decoration-edit" hidden><label>크기<input id="decoration-size" type="range" min="0.03" max="0.22" step="0.005"></label><label>색상<input type="color" id="decoration-color" value="#ffffff"></label><button class="text-button danger" id="delete-decoration">선택 삭제</button></div>
+          </div>
+        </div>
+
+        <div class="step-content" data-step="4" hidden>
+          <div class="ready-card"><span>✳</span><h3>오늘의 순간이 완성됐어요.</h3><p>이 작은 한 장이, 오래 남는 기억이 되길.</p></div>
+          <button class="button lime download-button" id="download">↓ PNG 이미지 저장</button>
+          <button class="button share-button" id="share">↗ 이미지 공유 / 기기에 저장</button>
+          <p class="small muted">기기에 따라 파일 앱의 다운로드 폴더에 저장될 수 있어요. 공유 화면에서 ‘이미지 저장’을 선택하면 사진첩에 담을 수 있어요.</p>
+          <div class="save-facts"><span>고화질 PNG</span><span id="output-size"></span><span>워터마크 없음</span></div>
+          <button class="text-button restart-button" id="restart">새로운 순간 담기 ↗</button>
+        </div>
+
+        <div class="navigation"><button class="button back-button" id="back">← 이전</button><button class="button primary" id="next">프레임 고르기 <span>→</span></button></div>
+      </section>
+
+      <aside class="preview-panel">
+        <div class="preview-top"><span class="eyebrow">YOUR MOMENT</span><span id="preview-layout">04 CUTS · STRIP</span><button class="expand-preview" id="change-layout" hidden>컷 변경</button><button class="expand-preview" id="expand-preview" hidden>⤢ 크게 편집</button></div>
+        <div class="preview-stage"><canvas id="preview" width="600" height="1700" aria-label="완성 사진 미리보기"></canvas><span class="stage-spark spark-one" aria-hidden="true">✳</span><span class="stage-spark spark-two" aria-hidden="true">✧</span></div>
+        <div class="preview-bottom"><span class="live-dot"></span><span id="preview-hint">나만의 한 장이 만들어지는 중</span></div>
+      </aside>
+    </div>
+    <div class="privacy-note"><span>◈</span><p><strong>여기서 만든 사진은, 여기서만.</strong> 사진은 서버로 전송되지 않아요. 저장 전에 페이지를 닫거나 새로고침하면 작업이 사라져요.</p></div>
+  </main>
+  <footer><span class="footer-brand">사제동행 찰칵! 포토</span><span>TOGETHER IN EVERY FRAME.</span><span>함께 찍고, 오래 기억해요.</span></footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="edit-dialog" data-tool="stickers" aria-label="사진 크게 꾸미기">
+    <header class="edit-header"><button class="text-button" id="close-edit">돌아가기</button><strong id="edit-title">사진 꾸미기</strong><span class="edit-header-space" aria-hidden="true"></span></header>
+    <section class="expanded-stage" id="expanded-stage"><canvas id="crop-preview" width="1000" height="750" aria-label="선택한 사진 구도 조정" hidden></canvas></section>
+    <p class="edit-help" id="edit-help">스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.</p>
+    <nav class="edit-tool-tabs" aria-label="꾸미기 도구"><button data-editor-tool="stickers">✿ 스티커</button><button data-editor-tool="text">가 문구</button><button data-editor-tool="photo">⤢ 사진 구도</button><button data-editor-tool="filter">◐ 필터</button></nav>
+    <section class="expanded-tools" id="expanded-tools"></section>
+  </dialog>
+</body>
+</html>
