@@ -424,7 +424,17 @@ async function bootEvent() {
     try { const { loadPublicEvent } = await import('./public-event.js'); state.event = await loadPublicEvent(id); blocked = false;if(!params.has('demo'))usage.enable(); try { localStorage.setItem('chalkak-last-event', id); } catch { /* 사진은 저장하지 않으며 행사 ID만 선택적으로 기억 */ } }
     catch (error) { $('step-title').textContent = '행사를 열 수 없어요.'; $('step-description').textContent = error.code === 'permission-denied' ? '게시되지 않았거나 삭제된 행사입니다. 운영자에게 QR을 확인해 주세요.' : error.message; toast('행사 설정을 확인해 주세요.'); return; }
   }
-  if (id || params.has('preview')) { $('event-intro').hidden = false; document.title = `${state.event.school} ${state.event.title} — 사제동행 찰칵! 포토`; document.querySelector('h1').textContent = state.event.title; document.querySelector('.intro-copy').textContent = [state.event.school, state.event.schedule].filter(Boolean).join(' · '); }
+  if (id || params.has('preview')) {
+    $('event-intro').hidden=false;
+    document.title=`${state.event.school} ${state.event.title} — 사제동행 찰칵! 포토`;
+    document.querySelector('h1').textContent=state.event.title;
+    $('event-school-details').textContent=[state.event.school,state.event.schedule].filter(Boolean).join(' · ');
+    const schoolLogo=$('event-school-logo');
+    schoolLogo.hidden=!state.event.logo;
+    schoolLogo.alt=state.event.school?state.event.school+' 로고':'학교 로고';
+    schoolLogo.onerror=()=>{schoolLogo.hidden=true;schoolLogo.removeAttribute('src');};
+    if(state.event.logo)schoolLogo.src=state.event.logo;
+  }
   $('show-date').checked = brandingModel(state.event).captureDate;
   state.orientation = state.event.orientation || 'portrait';
   renderCollection();renderChoices(); renderSteps(); render(); assetReady = loadAssets();
