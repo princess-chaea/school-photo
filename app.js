@@ -142,7 +142,16 @@ function renderSteps() {
   $('preview-hint').textContent = state.step === 3 ? '도구 탭을 눌러 원하는 기능을 선택해요' : state.step === 4 ? '오늘의 우리, 오래 간직해요' : '나만의 한 장이 만들어지는 중';
   updateButtons();
 }
-function updateCameraGeometry(){const slot=currentGeometry().slots[state.selectedPhoto]||currentGeometry().slots[0],shell=$('camera-shell'),parent=$('web-capture-area');if(!slot||parent.hidden)return;const ratio=slot.w/slot.h,maxH=Math.max(130,Math.min(innerHeight*.34,420)),width=Math.min(parent.clientWidth,maxH*ratio);shell.style.width=width+'px';shell.style.height=width/ratio+'px';$('web-capture-guide').textContent=(state.selectedPhoto+1)+'번 컷 · 사진 칸과 같은 비율·구도로 저장돼요.';}
+function updateCameraGeometry(){
+  const slot=currentGeometry().slots[state.selectedPhoto]||currentGeometry().slots[0],shell=$('camera-shell'),parent=$('web-capture-area');
+  if(!slot||parent.hidden)return;
+  const ratio=slot.w/slot.h,maxH=Math.max(130,Math.min(innerHeight*.34,420)),width=Math.min(parent.clientWidth,maxH*ratio),height=width/ratio;
+  shell.style.width=width+'px';shell.style.height=height+'px';
+  const shortSide=Math.min(width,height);
+  shell.style.setProperty('--camera-countdown-size',Math.max(12,Math.min(80,shortSide*.65))+'px');
+  shell.style.setProperty('--camera-symbol-size',Math.max(14,Math.min(42,shortSide*.5))+'px');
+  $('web-capture-guide').textContent=(state.selectedPhoto+1)+'번 컷 · 사진 칸과 같은 비율·구도로 저장돼요.';
+}
 window.addEventListener('resize',updateCameraGeometry);
 function updateButtons() {
   $('next').disabled = blocked || busy || (state.step === 2 && !state.photos.every(Boolean)); $('back').disabled = busy;
@@ -226,7 +235,7 @@ function render(exporting = false) {
 function stopCamera() {
   cameraEpoch++; captureEpoch++; busy = false;
   if (stream) stream.getTracks().forEach(t => t.stop()); stream = null;
-  $('video').srcObject = null; $('camera-placeholder').hidden = false; $('camera-live').hidden = true; $('countdown').textContent = ''; updateButtons();
+  $('video').srcObject = null; $('camera-placeholder').hidden = false; $('camera-onboarding').hidden = false; $('camera-live').hidden = true; $('countdown').textContent = ''; updateButtons();
 }
 async function startCamera() {
   if (starting) return;
@@ -238,9 +247,9 @@ async function startCamera() {
     if (cameraEpoch !== epoch || state.step !== 2) { obtained.getTracks().forEach(t => t.stop()); return; }
     stream = obtained; $('video').srcObject = stream; $('video').style.transform = facing === 'user' ? 'scaleX(-1)' : 'none'; await $('video').play();
     if (cameraEpoch !== epoch) return;
-    $('camera-placeholder').hidden = true; $('camera-live').hidden = false;
+    $('camera-placeholder').hidden = true; $('camera-onboarding').hidden = true; $('camera-live').hidden = false;
     stream.getVideoTracks()[0].addEventListener('ended', () => { if (stream === obtained) { stopCamera(); toast('카메라 연결이 끝났어요. 다시 켜 주세요.'); } });
-  } catch (error) { if (obtained) obtained.getTracks().forEach(t => t.stop()); stream = null; $('camera-placeholder').hidden = false; $('camera-live').hidden = true; toast(error.name === 'NotAllowedError' ? '카메라 권한을 허용해 주세요. 내 사진 선택으로도 이용할 수 있어요.' : '카메라를 연결하지 못했어요. 다른 앱에서 사용 중인지 확인해 주세요.'); }
+  } catch (error) { if (obtained) obtained.getTracks().forEach(t => t.stop()); stream = null; $('camera-placeholder').hidden = false; $('camera-onboarding').hidden = false; $('camera-live').hidden = true; toast(error.name === 'NotAllowedError' ? '카메라 권한을 허용해 주세요. 내 사진 선택으로도 이용할 수 있어요.' : '카메라를 연결하지 못했어요. 다른 앱에서 사용 중인지 확인해 주세요.'); }
   finally { starting = false; $('camera-start').disabled = false; labelButton($('camera-start'), 'camera', '카메라 켜기'); updateButtons(); }
 }
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
