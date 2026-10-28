@@ -56,19 +56,70 @@ service cloud.firestore {
     function mayPublish(data) {
       return data.published == false || !exists(/databases/$(database)/documents/userDirectory/$(request.auth.uid)) || !('publishingBlocked' in get(/databases/$(database)/documents/userDirectory/$(request.auth.uid)).data) || get(/databases/$(database)/documents/userDirectory/$(request.auth.uid)).data.publishingBlocked != true;
     }
+    function validDirectoryDates(d) {
+      return (!('createdAt' in d) || (d.createdAt is timestamp && d.createdAt <= request.time))
+        && (!('firstSeen' in d) || (d.firstSeen is timestamp && d.firstSeen <= request.time));
+    }
     match /userDirectory/{uid} {
-      allow read: if siteAdmin();
-      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.keys().hasOnly(['displayName','email','lastSeen']) && validDirectory(request.resource.data);
-      allow update: if (signedIn() && request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName','email','lastSeen']) && validDirectory(request.resource.data)) || (siteAdmin() && request.auth.uid != uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['publishingBlocked']) && request.resource.data.publishingBlocked is bool);
+      allow get: if siteAdmin() || (signedIn() && request.auth.uid == uid);
+      allow list: if siteAdmin();
+      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.keys().hasOnly(['displayName','email','lastSeen','createdAt','firstSeen']) && validDirectory(request.resource.data) && validDirectoryDates(request.resource.data) && (!('firstSeen' in request.resource.data) || request.resource.data.firstSeen == request.time);
+      allow update: if (signedIn() && request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName','email','lastSeen','createdAt','firstSeen']) && validDirectory(request.resource.data) && validDirectoryDates(request.resource.data)
+        && (!('createdAt' in resource.data) || request.resource.data.createdAt == resource.data.createdAt)
+        && (('firstSeen' in resource.data) ? request.resource.data.firstSeen == resource.data.firstSeen : (!('firstSeen' in request.resource.data) || request.resource.data.firstSeen == request.time)))
+        || (siteAdmin() && request.auth.uid != uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['publishingBlocked']) && request.resource.data.publishingBlocked is bool);
     }
     function validDirectory(d) { return d.displayName is string && d.displayName.size() <= 80 && d.email == request.auth.token.email && d.lastSeen == request.time; }
     match /events/{eventId} {
       // 참가자는 QR에 적힌 게시 행사 한 건만 읽습니다. 전체 공개 목록은 허용하지 않습니다.
-      allow get: if resource.data.published == true || owns(resource.data);
+      allow get: if siteAdmin() || resource.data.published == true || owns(resource.data);
       allow list: if siteAdmin() || owns(resource.data);
       allow create: if owns(request.resource.data) && validEvent(request.resource.data) && mayPublish(request.resource.data);
       allow update: if (owns(resource.data) && request.resource.data.ownerId == resource.data.ownerId && validEvent(request.resource.data) && mayPublish(request.resource.data)) || (siteAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['published','updatedAt']) && request.resource.data.published == false && request.resource.data.updatedAt == request.time);
       allow delete: if owns(resource.data);
+    }
+    function usageTotal(d) { return d.visits + d.starts + d.cameraShots + d.photoImports + d.completions + d.downloads + d.shares + d.submissions; }
+    match /usageDaily/{usageId} {
+      function validUsage(d) {
+        return d.keys().hasOnly(['eventId','shard','day','updatedAt','visits','starts','cameraShots','photoImports','completions','downloads','shares','submissions'])
+          && d.eventId is string && d.eventId.matches('[a-zA-Z0-9_-]{1,100}')
+          && d.day is timestamp && d.day == (request.time + duration.value(9,'h')).date() - duration.value(9,'h')
+          && d.shard is int && d.shard >= 0 && d.shard < 8 && usageId == d.eventId + '_' + string(int(d.day.toMillis())) + '_' + string(d.shard) && d.updatedAt == request.time
+          && d.visits is int && d.visits >= 0
+          && d.starts is int && d.starts >= 0
+          && d.cameraShots is int && d.cameraShots >= 0
+          && d.photoImports is int && d.photoImports >= 0
+          && d.completions is int && d.completions >= 0
+          && d.downloads is int && d.downloads >= 0
+          && d.shares is int && d.shares >= 0
+          && d.submissions is int && d.submissions >= 0
+          && get(/databases/$(database)/documents/events/$(d.eventId)).data.published == true;
+      }
+      allow read: if siteAdmin();
+      allow create: if validUsage(request.resource.data) && usageTotal(request.resource.data) == 1;
+      allow update: if validUsage(request.resource.data) && request.resource.data.eventId == resource.data.eventId && request.resource.data.day == resource.data.day && request.resource.data.shard == resource.data.shard
+        && request.resource.data.visits >= resource.data.visits
+        && request.resource.data.starts >= resource.data.starts
+        && request.resource.data.cameraShots >= resource.data.cameraShots
+        && request.resource.data.photoImports >= resource.data.photoImports
+        && request.resource.data.completions >= resource.data.completions
+        && request.resource.data.downloads >= resource.data.downloads
+        && request.resource.data.shares >= resource.data.shares
+        && request.resource.data.submissions >= resource.data.submissions
+        && usageTotal(request.resource.data) == usageTotal(resource.data) + 1;
+      allow delete: if false;
+    }
+    match /moderationActions/{actionId} {
+      allow read: if siteAdmin();
+      allow create: if siteAdmin() && request.resource.data.keys().hasOnly(['eventId','eventTitle','actorId','action','reason','createdAt'])
+        && request.resource.data.eventId is string && request.resource.data.eventId.matches('[a-zA-Z0-9_-]{1,100}')
+        && request.resource.data.eventTitle is string && request.resource.data.eventTitle.size() <= 80
+        && request.resource.data.actorId == request.auth.uid && request.resource.data.action == 'unpublish'
+        && request.resource.data.reason is string && request.resource.data.reason.size() <= 300 && request.resource.data.createdAt == request.time
+        && get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.published == true
+        && getAfter(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.published == false
+        && request.resource.data.eventTitle == get(/databases/$(database)/documents/events/$(request.resource.data.eventId)).data.title;
+      allow update, delete: if false;
     }
     match /users/{uid}/assets/{assetId} {
       function owner() { return signedIn() && request.auth.uid == uid; }

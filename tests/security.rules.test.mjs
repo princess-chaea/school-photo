@@ -140,3 +140,31 @@ test('추가 문구 8개와 글자별 크기 설정을 저장하고 상자 개�
  await assertSucceeds(setDoc(doc(a,'events','extra-texts'),data));
  await assertFails(setDoc(doc(a,'events','too-many-texts'),{...data,branding:{...data.branding,texts:[...data.branding.texts,data.branding.texts[0]]}}));
 });
+
+test('익명 사용 집계는 게시 행사·한국 날짜·한 번의 원자 증가만 허용하고 사진·식별자와 조회는 차단한다',async()=>{
+ const {Timestamp,increment}=await import('firebase/firestore'),{usageDay,emptyUsage}=await import('../usage-data.js');const teacher=env.authenticatedContext('teacher-a').firestore(),guest=env.unauthenticatedContext().firestore(),other=env.authenticatedContext('teacher-b').firestore(),admin=env.authenticatedContext('admin',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore();
+ await setDoc(doc(teacher,'events','live'),config(true));await setDoc(doc(teacher,'events','draft'),config(false));const day=usageDay(),data={eventId:'live',shard:0,day:Timestamp.fromMillis(day),...emptyUsage(),visits:1,updatedAt:serverTimestamp()},target=doc(guest,'usageDaily','live_'+day+'_0');
+ await assertSucceeds(setDoc(target,data));await assertFails(getDoc(target));await assertFails(getDoc(doc(other,'usageDaily',target.id)));await assertSucceeds(getDoc(doc(admin,'usageDaily',target.id)));
+ await assertSucceeds(setDoc(target,{cameraShots:increment(1),updatedAt:serverTimestamp()},{merge:true}));
+ await assertFails(setDoc(target,{cameraShots:increment(20),updatedAt:serverTimestamp()},{merge:true}));await assertFails(setDoc(target,{visits:0,cameraShots:3,updatedAt:serverTimestamp()},{merge:true}));
+ await assertFails(setDoc(doc(guest,'usageDaily','draft_'+day+'_0'),{...data,eventId:'draft'}));await assertFails(setDoc(doc(guest,'usageDaily','live_'+(day-86400000)+'_0'),{...data,day:Timestamp.fromMillis(day-86400000)}));
+ for(const extra of [{imageBase64:'photo'},{studentId:'student'},{ip:'1.2.3.4'},{userAgent:'device'}])await assertFails(setDoc(doc(guest,'usageDaily','live_'+day+'_1'),{...data,shard:1,...extra}));
+ await assertFails(deleteDoc(target));
+});
+test('교사 가입일은 한 번 기록하면 본인이 바꿀 수 없고 다른 교사 계정 조회도 차단한다',async()=>{
+ const {Timestamp}=await import('firebase/firestore');const a=env.authenticatedContext('teacher-a',{email:'a@example.com'}).firestore(),b=env.authenticatedContext('teacher-b').firestore();const reference=doc(a,'userDirectory','teacher-a');
+ const createdAt=Timestamp.fromMillis(Date.now()-86400000);await assertSucceeds(setDoc(reference,{displayName:'교사',email:'a@example.com',createdAt,firstSeen:serverTimestamp(),lastSeen:serverTimestamp()}));await assertSucceeds(getDoc(reference));await assertFails(getDoc(doc(b,'userDirectory','teacher-a')));await assertFails(setDoc(reference,{createdAt:Timestamp.fromMillis(Date.now()-1000),lastSeen:serverTimestamp()},{merge:true}));
+});
+test('운영자는 비공개 행사 내용을 검토하고 실제 게시 중지와 검토 기록을 함께 저장한다',async()=>{
+ const {writeBatch}=await import('firebase/firestore');const a=env.authenticatedContext('teacher-a').firestore(),other=env.authenticatedContext('teacher-b').firestore(),admin=env.authenticatedContext('admin',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore();await setDoc(doc(a,'events','review'),config(true));await setDoc(doc(a,'events','private-review'),config(false));await assertSucceeds(getDoc(doc(admin,'events','private-review')));await assertFails(getDoc(doc(other,'events','private-review')));
+ const action={eventId:'review',eventTitle:'가을 축제',actorId:'admin',action:'unpublish',reason:'문구 검토',createdAt:serverTimestamp()};await assertFails(setDoc(doc(other,'moderationActions','bad'),action));await assertFails(setDoc(doc(admin,'moderationActions','without-stop'),action));
+ const batch=writeBatch(admin);batch.update(doc(admin,'events','review'),{published:false,updatedAt:serverTimestamp()});batch.set(doc(admin,'moderationActions','approved'),action);await assertSucceeds(batch.commit());await assertSucceeds(getDoc(doc(admin,'moderationActions','approved')));await assertFails(getDoc(doc(other,'moderationActions','approved')));
+});
+test('운영자 본인 소유의 복합 문구 행사도 검토 후 게시 중지와 기록을 저장한다',async()=>{
+ const {writeBatch}=await import('firebase/firestore');const admin=env.authenticatedContext('operator',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore(),event=normalizeEvent({...DEFAULT_EVENT,title:'운영자 행사',branding:{texts:Array.from({length:8},(_,i)=>({id:'extra-'+i,text:'추가 문구',letterColors:['#ff0000'],letterSizes:[2]}))}});
+ await assertSucceeds(setDoc(doc(admin,'events','own-review'),{...event,ownerId:'operator',published:true,updatedAt:serverTimestamp()}));const batch=writeBatch(admin);batch.update(doc(admin,'events','own-review'),{published:false,updatedAt:serverTimestamp()});batch.set(doc(admin,'moderationActions','own-stop'),{eventId:'own-review',eventTitle:'운영자 행사',actorId:'operator',action:'unpublish',reason:'배치 검토',createdAt:serverTimestamp()});await assertSucceeds(batch.commit());
+});
+test('집계의 초기 원자 증가와 동시 증가가 수신한 횟수를 잃지 않고 합산된다',async()=>{
+ const {Timestamp,increment}=await import('firebase/firestore'),{usageDay,USAGE_KEYS}=await import('../usage-data.js');const a=env.authenticatedContext('teacher-a').firestore(),guest=env.unauthenticatedContext().firestore(),admin=env.authenticatedContext('operator',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore();await setDoc(doc(a,'events','parallel'),config(true));const day=usageDay(),reference=doc(guest,'usageDaily','parallel_'+day+'_2');
+ const send=()=>setDoc(reference,{eventId:'parallel',shard:2,day:Timestamp.fromMillis(day),...Object.fromEntries(USAGE_KEYS.map(key=>[key,increment(key==='photoImports'?1:0)])),updatedAt:serverTimestamp()},{merge:true});await assertSucceeds(send());await assertSucceeds(Promise.all(Array.from({length:6},send)));assert.equal((await getDoc(doc(admin,'usageDaily',reference.id))).data().photoImports,7);
+});

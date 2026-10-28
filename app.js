@@ -1,3 +1,4 @@
+import {createUsageTracker} from './usage-data.js';
 import {createTextStyleControls} from './text-style-controls.js';
 import {textColorSettings,paintColoredText,measureStyledText} from './text-colors.js';
 import {confirmAction} from './app-dialog.js';
@@ -23,6 +24,7 @@ let stream = null, facing = 'user', busy = false, starting = false, cameraEpoch 
 let photoDate = new Date(), assetImages = new Map(), failedAssets = new Set();
 const pointers = new Map();
 let gesture = null, deletedDecoration = null, eventId='', submitting=false, lastSubmission=null,lastDownloadedSignature=null;
+const usage=createUsageTracker(async kind=>{const{recordPublicUsage}=await import('./public-event.js');await recordPublicUsage(eventId,kind);});
 let blocked = false, assetReady = Promise.resolve();
 const editDialog = $('edit-dialog'), previewHome = canvas.parentElement, toolsHome = $('decoration-tools').parentElement;
 const cropCanvas = $('crop-preview'), cropPointers = new Map();
@@ -111,6 +113,7 @@ function go(step) {
   if (busy) return;
   if (step >= 3 && !state.photos.every(Boolean)) { toast('모든 칸에 사진을 채워 주세요.'); return; }
   if (state.step === 2 && step !== 2) stopCamera();
+  if(step===2)usage.start();if(step===4)usage.complete();
   state.step = step; state.selectedDeco = null; pointers.clear(); gesture = null;
   renderSteps(); render(); updateAdjustment();
   if(step===2&&!$('web-capture-area').hidden&&!stream)startCamera();
@@ -241,7 +244,7 @@ async function captureOne(index, epoch) {
   const slot=currentGeometry().slots[index],source=crop(video.videoWidth,video.videoHeight,slot.w,slot.h); const c=document.createElement('canvas'),scale=Math.min(1,1800/Math.max(source.w,source.h));c.width=Math.max(1,Math.round(source.w*scale));c.height=Math.max(1,Math.round(source.h*scale));
   const cc = c.getContext('2d'); if (facing === 'user') { cc.translate(c.width, 0); cc.scale(-1, 1); } cc.drawImage(video,source.x,source.y,source.w,source.h,0,0,c.width,c.height);
   const image = await imageFromURL(c.toDataURL('image/jpeg', .93)); if (epoch !== captureEpoch) return false;
-  savePhoto(image, index); $('camera-flash').classList.remove('flash'); void $('camera-flash').offsetWidth; $('camera-flash').classList.add('flash'); return true;
+  savePhoto(image, index);usage.record('cameraShots'); $('camera-flash').classList.remove('flash'); void $('camera-flash').offsetWidth; $('camera-flash').classList.add('flash'); return true;
 }
 async function capture(auto) {
   if (busy || !stream) return;
@@ -364,12 +367,13 @@ function currentResultSignature(){return state.step===4?$('export-format').value
 async function downloadFinishedImage(){
   const signature=currentResultSignature();
   const blob=await exportImage();downloadBlob(blob,`moment-${$('export-format').value}-${photoDate.toISOString().slice(0,10)}.png`);
+  usage.record('downloads');
   lastDownloadedSignature=signature&&signature===currentResultSignature()?signature:null;
   return Boolean(lastDownloadedSignature);
 }
 function prepareCollectionLink(s){const link=$('collection-open');link.href=s.url;link.textContent='2. '+collectionName(s)+' 열고 올리기 ↗';}
 function openCollectionLink(s){
-  const link=document.createElement('a');link.href=s.url;link.target='_blank';link.rel='noopener noreferrer';document.body.append(link);link.click();link.remove();
+  const link=document.createElement('a');link.href=s.url;link.target='_blank';link.rel='noopener noreferrer';document.body.append(link);link.click();link.remove();usage.record('shares');
   $('collection-status').textContent=collectionName(s)+'를 열었어요. 다운로드한 이미지를 선택해 올려 주세요. 제출 완료 여부는 게시판에서 확인해 주세요.';
 }
 $('close-collection-save').onclick=()=>$('collection-save-dialog').close();
@@ -379,7 +383,7 @@ $('collection-download').onclick=async()=>{
  catch(error){$('collection-save-status').textContent='저장하지 못했어요. '+error.message;}
  finally{button.disabled=false;}
 };
-$('collection-open').onclick=()=>{$('collection-save-dialog').close();$('collection-status').textContent='게시판에서 저장한 이미지를 선택해 올려 주세요. 아직 자동 게시된 것은 아니에요.';};
+$('collection-open').onclick=()=>{usage.record('shares');$('collection-save-dialog').close();$('collection-status').textContent='게시판에서 저장한 이미지를 선택해 올려 주세요. 아직 자동 게시된 것은 아니에요.';};
 $('submit-result').onclick=async()=>{
   if(submitting)return;const s=normalizeSharing(state.event.sharing);
   if(s.mode==='link'){
@@ -393,6 +397,7 @@ $('submit-result').onclick=async()=>{
       const imageBase64=await submissionImage(),fingerprint=await crypto.subtle.digest('SHA-256',Uint8Array.from(atob(imageBase64),c=>c.charCodeAt(0))),hash=[...new Uint8Array(fingerprint)].map(x=>x.toString(16).padStart(2,'0')).join('');
       if(lastSubmission?.hash!==hash)lastSubmission={hash,id:crypto.randomUUID()};
       const result=await callCollectionRelay(s.relayUrl,{action:'submit',eventId,submissionKey:s.submissionKey,submissionId:lastSubmission.id,imageBase64,consent:true});
+      if(!lastSubmission.counted){usage.record('submissions');lastSubmission.counted=true;}
       $('collection-status').textContent=result.message||'제출했어요. 감사합니다!';
       if(result.url&&httpsURL(result.url)){const a=document.createElement('a');a.href=httpsURL(result.url);a.target='_blank';a.rel='noopener noreferrer';a.textContent=' 제출 결과 보기 ↗';$('collection-status').append(a);}
     }
@@ -408,7 +413,7 @@ async function bootEvent() {
     try { const preview = sessionStorage.getItem('moment-event-preview'); if (preview) state.event = normalizeEvent(JSON.parse(preview)); } catch { toast('행사 미리보기를 불러오지 못했어요.'); }
   } else if (id) {
     blocked = true; $('next').disabled = true;
-    try { const { loadPublicEvent } = await import('./public-event.js'); state.event = await loadPublicEvent(id); blocked = false; try { localStorage.setItem('chalkak-last-event', id); } catch { /* 사진은 저장하지 않으며 행사 ID만 선택적으로 기억 */ } }
+    try { const { loadPublicEvent } = await import('./public-event.js'); state.event = await loadPublicEvent(id); blocked = false;if(!params.has('demo'))usage.enable(); try { localStorage.setItem('chalkak-last-event', id); } catch { /* 사진은 저장하지 않으며 행사 ID만 선택적으로 기억 */ } }
     catch (error) { $('step-title').textContent = '행사를 열 수 없어요.'; $('step-description').textContent = error.code === 'permission-denied' ? '게시되지 않았거나 삭제된 행사입니다. 운영자에게 QR을 확인해 주세요.' : error.message; toast('행사 설정을 확인해 주세요.'); return; }
   }
   if (id || params.has('preview')) { $('event-intro').hidden = false; document.title = `${state.event.school} ${state.event.title} — 사제동행 찰칵! 포토`; document.querySelector('h1').textContent = state.event.title; document.querySelector('.intro-copy').textContent = [state.event.school, state.event.schedule].filter(Boolean).join(' · '); }
@@ -429,7 +434,7 @@ async function importPhotoFiles(e) {
     for (const [n, file] of files.slice(0, state.count).entries()) {
       if (!file.type.startsWith('image/') || file.size > 25 * 1024 * 1024) { toast('25MB 이하 이미지 파일을 선택해 주세요.'); continue; }
       const url = URL.createObjectURL(file);
-      try { const img = await imageFromURL(url); const c = document.createElement('canvas'); const scale = Math.min(1, 1800 / Math.max(img.width, img.height)); c.width = Math.max(1, Math.round(img.width * scale)); c.height = Math.max(1, Math.round(img.height * scale)); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); const resized = await imageFromURL(c.toDataURL('image/jpeg', .93)); savePhoto(resized, indices[n]); imported++; } catch { toast('이 이미지를 읽지 못했어요. JPEG·PNG·WebP로 다시 선택해 주세요.'); } finally { URL.revokeObjectURL(url); }
+      try { const img = await imageFromURL(url); const c = document.createElement('canvas'); const scale = Math.min(1, 1800 / Math.max(img.width, img.height)); c.width = Math.max(1, Math.round(img.width * scale)); c.height = Math.max(1, Math.round(img.height * scale)); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); const resized = await imageFromURL(c.toDataURL('image/jpeg', .93)); savePhoto(resized, indices[n]);usage.record('photoImports'); imported++; } catch { toast('이 이미지를 읽지 못했어요. JPEG·PNG·WebP로 다시 선택해 주세요.'); } finally { URL.revokeObjectURL(url); }
     }
     if (imported) { state.selectedPhoto = Math.max(0, state.photos.findIndex(p => !p)); toast(`${imported}장의 사진을 담았어요. 사진은 전송되지 않았어요.`); }
   } finally { busy = false; e.target.value = ''; renderThumbnails(); updateButtons();if(imported&&state.photos.every(Boolean))go(3); }
@@ -465,8 +470,8 @@ $('close-edit').addEventListener('click', closeEditor);
 editDialog.addEventListener('cancel', e => { e.preventDefault(); closeEditor(); });
 canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3 || !editDialog.open || !canEditDecoration(d)) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if(e.key.toLowerCase()==='r'){e.preventDefault();d.rotation=(d.rotation||0)+(e.shiftKey?-15:15);updateAdjustment();render();} if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
 $('download').addEventListener('click', async () => { try { await downloadFinishedImage(); toast('다운로드를 시작했어요. 기기의 저장 위치를 확인해 주세요.'); } catch (error) { toast(`저장 실패: ${error.message}`); } });
-$('share').addEventListener('click', async () => { try { const blob = await exportImage(), file = new File([blob], 'moment.png', { type: 'image/png' }); if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: state.event.title }); else { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: downloadURL, target: '_blank', rel: 'noopener' }); link.click(); toast('이미지를 길게 눌러 저장하거나 PNG 저장 버튼을 이용해 주세요.'); } } catch (error) { if (error.name !== 'AbortError') toast('공유하지 못했어요. PNG 저장 버튼을 이용해 주세요.'); } });
-$('restart').addEventListener('click', async () => { if (!await confirmAction('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return; stopCamera();lastDownloadedSignature=null; state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
+$('share').addEventListener('click', async () => { try { const blob = await exportImage(), file = new File([blob], 'moment.png', { type: 'image/png' }); if (navigator.canShare?.({ files: [file] })) {await navigator.share({ files: [file], title: state.event.title });usage.record('shares');} else { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: downloadURL, target: '_blank', rel: 'noopener' }); link.click();usage.record('shares'); toast('이미지를 길게 눌러 저장하거나 PNG 저장 버튼을 이용해 주세요.'); } } catch (error) { if (error.name !== 'AbortError') toast('공유하지 못했어요. PNG 저장 버튼을 이용해 주세요.'); } });
+$('restart').addEventListener('click', async () => { if (!await confirmAction('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return;usage.restart(); stopCamera();lastDownloadedSignature=null; state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopCamera(); }); window.addEventListener('pagehide', stopCamera);
 window.addEventListener('beforeunload', e => { if (state.photos.some(Boolean)) { e.preventDefault(); e.returnValue = ''; } });
 for (const [id, name, label] of [['back', 'back', '이전'], ['native-capture', 'camera', '기본 카메라로 촬영'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '돌아가기'], ['expand-preview', 'expand', '크게 편집'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);

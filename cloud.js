@@ -1,7 +1,8 @@
+import {usageDay} from './usage-data.js';
 // 운영자 전용 모듈입니다. 참가자는 public-event.js의 읽기 기능만 사용합니다.
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, collection, query, where, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc, serverTimestamp, connectFirestoreEmulator, limit,orderBy,documentId,startAfter } from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc, serverTimestamp, connectFirestoreEmulator, limit,orderBy,documentId,startAfter,getCountFromServer,Timestamp,runTransaction } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, connectStorageEmulator } from 'firebase/storage';
 import { normalizeEvent } from './core.js';
 
@@ -83,7 +84,10 @@ export async function uploadSharedAsset(file, kind, name, metadata) {
 export async function setSharedActive(id, active) { if (!isSiteAdmin(firebase().auth.currentUser)) throw new Error('운영자 전용입니다.'); await updateDoc(doc(firebase().db, 'sharedAssets', id), { active: Boolean(active) }); }
 
 export async function recordOperatorUser(user) {
-  await setDoc(doc(firebase().db,'userDirectory',user.uid),{displayName:(user.displayName||'').slice(0,80),email:user.email||'',lastSeen:serverTimestamp()},{merge:true});
+  const reference=doc(firebase().db,'userDirectory',user.uid),previous=await getDoc(reference),data={displayName:(user.displayName||'').slice(0,80),email:user.email||'',lastSeen:serverTimestamp()};
+  if(!previous.data()?.firstSeen)data.firstSeen=serverTimestamp();
+  const created=Date.parse(user.metadata?.creationTime||'');if(!previous.data()?.createdAt&&Number.isFinite(created))data.createdAt=Timestamp.fromMillis(created);
+  await setDoc(reference,data,{merge:true});
 }
 export async function listOperationsPage(kind,after=null){
   if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');
@@ -91,12 +95,33 @@ export async function listOperationsPage(kind,after=null){
   const snap=await getDocs(query(collection(firebase().db,kind==='users'?'userDirectory':'events'),...constraints));
   return {items:snap.docs.map(d=>({...d.data(),id:d.id})),cursor:snap.docs.at(-1)?.id||null,more:snap.size===100};
 }
-export async function moderateEvent(id){
-  if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');
-  await updateDoc(doc(firebase().db,'events',id),{published:false,updatedAt:serverTimestamp()});
+export async function moderateEvent(id,expectedUpdatedAt,reason=''){
+  const {auth,db}=firebase();if(!isSiteAdmin(auth.currentUser))throw new Error('운영자 전용입니다.');
+  await runTransaction(db,async transaction=>{
+    const reference=doc(db,'events',id),snapshot=await transaction.get(reference);if(!snapshot.exists())throw new Error('삭제된 행사입니다.');
+    const current=snapshot.data();if(expectedUpdatedAt&&!current.updatedAt?.isEqual?.(expectedUpdatedAt))throw new Error('검토 중 행사 내용이 변경됐어요. 미리보기를 다시 열어 확인해 주세요.');
+    if(!current.published)return;
+    transaction.update(reference,{published:false,updatedAt:serverTimestamp()});
+    transaction.set(doc(collection(db,'moderationActions')),{eventId:id,eventTitle:String(current.title||'').slice(0,80),actorId:auth.currentUser.uid,action:'unpublish',reason:reason.slice(0,300),createdAt:serverTimestamp()});
+  });
 }
 export async function setPublishingBlocked(uid,blocked){
   if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');
   if(uid===firebase().auth.currentUser.uid)throw new Error('본인의 운영 권한은 변경할 수 없습니다.');
   await updateDoc(doc(firebase().db,'userDirectory',uid),{publishingBlocked:Boolean(blocked)});
 }
+
+export async function getOperationsOverview(days=7){
+ const {auth,db}=firebase();if(!isSiteAdmin(auth.currentUser))throw new Error('운영자 전용입니다.');
+ const first=usageDay()-(days-1)*86400000,count=async source=>(await getCountFromServer(source)).data().count;
+ const [users,totalEvents,published,blocked,knownDates,usage,signup,recent]=await Promise.all([
+  count(collection(db,'userDirectory')),count(collection(db,'events')),count(query(collection(db,'events'),where('published','==',true))),count(query(collection(db,'userDirectory'),where('publishingBlocked','==',true))),count(query(collection(db,'userDirectory'),where('createdAt','>=',Timestamp.fromMillis(0)))),
+  getDocs(query(collection(db,'usageDaily'),where('day','>=',Timestamp.fromMillis(first)))),
+  Promise.all(Array.from({length:days},async(_,index)=>{const day=first+index*86400000;return{day,count:await count(query(collection(db,'userDirectory'),where('createdAt','>=',Timestamp.fromMillis(day)),where('createdAt','<',Timestamp.fromMillis(day+86400000))))};})),getDocs(query(collection(db,'events'),orderBy('updatedAt','desc'),limit(5)))
+ ]);
+ return {users,totalEvents,published,blocked,knownDates,signup,recent:recent.docs.map(d=>({...d.data(),id:d.id})),usage:usage.docs.map(d=>({...d.data(),id:d.id}))};
+}
+export async function getOperationsEvent(id){
+ if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');const snap=await getDoc(doc(firebase().db,'events',id));if(!snap.exists())throw new Error('삭제된 행사입니다.');return {...normalizeEvent(snap.data()),id:snap.id,ownerId:snap.data().ownerId,published:snap.data().published,updatedAt:snap.data().updatedAt};
+}
+export async function listModerationActions(){if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');const snap=await getDocs(query(collection(firebase().db,'moderationActions'),orderBy('createdAt','desc'),limit(50)));return snap.docs.map(d=>({...d.data(),id:d.id}));}
