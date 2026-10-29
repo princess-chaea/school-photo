@@ -11,7 +11,8 @@
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile.css">
   <script src="/app.js" type="module"></script>
-<link rel="stylesheet" href="/legal.css"><link rel="stylesheet" href="/responsive-ui.css"><link rel="stylesheet" href="/font-picker.css"></head>
+<link rel="stylesheet" href="/legal.css"><link rel="stylesheet" href="/responsive-ui.css"><link rel="stylesheet" href="/font-picker.css"><link rel="stylesheet" href="./inline-editor.css">
+</head>
 <body class="booth-app">
   <header class="topbar">
     <div class="wordmark school-wordmark" aria-label="사제동행 찰칵! 포토"><img src="/school-booth-logo.webp" alt="선생님과 학생이 함께 포즈를 취하는 포토부스"><span><small>사제동행</small>찰칵! 포토</span></div>
@@ -111,18 +112,19 @@
         <div class="preview-stage"><canvas id="preview" width="600" height="1700" aria-label="완성 사진 미리보기"></canvas><canvas id="save-preview" aria-label="선택한 저장 용도 미리보기" hidden></canvas><span class="stage-spark spark-one" aria-hidden="true">✳</span><span class="stage-spark spark-two" aria-hidden="true">✧</span></div>
         <div class="preview-bottom"><span class="live-dot"></span><span id="preview-hint">나만의 한 장이 만들어지는 중</span></div>
       </aside>
+  <section id="decoration-editor" data-tool="stickers" aria-labelledby="edit-title" hidden>
+    <header class="edit-header"><button class="text-button" id="close-edit">돌아가기</button><strong id="edit-title" tabindex="-1">사진 꾸미기</strong><button type="button" class="button primary" id="finish-edit">저장·공유로</button></header>
+    <div id="editor-view-controls" class="editor-view-controls"><button id="editor-view-minus" aria-label="프레임 보기 축소">−</button><span class="view-label">보기</span><output id="editor-view-value">100%</output><button id="editor-view-plus" aria-label="프레임 보기 확대">+</button><button id="editor-view-fit">전체</button></div><section class="expanded-stage" id="expanded-stage"><div id="editor-viewport"><canvas id="crop-preview" width="1000" height="750" aria-label="선택한 사진 구도 조정" hidden></canvas></div></section>
+    <div class="editor-quick-row"><div class="editor-selection-actions"><button class="icon-button" id="undo-decoration" aria-label="스티커·문구 삭제 되돌리기" title="삭제 되돌리기" disabled></button><button class="icon-button" id="rotate-decoration" aria-label="선택한 요소 15도 회전" title="15도 회전" disabled></button><button class="icon-button danger" id="delete-decoration" aria-label="선택한 스티커·문구 삭제" title="선택한 스티커·문구 삭제" disabled></button></div><button type="button" class="tool-tray-toggle" id="toggle-editor-tools" aria-expanded="true" aria-controls="expanded-tools">도구 접기 ⌄</button></div><p class="edit-help" id="edit-help">스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.</p>
+    <nav class="edit-tool-tabs" aria-label="꾸미기 도구"><button data-editor-tool="stickers">✿ 스티커</button><button data-editor-tool="text">가 문구</button><button data-editor-tool="photo">⤢ 사진 구도</button><button data-editor-tool="filter">◐ 필터</button></nav>
+    <section class="expanded-tools" id="expanded-tools"></section>
+  </section>
     </div>
     <div class="privacy-note"><span>◈</span><p><strong>사진 제출은 내가 선택해요.</strong> 저장·꾸미기는 기기에서 처리하며, 제출 버튼을 누른 완성 이미지만 선생님의 수합 공간으로 보내요. 저장 전에 페이지를 닫거나 새로고침하면 작업이 사라져요.</p></div>
   </main>
   <footer class="legal-footer"><span class="footer-brand">사제동행 찰칵! 포토</span><nav aria-label="서비스 안내"><a href="/legal.html#privacy" target="_blank" rel="noopener">개인정보처리방침</a><a href="/legal.html#terms" target="_blank" rel="noopener">이용약관</a></nav><address>문의 · 하주초 교사 이성근<br><a href="mailto:dltjdrms320@gmail.com">dltjdrms320@gmail.com</a></address></footer>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <dialog id="edit-dialog" data-tool="stickers" aria-label="사진 크게 꾸미기">
-    <header class="edit-header"><button class="text-button" id="close-edit">돌아가기</button><strong id="edit-title">사진 꾸미기</strong><button type="button" class="button primary" id="finish-edit">저장·공유로</button></header>
-    <div id="editor-view-controls" class="editor-view-controls"><button id="editor-view-minus" aria-label="프레임 보기 축소">−</button><span class="view-label">보기</span><output id="editor-view-value">100%</output><button id="editor-view-plus" aria-label="프레임 보기 확대">+</button><button id="editor-view-fit">전체</button></div><section class="expanded-stage" id="expanded-stage"><div id="editor-viewport"><canvas id="crop-preview" width="1000" height="750" aria-label="선택한 사진 구도 조정" hidden></canvas></div></section>
-    <div class="editor-quick-row"><div class="editor-selection-actions"><button class="icon-button" id="undo-decoration" aria-label="스티커·문구 삭제 되돌리기" title="삭제 되돌리기" disabled></button><button class="icon-button" id="rotate-decoration" aria-label="선택한 요소 15도 회전" title="15도 회전" disabled></button><button class="icon-button danger" id="delete-decoration" aria-label="선택한 스티커·문구 삭제" title="선택한 스티커·문구 삭제" disabled></button></div><button type="button" class="tool-tray-toggle" id="toggle-editor-tools" aria-expanded="true" aria-controls="expanded-tools">도구 접기 ⌄</button></div><p class="edit-help" id="edit-help">스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.</p>
-    <nav class="edit-tool-tabs" aria-label="꾸미기 도구"><button data-editor-tool="stickers">✿ 스티커</button><button data-editor-tool="text">가 문구</button><button data-editor-tool="photo">⤢ 사진 구도</button><button data-editor-tool="filter">◐ 필터</button></nav>
-    <section class="expanded-tools" id="expanded-tools"></section>
-  </dialog>
+
 <dialog id="collection-save-dialog" class="collection-save-dialog" aria-labelledby="collection-save-title"><header><h2 id="collection-save-title">먼저 완성 이미지를 저장해요</h2><button type="button" class="text-button" id="close-collection-save">닫기 ×</button></header><div id="collection-brand" class="collection-brand" hidden></div><p>저장한 이미지를 게시판에서 선택해 올리면 돼요.</p><p class="small muted">기기에 따라 다운로드 폴더에 저장될 수 있어요. 갤러리에 저장됐는지는 이 앱에서 확인할 수 없어요.</p><button type="button" class="button lime" id="collection-download">1. 이미지 저장</button><p id="collection-save-status" role="status" aria-live="polite"></p><a class="button primary" id="collection-open" target="_blank" rel="noopener noreferrer" hidden>2. 게시판 열고 올리기 ↗</a></dialog>
 <dialog id="export-format-dialog" class="export-format-dialog" aria-label="저장 규격 선택"><header><h2>어디에 사용할까요?</h2><button type="button" class="text-button" id="close-export-format">돌아가기</button></header><p class="small muted">사용할 용도를 먼저 고르세요. 선택한 비율로 촬영과 꾸미기를 진행해요.</p><div id="export-format-options"></div></dialog></body>
 </html>

@@ -29,10 +29,10 @@ const pointers = new Map();
 let gesture = null, deletedDecoration = null, eventId='', submitting=false, lastSubmission=null,lastDownloadedSignature=null;
 const usage=createUsageTracker(async kind=>{const{recordPublicUsage}=await import('./public-event.js');await recordPublicUsage(eventId,kind);});
 let blocked = false, assetReady = Promise.resolve();
-const editDialog = $('edit-dialog'), previewHome = canvas.parentElement, toolsHome = $('decoration-tools').parentElement;
+const decorationEditor = $('decoration-editor'), previewHome = canvas.parentElement, toolsHome = $('decoration-tools').parentElement;
 const cropCanvas = $('crop-preview'), cropPointers = new Map();
 let cropGesture = null;
-const editorView=createEditorView(editDialog,canvas,{isDecorationTarget:e=>pointers.size>0||decorationAt(e)!==null});
+const editorView=createEditorView(decorationEditor,canvas,{isDecorationTarget:e=>pointers.size>0||decorationAt(e)!==null});
 const saveCanvas=$('save-preview');
 for(const group of [...new Set(EXPORT_FORMATS.map(f=>f.group))]){const optgroup=document.createElement('optgroup');optgroup.label=group;for(const f of EXPORT_FORMATS.filter(f=>f.group===group))optgroup.append(Object.assign(document.createElement('option'),{value:f.id,textContent:f.name}));$('export-format').append(optgroup);}
 $('export-format').value='print-4x6';
@@ -118,18 +118,18 @@ function renderFilterChoices(){
     section.append(heading,cards);list.append(section);
   }
 }
-function canEditDecoration(d){return Boolean(d)&&editDialog.dataset.tool!=='photo';}
+function canEditDecoration(d){return Boolean(d)&&decorationEditor.dataset.tool!=='photo';}
 function go(step) {
   if (busy) return;
   if (step >= 3 && !state.photos.every(Boolean)) { toast('모든 칸에 사진을 채워 주세요.'); return; }
   if (state.step === 2 && step !== 2) stopCamera();
-  if(step!==3&&editDialog.open)closeEditor();
+  if(step!==3&&!decorationEditor.hidden)closeEditor();
   if(step===2)usage.start();if(step===4)usage.complete();
   state.step = step; state.selectedDeco = null; pointers.clear(); gesture = null;
   renderSteps(); render(); updateAdjustment();
   if(step===2&&!$('web-capture-area').hidden&&!stream)startCamera();
-  if(step===3){openEditorTool(editDialog.dataset.tool||'stickers');return;}
-  $('step-title').focus({ preventScroll: true });
+  if(step===3)openEditorTool(decorationEditor.dataset.tool||'stickers');
+  (step===3?$('edit-title'):$('step-title')).focus({ preventScroll: true });
   window.scrollTo({ top: Math.max(0, document.querySelector('.steps').getBoundingClientRect().top + scrollY - 15), behavior: 'smooth' });
 }
 function renderSteps() {
@@ -220,7 +220,7 @@ function render(exporting = false) {
   branding(g, frame);
   if ($('show-date').checked) fitText(photoDate.toLocaleDateString('sv-SE').replaceAll('-', '. '), g.width / 2, g.footerY + 82, g.width - 80, 13, frame.ink);
   state.decorations.forEach(d => { const b = decorationBox(d, g); ctx.save();ctx.translate(b.x,b.y);ctx.rotate(radians(d.rotation||0)); ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.fillStyle = d.color; ctx.font = `700 ${b.font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; if (d.type === 'image') { const image = assetImages.get(d.url); if (image) ctx.drawImage(image, -b.w / 2, -b.h / 2, b.w, b.h); } else paintColoredText(ctx,d.text,0,0,b.w,d,d.color); ctx.restore(); });
-  if (!exporting && state.step === 3 && editDialog.open) {
+  if (!exporting && state.step === 3 && !decorationEditor.hidden) {
     if (state.selectedDeco !== null) {
       const d=state.decorations[state.selectedDeco];if(d){const b=decorationBox(d,g),scale=g.width/Math.max(1,canvas.getBoundingClientRect().width),gap=4*scale,h=5*scale;
         ctx.save();ctx.translate(b.x,b.y);ctx.rotate(radians(d.rotation||0));ctx.strokeStyle='#52882d';ctx.lineWidth=1.5*scale;ctx.setLineDash([4*scale,3*scale]);ctx.strokeRect(-b.w/2-gap,-b.h/2-gap,b.w+2*gap,b.h+2*gap);ctx.setLineDash([]);ctx.fillStyle='#c5f564';for(const x of [-1,1])for(const y of [-1,1]){ctx.fillRect(x*(b.w/2+gap)-h,y*(b.h/2+gap)-h,2*h,2*h);ctx.strokeRect(x*(b.w/2+gap)-h,y*(b.h/2+gap)-h,2*h,2*h);}ctx.restore();
@@ -230,10 +230,10 @@ function render(exporting = false) {
     else { const s = g.slots[state.selectedPhoto]; ctx.strokeStyle = '#98bb63'; ctx.lineWidth = 5; ctx.strokeRect(s.x + 2, s.y + 2, s.w - 4, s.h - 4); }
   }
   $('preview-layout').textContent = `${state.count} CUTS · ${g.width} × ${g.height}`; $('output-size').textContent = `${g.width} × ${g.height}px · 300dpi`;
-  if (!editDialog.open) {canvas.hidden=state.step===4;saveCanvas.hidden=state.step!==4;}
+  if (decorationEditor.hidden) {canvas.hidden=state.step===4;saveCanvas.hidden=state.step!==4;}
   exportPicker.refresh();
   if(state.step===4){const output=paintExport(canvas,saveCanvas,outputFormat(),frame.bg);$('output-size').textContent=output.width+' × '+output.height+'px · 300dpi';$('export-format-note').textContent=output.width+' × '+output.height+'px · 선택한 용도로 저장해요.';}
-  if (editDialog.open && editDialog.dataset.tool === 'photo') renderCrop();
+  if (!decorationEditor.hidden && decorationEditor.dataset.tool === 'photo') renderCrop();
 }
 function stopCamera() {
   cameraEpoch++; captureEpoch++; busy = false;
@@ -294,7 +294,7 @@ function renderPhotoPicker() {
   });
 }
 function selectEditorTool(tool) {
-  editDialog.dataset.tool = tool;pointers.clear();gesture=null;cropPointers.clear();cropGesture=null;if(!canEditDecoration(state.decorations[state.selectedDeco]))state.selectedDeco=null;if(tool==='filter')renderFilterChoices();
+  decorationEditor.dataset.tool = tool;pointers.clear();gesture=null;cropPointers.clear();cropGesture=null;if(!canEditDecoration(state.decorations[state.selectedDeco]))state.selectedDeco=null;if(tool==='filter')renderFilterChoices();
   canvas.hidden = tool === 'photo'; cropCanvas.hidden = tool !== 'photo';
   $('edit-title').textContent = { stickers: '스티커로 꾸미기', text: '마음을 적어요', photo: '사진을 크게 보고 조정해요', filter: '오늘의 분위기' }[tool];
   $('edit-help').textContent = tool === 'photo' ? '사진을 끌어 구도 이동 · 두 손가락 또는 +/−로 확대·축소' : tool==='filter'?'색감 필터를 눌러 비교해요. 모든 사진에 적용되며 원본은 유지돼요.':tool==='text'?'문구를 추가하고 끌어 이동해요. 모서리·두 손가락으로 크기와 회전을 조절해요.':'빈 곳은 끌어 화면 이동 · 스티커·글자는 눌러 편집 · 두 손가락으로 크기·회전';
@@ -303,13 +303,13 @@ function selectEditorTool(tool) {
 }
 function openEditorTool(tool = 'stickers') {
   if (state.step !== 3) return;
-  if (!editDialog.open) { $('editor-viewport').prepend(canvas); $('expanded-tools').append($('decoration-tools')); document.body.classList.add('modal-open'); editDialog.showModal(); editorView.reset(); }
+  if (decorationEditor.hidden) { $('editor-viewport').prepend(canvas); $('expanded-tools').append($('decoration-tools')); decorationEditor.hidden=false; editorView.reset(); }
   $('expanded-tools').hidden=false;$('toggle-editor-tools').setAttribute('aria-expanded','true');$('toggle-editor-tools').textContent='도구 접기 ⌄';
   selectEditorTool(tool);
 }
 function closeEditor() {
-  if (editDialog.open) editDialog.close();
-  editorView.clear(); canvas.hidden = false; previewHome.prepend(canvas); toolsHome.append($('decoration-tools')); document.body.classList.remove('modal-open'); pointers.clear(); cropPointers.clear(); gesture = null; cropGesture = null; render();
+  decorationEditor.hidden=true;
+  editorView.clear(); canvas.hidden = false; previewHome.prepend(canvas); toolsHome.append($('decoration-tools')); pointers.clear(); cropPointers.clear(); gesture = null; cropGesture = null; render();
 }
 function renderCrop() {
   const photo = state.photos[state.selectedPhoto]; if (!photo) return;
@@ -344,8 +344,8 @@ function decorationAt(e){
  return null;
 }
 function pointerDown(e) {
-  if (state.step !== 3 || !editDialog.open || editDialog.dataset.tool==='photo') return;
-  let switched=false;const target=decorationAt(e);if(!pointers.size&&target!==null){const tool=state.decorations[target].type==='text'?'text':'stickers';if(editDialog.dataset.tool!==tool){selectEditorTool(tool);switched=true;}}
+  if (state.step !== 3 || decorationEditor.hidden || decorationEditor.dataset.tool==='photo') return;
+  let switched=false;const target=decorationAt(e);if(!pointers.size&&target!==null){const tool=state.decorations[target].type==='text'?'text':'stickers';if(decorationEditor.dataset.tool!==tool){selectEditorTool(tool);switched=true;}}
   e.preventDefault(); canvas.setPointerCapture(e.pointerId); const p = point(e); pointers.set(e.pointerId, p); const g = currentGeometry();
   if(switched){state.selectedDeco=target;const d=state.decorations[target];gesture={mode:'move',dx:p.x/g.width-d.x,dy:p.y/g.height-d.y};updateAdjustment();render();return;}
   if (pointers.size === 2 && state.selectedDeco !== null) { const [a, b] = [...pointers.values()]; const d = state.decorations[state.selectedDeco]; gesture = { mode: 'pinch', distance: distance(a,b),size:d.size,angle:degrees(Math.atan2(b.y-a.y,b.x-a.x)),rotation:d.rotation||0 }; return; }
@@ -507,14 +507,13 @@ document.querySelectorAll('[data-open-tool]').forEach(b => b.addEventListener('c
 document.querySelectorAll('[data-editor-tool]').forEach(b => b.addEventListener('click', () => selectEditorTool(b.dataset.editorTool)));
 $('close-edit').addEventListener('click',()=>go(2));
 $('finish-edit').addEventListener('click',()=>go(4));
-editDialog.addEventListener('cancel', e => { e.preventDefault();e.stopPropagation();go(2); });
-canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3 || !editDialog.open || !canEditDecoration(d)) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if(e.key.toLowerCase()==='r'){e.preventDefault();d.rotation=(d.rotation||0)+(e.shiftKey?-15:15);updateAdjustment();render();} if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
+canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3 || decorationEditor.hidden || !canEditDecoration(d)) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if(e.key.toLowerCase()==='r'){e.preventDefault();d.rotation=(d.rotation||0)+(e.shiftKey?-15:15);updateAdjustment();render();} if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
 $('download').addEventListener('click', async () => { try { await downloadFinishedImage(); toast('다운로드를 시작했어요. 기기의 저장 위치를 확인해 주세요.'); } catch (error) { toast(`저장 실패: ${error.message}`); } });
 $('share').addEventListener('click', async () => { try { const blob = await exportImage(), file = new File([blob], 'moment.png', { type: 'image/png' }); if (navigator.canShare?.({ files: [file] })) {await navigator.share({ files: [file], title: state.event.title });usage.record('shares');} else { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: downloadURL, target: '_blank', rel: 'noopener' }); link.click();usage.record('shares'); toast('이미지를 길게 눌러 저장하거나 PNG 저장 버튼을 이용해 주세요.'); } } catch (error) { if (error.name !== 'AbortError') toast('공유하지 못했어요. PNG 저장 버튼을 이용해 주세요.'); } });
 $('restart').addEventListener('click', async () => { if (!await confirmAction('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return;usage.restart(); stopCamera();lastDownloadedSignature=null; state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopCamera(); }); window.addEventListener('pagehide', stopCamera);
 window.addEventListener('beforeunload', e => { if (state.photos.some(Boolean)) { e.preventDefault(); e.returnValue = ''; } });
-for (const [id, name, label] of [['back', 'back', '이전'], ['native-capture', 'camera', '기본 카메라로 촬영'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '사진 다시 찍기'], ['expand-preview', 'expand', '크게 편집'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);
+for (const [id, name, label] of [['back', 'back', '이전'], ['native-capture', 'camera', '기본 카메라로 촬영'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '사진 다시 찍기'], ['expand-preview', 'expand', '꾸미기 수정'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);
 document.querySelectorAll('[data-open-tool], [data-editor-tool]').forEach(b => { const tool = b.dataset.openTool || b.dataset.editorTool; const name = { stickers: 'sticker', text: 'text', photo: 'crop', filter: 'filter' }[tool]; labelButton(b, name, { stickers: '스티커', text: '문구', photo: '사진 구도', filter: '필터' }[tool]); });
 for(const id of ['text-font']){fillFontSelect($(id));$(id).onchange=async()=>{const font=$(id).value;try{await loadFont(font);const d=state.decorations[state.selectedDeco];if(id==='text-font'&&d?.type==='text')d.font=font;render();}catch(error){toast(error.message);}};}
 renderChoices(); renderThumbnails(); renderSteps(); render(); bootEvent();
