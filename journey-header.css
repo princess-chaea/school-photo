@@ -17,3 +17,21 @@ body.booth-app .journey-header{min-width:0}
  body.booth-app #journey-info .steps li{padding:0 4px}
  body.booth-app .topbar{height:46px;flex-basis:46px}
 }
+/* Desktop keeps event context and the five stages in one compact row. */
+@media(min-width:1101px){
+ body.booth-app .topbar{width:calc(100% - 60px);max-width:1050px;height:58px;margin:0 auto}
+ body.booth-app .topbar .school-wordmark{font-size:21px;gap:9px}
+ body.booth-app .topbar .school-wordmark img{width:40px;height:40px}
+ body.booth-app .topbar .school-wordmark small{font-size:9px}
+ body.booth-app .journey-header{margin:0}
+ body.booth-app #journey-info{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:14px 0 18px}
+ body.booth-app #journey-info .intro{flex:1 1 300px;min-width:0;max-width:40%;padding:0;text-align:left}
+ body.booth-app #journey-info .intro h1{margin:0;font-size:24px;line-height:1.35;letter-spacing:-.8px;overflow-wrap:anywhere}
+ body.booth-app #journey-info .intro-copy{justify-content:flex-start;margin:5px 0 0;font-size:11px;line-height:1.6;overflow-wrap:anywhere}
+ body.booth-app #journey-info .intro-copy img{width:22px;height:22px}
+ body.booth-app #journey-info .steps{flex:1 1 580px;width:auto;max-width:620px;margin:0 0 0 auto}
+ body.booth-app #journey-info .steps ol:before{top:14px}
+ body.booth-app #journey-info .steps li{padding:0 8px}
+ body.booth-app #journey-info .step-number{width:28px;height:28px;margin:0 auto 5px}
+ body.booth-app #journey-info .step-label{font-size:11px;white-space:nowrap}
+}
