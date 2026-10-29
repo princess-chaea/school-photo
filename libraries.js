@@ -15,7 +15,7 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
   const frameUpload=createFrameUpload(), drafts=new WeakMap();let makerShared=false,frameMaker;
   for(const id of ['asset-form','shared-form','frame-form']){const form=$(id),submit=form.querySelector('button[type=submit],button.button.lime');const cell=document.createElement('div');cell.className='upload-submit-cell';const label=element('span','업로드','field-label');submit.before(cell);cell.append(label,submit);form.classList.add('upload-three-steps');}
   for(const id of ['asset-file','shared-file','frame-upload-file']){
-    const input=$(id),cell=input.parentElement,picker=element('div','','upload-file-picker'),caption=element('span','파일 첨부');cell.classList.add('upload-file-cell');input.before(picker);picker.append(icon('upload'),caption,input);
+    const input=$(id),cell=input.parentElement,picker=element('div','','upload-file-picker'),caption=element('span','파일 첨부');cell.classList.add('upload-file-cell');input.before(picker);picker.append(icon('attachment'),caption,input);
     const sync=()=>{caption.textContent=input.files[0]?.name||'파일 첨부';picker.title=caption.textContent;};input.addEventListener('change',sync);input.addEventListener('file-label-update',sync);input.form.addEventListener('reset',()=>queueMicrotask(sync));
   }
   const designFilters=document.createElement('div');designFilters.className='sticker-library-filters';designFilters.innerHTML='<label>디자인 검색<input type="search" placeholder="이름으로 찾기" data-design-search></label><label>테마<select data-design-category><option>전체</option></select></label>';$('asset-library').before(designFilters);
