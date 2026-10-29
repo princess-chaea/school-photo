@@ -84,3 +84,10 @@ body.booth-app #decoration-editor .filter-chip canvas{height:64px}
 body.booth-app #decoration-editor .filter-chip span{white-space:normal;word-break:keep-all;font-size:11px;line-height:1.5}
 @media(min-width:701px){body.booth-app #decoration-editor .photo-picker button{flex-basis:56px;width:56px;height:56px}}
 @media(min-width:1101px){body.booth-app #decoration-editor[data-tool="photo"]:not([hidden]){height:clamp(560px,78dvh,850px)}}
+/* Selected tools use weight, contrast and an underline instead of disclosure arrows. */
+body.booth-app #decoration-editor .edit-tool-tabs button{font-weight:600;color:#49573d}
+body.booth-app #decoration-editor .edit-tool-tabs button.selected{font-weight:800;color:#252820;background:#edf3e4;border-bottom:3px solid #607f40}
+body.booth-app #decoration-editor .edit-tool-tabs button.selected span{font-weight:inherit}
+body.booth-app #decoration-editor .filter-targets{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;gap:6px;padding:4px 2px;margin:0 0 8px}
+body.booth-app #decoration-editor .filter-targets button{position:relative;flex:0 0 44px;width:44px;height:44px;color:#252820;font-size:12px;font-weight:700}
+body.booth-app #decoration-editor .filter-targets button span{position:absolute;right:1px;bottom:1px;padding:0 4px;border-radius:4px;background:#fffefa;color:#252820;font-size:10px;line-height:16px}

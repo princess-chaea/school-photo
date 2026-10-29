@@ -79,7 +79,7 @@
           <div id="decoration-tools">
           <div class="tool-group" data-tool="filter">
           <p class="field-label">사진 분위기</p>
-          <p class="small muted">모든 사진에 적용돼요. 미리보기를 눌러 색감을 비교해 보세요.</p><label class="filter-category-label" for="filter-category">분위기별로 보기<select id="filter-category"><option value="전체">전체 · 40가지</option></select></label><p id="filter-current" class="small muted" aria-live="polite"></p><div class="filter-options" id="filter-options"></div>
+          <div id="filter-targets" class="photo-picker filter-targets" role="group" aria-label="필터를 적용할 사진 선택"></div><label class="filter-category-label" for="filter-category">분위기별로 보기<select id="filter-category"><option value="전체">전체 · 40가지</option></select></label><p id="filter-current" class="small muted" aria-live="polite"></p><div class="filter-options" id="filter-options"></div>
           </div>
           <div class="tool-group" data-tool="photo">
           <div class="photo-picker" id="photo-picker" aria-label="조정할 사진 선택"></div>
@@ -123,7 +123,7 @@
     <div id="editor-view-controls" class="editor-view-controls"><button id="editor-view-minus" aria-label="프레임 보기 축소">−</button><span class="view-label">보기</span><output id="editor-view-value">100%</output><button id="editor-view-plus" aria-label="프레임 보기 확대">+</button><button id="editor-view-fit">전체</button></div><section class="expanded-stage" id="expanded-stage"><div id="editor-viewport"><canvas id="crop-preview" width="1000" height="750" aria-label="선택한 사진 구도 조정" hidden></canvas></div></section>
     <div class="editor-quick-row"><div class="editor-selection-actions"><button class="icon-button" id="undo-decoration" aria-label="스티커·문구 삭제 되돌리기" title="삭제 되돌리기" disabled></button><button class="icon-button" id="rotate-decoration" aria-label="선택한 요소 15도 회전" title="15도 회전" disabled></button><button class="icon-button danger" id="delete-decoration" aria-label="선택한 스티커·문구 삭제" title="선택한 스티커·문구 삭제" disabled></button></div></div><p class="edit-help" id="edit-help">스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.</p>
     <nav class="edit-tool-tabs" aria-label="꾸미기 도구"><button data-editor-tool="stickers">✿ 스티커</button><button data-editor-tool="text">가 문구</button><button data-editor-tool="photo">⤢ 사진 구도</button><button data-editor-tool="filter">◐ 필터</button></nav>
-    <section class="expanded-tools" id="expanded-tools"><div class="mobile-tool-header"><span>꾸미기 도구</span><button type="button" id="close-mobile-tools" class="text-button" hidden>사진 크게 보기 ⌄</button></div><div id="mobile-tool-content"></div></section>
+    <section class="expanded-tools" id="expanded-tools"><div id="mobile-tool-content"></div></section>
   </section>
     </div>
     <div class="privacy-note"><span>◈</span><p><strong>사진 제출은 내가 선택해요.</strong> 저장·꾸미기는 기기에서 처리하며, 제출 버튼을 누른 완성 이미지만 선생님의 수합 공간으로 보내요. 저장 전에 페이지를 닫거나 새로고침하면 작업이 사라져요.</p></div>

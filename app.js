@@ -25,7 +25,7 @@ const canvas = $('preview'), ctx = canvas.getContext('2d');
 const titles = ['어떤 프레임에 담을까요?', '어디에 사용할 사진인가요?', '준비됐나요? 하나, 둘, 셋.', '우리답게, 조금 더 특별하게.', '이 순간을 간직해요.'];
 const descriptions = ['사진을 감쌀 색상이나 행사에 준비된 콜라보·특별 프레임을 선택하세요.', '선택한 프레임이 지원하는 용도와 컷 수, 가로·세로 배치를 확인하세요.', '사진을 찍거나 기기에 있는 사진을 골라주세요.', '사진 위에 스티커와 문구를 자유롭게 놓아보세요.', '완성 이미지는 내 기기에만 저장돼요.'];
 const nextLabels = ['용도·배치 선택으로', '촬영 시작', '꾸미기로', '저장·공유로'];
-let state = { step: 0, count: 4, frame: 0, orientation: 'portrait', photos: Array(4).fill(null), selectedPhoto: 0, selectedDeco: null, filter: 'original', decorations: [], event: structuredClone(DEFAULT_EVENT) };
+let state = { step: 0, count: 4, frame: 0, orientation: 'portrait', photos: Array(4).fill(null), selectedPhoto: 0, selectedDeco: null, filter: 'original', filterScope:'all', decorations: [], event: structuredClone(DEFAULT_EVENT) };
 let stream = null, facing = 'user', busy = false, starting = false, cameraEpoch = 0, captureEpoch = 0, toastTimeout, downloadURL;
 let photoDate = new Date(), assetImages = new Map(), failedAssets = new Set();
 const pointers = new Map();
@@ -114,12 +114,24 @@ function renderStickerChoices(){
   });
 }
 $('sticker-category').addEventListener('change',renderStickerChoices);
+function photoFilter(photo){return FILTERS.find(f=>f.id===(photo?.filter||state.filter))||FILTERS[0];}
+function renderFilterTargets(){
+ const root=$('filter-targets');root.replaceChildren();
+ const all=createButton(state.filterScope==='all'?'selected':'','전체',()=>{state.filterScope='all';renderFilterChoices();render();});all.setAttribute('aria-label','전체 사진에 필터 적용');all.setAttribute('aria-pressed',String(state.filterScope==='all'));root.append(all);
+ state.photos.forEach((photo,i)=>{
+  if(!photo)return;const active=state.filterScope==='photo'&&state.selectedPhoto===i;
+  const button=createButton(active?'selected':'','',()=>{state.filterScope='photo';state.selectedPhoto=i;state.selectedDeco=null;renderFilterChoices();updateAdjustment();render();});button.setAttribute('aria-label',`${i+1}번 사진에 필터 적용`);button.setAttribute('aria-pressed',String(active));
+  const image=new Image();image.src=photo.image.src;image.alt='';image.style.filter=photoFilter(photo).css;const badge=document.createElement('span');badge.textContent=i+1;button.append(image,badge);root.append(button);
+ });
+}
 function renderFilterChoices(){
-  const category=$('filter-category'),previous=category.value,groups=[...new Set(FILTERS.map(f=>f.group))];category.replaceChildren(...['전체',...groups].map(value=>Object.assign(document.createElement('option'),{value,textContent:value==='전체'?`전체 · ${FILTERS.length}가지`:`${value} · ${FILTERS.filter(f=>f.group===value).length}가지`})) );category.value=['전체',...groups].includes(previous)?previous:'전체';$('filter-current').textContent='선택한 필터: '+FILTERS.find(f=>f.id===state.filter).name;const list=$('filter-options');list.replaceChildren();const photo=state.photos[state.selectedPhoto]||state.photos.find(Boolean);
+ renderFilterTargets();const photo=state.photos[state.selectedPhoto]||state.photos.find(Boolean),filters=new Set(state.photos.filter(Boolean).map(p=>photoFilter(p).id)),activeFilter=state.filterScope==='photo'?photoFilter(photo).id:filters.size>1?null:[...filters][0]||state.filter;
+
+  const category=$('filter-category'),previous=category.value,groups=[...new Set(FILTERS.map(f=>f.group))];category.replaceChildren(...['전체',...groups].map(value=>Object.assign(document.createElement('option'),{value,textContent:value==='전체'?`전체 · ${FILTERS.length}가지`:`${value} · ${FILTERS.filter(f=>f.group===value).length}가지`})) );category.value=['전체',...groups].includes(previous)?previous:'전체';$('filter-current').textContent=(state.filterScope==='all'?'전체 사진':`${state.selectedPhoto+1}번 사진`)+ ' · '+(activeFilter?FILTERS.find(f=>f.id===activeFilter).name:'사진별로 다른 필터');const list=$('filter-options');list.replaceChildren();
   for(const group of groups.filter(g=>category.value==='전체'||g===category.value)){
     const section=document.createElement('section');section.className='filter-category';const heading=document.createElement('h3');heading.textContent=group;const cards=document.createElement('div');cards.className='filter-cards';
     for(const filter of FILTERS.filter(f=>f.group===group)){
-      const button=createButton(`filter-chip ${state.filter===filter.id?'selected':''}`,'',()=>{state.filter=filter.id;renderFilterChoices();render();});button.setAttribute('aria-label',filter.name);button.setAttribute('aria-pressed',String(state.filter===filter.id));
+      const button=createButton(`filter-chip ${activeFilter===filter.id?'selected':''}`,'',()=>{if(state.filterScope==='all'){state.filter=filter.id;state.photos.forEach(p=>{if(p)delete p.filter;});}else if(photo)photo.filter=filter.id;renderFilterChoices();render();});button.setAttribute('aria-label',filter.name);button.setAttribute('aria-pressed',String(activeFilter===filter.id));
       const preview=document.createElement('canvas');preview.width=96;preview.height=72;preview.setAttribute('aria-hidden','true');const context=preview.getContext('2d');context.filter=filter.css;
       if(photo){const c=crop(photo.image.width,photo.image.height,96,72);context.drawImage(photo.image,c.x,c.y,c.w,c.h,0,0,96,72);}else{context.fillStyle='#a8d6c5';context.fillRect(0,0,96,72);context.fillStyle='#f6b4b9';context.fillRect(48,0,48,72);context.fillStyle='#ffdc7c';context.beginPath();context.arc(48,36,20,0,Math.PI*2);context.fill();}
       const label=document.createElement('span');label.textContent=filter.name;button.append(preview,label);cards.append(button);
@@ -217,7 +229,7 @@ function render(exporting = false) {
     const photo = state.photos[i]; ctx.save(); ctx.beginPath(); ctx.rect(slot.x, slot.y, slot.w, slot.h); ctx.clip();
     if (photo) {
       const c = crop(photo.image.width, photo.image.height, slot.w, slot.h, photo.zoom, photo.panX, photo.panY);
-      ctx.filter = FILTERS.find(f => f.id === state.filter).css; ctx.drawImage(photo.image, c.x, c.y, c.w, c.h, slot.x, slot.y, slot.w, slot.h);
+      ctx.filter = photoFilter(photo).css; ctx.drawImage(photo.image, c.x, c.y, c.w, c.h, slot.x, slot.y, slot.w, slot.h);
     } else {
       ctx.fillStyle = state.frame === 1 ? '#3a3d36' : '#e3e7dc'; ctx.fillRect(slot.x, slot.y, slot.w, slot.h);
       ctx.strokeStyle = state.frame === 1 ? '#626959' : '#c5cdb9'; ctx.lineWidth = 1.4; const cx = slot.x + slot.w / 2, cy = slot.y + slot.h / 2;
@@ -237,7 +249,7 @@ function render(exporting = false) {
         const handle=rotationHandle(b,d,g),edge=rotatedPoint(0,-b.h/2-gap,b,d.rotation||0);ctx.save();ctx.strokeStyle='#52882d';ctx.lineWidth=1.5*scale;ctx.beginPath();ctx.moveTo(edge.x,edge.y);ctx.lineTo(handle.x,handle.y);ctx.stroke();ctx.beginPath();ctx.arc(handle.x,handle.y,14*scale,0,Math.PI*2);ctx.fillStyle='#fffefa';ctx.fill();ctx.stroke();ctx.fillStyle='#415c2c';ctx.font=`${20*scale}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('↻',handle.x,handle.y);ctx.restore();
       }
     }
-    else { const s = g.slots[state.selectedPhoto]; ctx.strokeStyle = '#98bb63'; ctx.lineWidth = 5; ctx.strokeRect(s.x + 2, s.y + 2, s.w - 4, s.h - 4); }
+    else if(decorationEditor.dataset.tool!=='filter'||state.filterScope==='photo') { const s = g.slots[state.selectedPhoto]; ctx.strokeStyle = '#98bb63'; ctx.lineWidth = 5; ctx.strokeRect(s.x + 2, s.y + 2, s.w - 4, s.h - 4); }
   }
   $('preview-layout').textContent = `${state.count} CUTS · ${g.width} × ${g.height}`; $('output-size').textContent = `${g.width} × ${g.height}px · 300dpi`;
   if (decorationEditor.hidden) {canvas.hidden=state.step===4;saveCanvas.hidden=state.step!==4;}
@@ -300,7 +312,7 @@ function renderPhotoPicker() {
   state.photos.forEach((photo, i) => {
     const b = createButton(i === state.selectedPhoto ? 'selected' : '', '', () => { state.selectedPhoto = i; state.selectedDeco = null; updateAdjustment(); renderPhotoPicker(); render(); });
     b.setAttribute('aria-label', `${i + 1}번 사진 구도 조정`); b.setAttribute('aria-pressed', String(i === state.selectedPhoto));
-    if (photo) { const image = new Image(); image.src = photo.image.src; image.alt = String(i + 1); b.append(image); } else b.textContent = String(i + 1);
+    if (photo) { const image = new Image(); image.src = photo.image.src; image.alt = String(i + 1);image.style.filter=photoFilter(photo).css; b.append(image); } else b.textContent = String(i + 1);
     $('photo-picker').append(b);
   });
 }
@@ -309,7 +321,7 @@ function selectEditorTool(tool,{openPanel=true}={}) {
   decorationEditor.dataset.tool = tool;pointers.clear();gesture=null;cropPointers.clear();cropGesture=null;if(!canEditDecoration(state.decorations[state.selectedDeco]))state.selectedDeco=null;if(tool==='filter')renderFilterChoices();
   canvas.hidden = tool === 'photo'; cropCanvas.hidden = tool !== 'photo';
   $('edit-title').textContent = { stickers: '스티커로 꾸미기', text: '마음을 적어요', photo: '사진을 크게 보고 조정해요', filter: '오늘의 분위기' }[tool];
-  $('edit-help').textContent = tool === 'photo' ? '사진을 끌어 구도 이동 · 두 손가락 또는 +/−로 확대·축소' : tool==='filter'?'색감 필터를 눌러 비교해요. 모든 사진에 적용되며 원본은 유지돼요.':tool==='text'?'문구를 추가하고 끌어 이동해요. 모서리·두 손가락으로 크기와 회전을 조절해요.':'빈 곳은 끌어 화면 이동 · 스티커·글자는 눌러 편집 · 두 손가락으로 크기·회전';
+  $('edit-help').textContent = tool === 'photo' ? '사진을 끌어 구도 이동 · 두 손가락 또는 +/−로 확대·축소' : tool==='filter'?'색감 필터를 눌러 비교해요. 전체 또는 사진을 선택해 적용해요. 원본은 유지돼요.':tool==='text'?'문구를 추가하고 끌어 이동해요. 모서리·두 손가락으로 크기와 회전을 조절해요.':'빈 곳은 끌어 화면 이동 · 스티커·글자는 눌러 편집 · 두 손가락으로 크기·회전';
   document.querySelectorAll('[data-editor-tool]').forEach(b => { b.classList.toggle('selected', b.dataset.editorTool === tool); b.setAttribute('aria-pressed', String(b.dataset.editorTool === tool)); });
   toolPanel.setOpen(openPanel);renderPhotoPicker(); updateAdjustment(); render(); editorView.refresh();
 }
@@ -327,7 +339,7 @@ function renderCrop() {
   const photo = state.photos[state.selectedPhoto]; if (!photo) return;
   const slot = currentGeometry().slots[state.selectedPhoto]; const height = Math.round(1000 * slot.h / slot.w); if (cropCanvas.width !== 1000 || cropCanvas.height !== height) { cropCanvas.width = 1000; cropCanvas.height = height; }
   const cc = cropCanvas.getContext('2d'), c = crop(photo.image.width, photo.image.height, cropCanvas.width, cropCanvas.height, photo.zoom, photo.panX, photo.panY);
-  cc.filter = FILTERS.find(f => f.id === state.filter).css; cc.clearRect(0, 0, cropCanvas.width, cropCanvas.height); cc.drawImage(photo.image, c.x, c.y, c.w, c.h, 0, 0, cropCanvas.width, cropCanvas.height); cc.filter = 'none';
+  cc.filter = photoFilter(photo).css; cc.clearRect(0, 0, cropCanvas.width, cropCanvas.height); cc.drawImage(photo.image, c.x, c.y, c.w, c.h, 0, 0, cropCanvas.width, cropCanvas.height); cc.filter = 'none';
 }
 function cropPoint(e) { const r = cropCanvas.getBoundingClientRect(); return { x: (e.clientX - r.left) * cropCanvas.width / r.width, y: (e.clientY - r.top) * cropCanvas.height / r.height }; }
 cropCanvas.addEventListener('pointerdown', e => {
@@ -524,7 +536,7 @@ $('finish-edit').addEventListener('click',()=>go(4));
 canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3 || decorationEditor.hidden || !canEditDecoration(d)) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if(e.key.toLowerCase()==='r'){e.preventDefault();d.rotation=(d.rotation||0)+(e.shiftKey?-15:15);updateAdjustment();render();} if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
 $('download').addEventListener('click', async () => { try { await downloadFinishedImage(); toast('다운로드를 시작했어요. 기기의 저장 위치를 확인해 주세요.'); } catch (error) { toast(`저장 실패: ${error.message}`); } });
 $('share').addEventListener('click', async () => { try { const blob = await exportImage(), file = new File([blob], 'moment.png', { type: 'image/png' }); if (navigator.canShare?.({ files: [file] })) {await navigator.share({ files: [file], title: state.event.title });usage.record('shares');} else { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: downloadURL, target: '_blank', rel: 'noopener' }); link.click();usage.record('shares'); toast('이미지를 길게 눌러 저장하거나 PNG 저장 버튼을 이용해 주세요.'); } } catch (error) { if (error.name !== 'AbortError') toast('공유하지 못했어요. PNG 저장 버튼을 이용해 주세요.'); } });
-$('restart').addEventListener('click', async () => { if (!await confirmAction('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return;usage.restart(); stopCamera();lastDownloadedSignature=null; state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
+$('restart').addEventListener('click', async () => { if (!await confirmAction('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return;usage.restart(); stopCamera();lastDownloadedSignature=null; state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original';state.filterScope='all'; renderChoices(); renderThumbnails(); go(0); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopCamera(); }); window.addEventListener('pagehide', stopCamera);
 window.addEventListener('beforeunload', e => { if (state.photos.some(Boolean)) { e.preventDefault(); e.returnValue = ''; } });
 for (const [id, name, label] of [['back', 'back', '이전'], ['native-capture', 'camera', '기본 카메라로 촬영'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '사진 다시 찍기'], ['expand-preview', 'expand', '꾸미기 수정'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);
