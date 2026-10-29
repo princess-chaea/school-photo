@@ -73,6 +73,11 @@ export async function listSharedAssets(all = false) {
   const snap = await getDocs(all ? source : query(source, where('active', '==', true)));
   return snap.docs.map(d => ({ ...d.data(), id: d.id, shared: true }));
 }
+export async function saveSharedPalette(palette){
+ if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');
+ const id=crypto.randomUUID(),asset={name:palette.name.slice(0,30),kind:'palette',bg:palette.bg,ink:palette.ink,active:true};
+ await setDoc(doc(firebase().db,'sharedAssets',id),asset);return{...asset,id,shared:true};
+}
 export async function uploadSharedAsset(file, kind, name, metadata) {
   if (!isSiteAdmin(firebase().auth.currentUser)) throw new Error('공용 자료 관리는 운영자 전용입니다.');
   if (!['frame','sticker'].includes(kind) || file.type !== 'image/webp' || file.size >= 4 * 1024 * 1024) throw new Error('최적화한 프레임 또는 스티커만 올릴 수 있어요.');

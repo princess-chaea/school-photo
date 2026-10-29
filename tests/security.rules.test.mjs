@@ -189,3 +189,14 @@ test('100개 기본 스티커의 행사 저장·전체 해제와 256개 상한�
  await assertFails(setDoc(doc(db,'events','stickers'),{...event,stickers:Array.from({length:257},()=>sticker)}));
  await assertSucceeds(setDoc(doc(db,'events','stickers'),{...event,stickers:[]}));
 });
+
+test('공용 단색 프레임은 인증된 운영자만 등록·노출 변경하며 다른 필드는 변경할 수 없다',async()=>{
+ const admin=env.authenticatedContext('operator',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore(),teacher=env.authenticatedContext('teacher-a').firestore(),guest=env.unauthenticatedContext().firestore();
+ const palette={name:'공용 민트',kind:'palette',bg:'#aaccbb',ink:'#123456',active:true};
+ await assertSucceeds(setDoc(doc(admin,'sharedAssets','mint'),palette));
+ await assertSucceeds(getDoc(doc(guest,'sharedAssets','mint')));
+ await assertFails(setDoc(doc(teacher,'sharedAssets','other'),palette));
+ await assertFails(setDoc(doc(admin,'sharedAssets','bad'),{...palette,bg:'url(evil)'}));
+ await assertFails(setDoc(doc(admin,'sharedAssets','mint'),{...palette,ink:'#ffffff'}));
+ await assertSucceeds(setDoc(doc(admin,'sharedAssets','mint'),{...palette,active:false}));
+});

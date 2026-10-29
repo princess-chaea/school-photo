@@ -154,13 +154,13 @@ service cloud.firestore {
     }
     match /sharedAssets/{assetId} {
       function validShared(d) {
-        return validPhotoSlots(d) && validFrameMode(d) && d.keys().hasAll(['name','kind','url','path','active'])
+        return (d.keys().hasOnly(['name','kind','bg','ink','active']) && d.kind == 'palette' && d.name is string && d.name.size() > 0 && d.name.size() <= 60 && d.bg.matches('#[0-9a-fA-F]{6}') && d.ink.matches('#[0-9a-fA-F]{6}') && d.active is bool) || (validPhotoSlots(d) && validFrameMode(d) && d.keys().hasAll(['name','kind','url','path','active'])
           && d.keys().hasOnly(['name','kind','url','path','active','originalBytes','optimizedBytes','width','height','format','layoutCount','orientation','photoSlots','frameFormat','preserveAspect','clearPhotoSlots'])
           && d.name is string && d.name.size() > 0 && d.name.size() <= 60
           && (!('frameFormat' in d) || d.frameFormat in ['print-4x6','print-3x5','print-5x7','square','feed','story','a4','screen'])
           && d.kind in ['frame','sticker'] && d.url is string && d.url.size() <= 4096
           && d.path == 'shared/assets/' + assetId && d.active is bool
-          && (d.kind != 'frame' || (d.layoutCount in [0,2,4,6,8]));
+          && (d.kind != 'frame' || (d.layoutCount in [0,2,4,6,8])));
       }
       allow read: if true;
       allow create: if siteAdmin() && validShared(request.resource.data);

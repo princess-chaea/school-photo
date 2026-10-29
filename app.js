@@ -19,9 +19,9 @@ import { icon, labelButton } from './icons.js';
 
 const $ = id => document.getElementById(id);
 const canvas = $('preview'), ctx = canvas.getContext('2d');
-const titles = ['어디에 사용할 사진인가요?', '어떤 프레임에 담을까요?', '준비됐나요? 하나, 둘, 셋.', '우리답게, 조금 더 특별하게.', '이 순간을 간직해요.'];
-const descriptions = ['용도와 컷 수, 가로·세로 배치를 선택하세요.', '사진을 감쌀 색상이나 행사에 준비된 콜라보·특별 프레임을 선택하세요.', '사진을 찍거나 기기에 있는 사진을 골라주세요.', '사진 위에 스티커와 문구를 자유롭게 놓아보세요.', '완성 이미지는 내 기기에만 저장돼요.'];
-const nextLabels = ['프레임 선택으로', '촬영 시작', '꾸미기로', '저장·공유로'];
+const titles = ['어떤 프레임에 담을까요?', '어디에 사용할 사진인가요?', '준비됐나요? 하나, 둘, 셋.', '우리답게, 조금 더 특별하게.', '이 순간을 간직해요.'];
+const descriptions = ['사진을 감쌀 색상이나 행사에 준비된 콜라보·특별 프레임을 선택하세요.', '선택한 프레임이 지원하는 용도와 컷 수, 가로·세로 배치를 확인하세요.', '사진을 찍거나 기기에 있는 사진을 골라주세요.', '사진 위에 스티커와 문구를 자유롭게 놓아보세요.', '완성 이미지는 내 기기에만 저장돼요.'];
+const nextLabels = ['용도·배치 선택으로', '촬영 시작', '꾸미기로', '저장·공유로'];
 let state = { step: 0, count: 4, frame: 0, orientation: 'portrait', photos: Array(4).fill(null), selectedPhoto: 0, selectedDeco: null, filter: 'original', decorations: [], event: structuredClone(DEFAULT_EVENT) };
 let stream = null, facing = 'user', busy = false, starting = false, cameraEpoch = 0, captureEpoch = 0, toastTimeout, downloadURL;
 let photoDate = new Date(), assetImages = new Map(), failedAssets = new Set();
@@ -38,7 +38,7 @@ for(const group of [...new Set(EXPORT_FORMATS.map(f=>f.group))]){const optgroup=
 $('export-format').value='print-4x6';
 function changePurpose(){ state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}}); renderChoices(); renderThumbnails(); render(); }
 $('export-format').addEventListener('change',changePurpose);
-const exportPicker=createExportPicker(()=>canvas,changePurpose,preset=>spaceGeometryFor(preset));
+const exportPicker=createExportPicker(()=>canvas,changePurpose,preset=>spaceGeometryFor(preset),preset=>compatibleFrame(state.event.frames[state.frame],state.count,state.orientation,preset));
 const studentTextStyles=createTextStyleControls($('student-text-style'),{
  textInput:$('selected-decoration-text'),
  getState:()=>{const d=state.decorations[state.selectedDeco];return d?.type==='text'?{key:d.id,label:'문구',text:d.text,settings:{...d,...textColorSettings(d.text,d)},baseSize:.055,minSize:.015,maxSize:.35,ink:'#ffffff'}:null;},
@@ -49,9 +49,10 @@ function outputFormat(){return (state.event.frames[state.frame]?.layoutCount || 
 function toast(message) { $('toast').textContent = message; $('toast').classList.add('visible'); clearTimeout(toastTimeout); toastTimeout = setTimeout(() => $('toast').classList.remove('visible'), 4500); }
 function createButton(className, text, handler) { const el = document.createElement('button'); el.className = className; el.textContent = text; el.type = 'button'; el.addEventListener('click', handler); return el; }
 function renderChoices() {
-  if (!state.event.frames.some(f => !f.layoutCount || (f.orientation || 'portrait') === state.orientation)) state.orientation = state.event.frames[0].orientation || 'portrait';
-  if (!state.event.frames.some(f => compatibleFrame(f,state.count,state.orientation))) { state.count = [2,4,6,8].find(n => state.event.frames.some(f => compatibleFrame(f,n,state.orientation))); state.photos = Array(state.count).fill(null); }
-  if (!state.event.frames[state.frame] || !compatibleFrame(state.event.frames[state.frame], state.count, state.orientation)) state.frame = state.event.frames.findIndex(f => compatibleFrame(f,state.count,state.orientation));
+  const selectedFrame=state.event.frames[state.frame]||state.event.frames[0];
+  if(selectedFrame.layoutCount){if(state.count!==selectedFrame.layoutCount){state.count=selectedFrame.layoutCount;state.photos=Array(state.count).fill(null);state.selectedPhoto=0;}state.orientation=selectedFrame.orientation||'portrait';}
+  const current=EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{};
+  if(!compatibleFrame(selectedFrame,state.count,state.orientation,current))$('export-format').value=(EXPORT_FORMATS.find(f=>f.id!=='original'&&compatibleFrame(selectedFrame,state.count,state.orientation,f))||EXPORT_FORMATS[0]).id;
   $('cut-options').replaceChildren();
   for (const count of [2, 4, 6, 8]) {
     const button = createButton(`cut-option ${state.count === count ? 'selected' : ''}`, '', async () => {
@@ -60,12 +61,12 @@ function renderChoices() {
       renderChoices(); renderThumbnails(); render();
     });
     button.setAttribute('aria-pressed', String(state.count === count));
-    button.disabled = !state.event.frames.some(f => compatibleFrame(f, count, state.orientation));
+    button.disabled = !compatibleFrame(selectedFrame,count,state.orientation,EXPORT_FORMATS.find(f=>f.id===$('export-format').value));
     if (button.disabled) button.title = '이 컷 수에 사용할 행사 프레임이 없어요.';
     const cols = state.orientation === 'landscape' ? ({2:2,4:2,6:3,8:4}[count]) : count === 2 ? 1 : 2;
     const strip = document.createElement('canvas'); strip.width=100;strip.height=80;strip.className='cut-layout-guide';strip.setAttribute('aria-hidden','true');
     const preset=EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{};
-    const frame=state.event.frames.find(f=>compatibleFrame(f,count,state.orientation));
+    const frame=selectedFrame.layoutCount&&selectedFrame.layoutCount!==count?undefined:selectedFrame;
     drawLayoutGuide(strip,spaceGeometryFor(preset,count,frame));
     const title = document.createElement('strong'); title.textContent = `${count}컷`;
     const desc = document.createElement('small'); desc.textContent = `${cols} × ${count / cols}`;
@@ -73,19 +74,23 @@ function renderChoices() {
     if (state.count === count) { const check = document.createElement('span'); check.className = 'check'; check.textContent = '✓'; button.append(check); }
     $('cut-options').append(button);
   }
-  $('orientation-options').replaceChildren(...[['portrait','세로 구성'],['landscape','가로 구성']].map(([value,label]) => { const b = createButton(state.orientation === value ? 'selected' : '',label,()=>{state.orientation=value;state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}});renderChoices();renderThumbnails();render();});b.setAttribute('aria-pressed',String(state.orientation===value));b.disabled=!state.event.frames.some(f=>!f.layoutCount||(f.orientation||'portrait')===value);return b; }));
-  renderFrameGroups($('frame-options'),state.event.frames,{student:true,filter:frame=>compatibleFrame(frame,state.count,state.orientation),renderCard:(frame,index,group)=>{
-    const button=createButton(`frame-option ${state.frame===index?'selected':''}`,'',()=>{state.frame=index;renderChoices();render();});button.setAttribute('aria-pressed',String(state.frame===index));button.setAttribute('aria-label',frame.name+' 프레임 선택');
+  $('orientation-options').replaceChildren(...[['portrait','세로 구성'],['landscape','가로 구성']].map(([value,label]) => { const b = createButton(state.orientation === value ? 'selected' : '',label,()=>{state.orientation=value;state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}});renderChoices();renderThumbnails();render();});b.setAttribute('aria-pressed',String(state.orientation===value));b.disabled=!compatibleFrame(selectedFrame,state.count,value,EXPORT_FORMATS.find(f=>f.id===$('export-format').value));return b; }));
+  renderFrameGroups($('frame-options'),state.event.frames,{student:true,renderCard:(frame,index,group)=>{
+    const button=createButton(`frame-option ${state.frame===index?'selected':''}`,'',async()=>{if(frame.layoutCount&&frame.layoutCount!==state.count&&state.photos.some(Boolean)&&!await confirmAction('다른 컷 수의 프레임을 선택하면 촬영한 사진과 꾸미기가 초기화돼요. 바꿀까요?'))return;if(frame.layoutCount&&frame.layoutCount!==state.count){state.decorations=[];state.selectedDeco=null;deletedDecoration=null;}state.frame=index;state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}});renderChoices();renderThumbnails();render();});button.setAttribute('aria-pressed',String(state.frame===index));button.setAttribute('aria-label',frame.name+' 프레임 선택');
     if(group==='base'){const dot=document.createElement('span');dot.className='palette-dot';dot.style.background=frame.bg;button.append(dot);}
     else{
       const sample=document.createElement('span');sample.className='color-sample frame-layout-sample';sample.style.background=frame.bg;
-      const guide=document.createElement('canvas');guide.width=160;guide.height=120;drawLayoutGuide(guide,spaceGeometryFor(EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{},state.count,frame),{background:frame.bg,ink:frame.ink});sample.append(guide);
-      if(frame.overlay){const image=new Image();image.src=frame.overlay;image.alt='';sample.append(image);}button.append(sample);
+      const guide=document.createElement('canvas');guide.width=160;guide.height=120;
+      const geometry=layout(frame.layoutCount||4,state.event,{frame,orientation:frame.orientation||'portrait'});
+      const paint=image=>{drawLayoutGuide(guide,geometry,{background:frame.bg,ink:frame.ink});if(image){const scale=Math.min(guide.width/geometry.width,guide.height/geometry.height),small={width:geometry.width*scale,height:geometry.height*scale,slots:geometry.slots.map(s=>({x:s.x*scale,y:s.y*scale,w:s.w*scale,h:s.h*scale}))},context=guide.getContext('2d');context.save();context.translate((guide.width-small.width)/2,(guide.height-small.height)/2);drawFrameOverlay(context,image,frame,small);context.restore();}};
+      paint(assetImages.get(frame.overlay));sample.append(guide);
+      if(frame.overlay&&!assetImages.has(frame.overlay))imageFromURL(frame.overlay).then(image=>{if(guide.isConnected)paint(image);}).catch(()=>{});
+      button.append(sample);
     }
-    const label=document.createElement('span');label.textContent=frame.name;button.append(label);return button;
+    const label=document.createElement('span');label.textContent=frame.name;button.append(label);if(frame.layoutCount){const scope=document.createElement('small');scope.textContent=frame.layoutCount+'컷 · '+(frame.orientation==='landscape'?'가로':'세로');button.append(scope);}return button;
   }});
   $('frame-name').textContent = state.event.frames[state.frame].name;
-  $('chosen-purpose').textContent = $('export-format').selectedOptions[0].textContent+' · '+state.count+'컷 · '+(state.orientation==='landscape'?'가로 배치':'세로 배치');
+  $('chosen-purpose').textContent='선택한 프레임: '+selectedFrame.name+' · '+(selectedFrame.layoutCount?selectedFrame.layoutCount+'컷 · '+(selectedFrame.orientation==='landscape'?'가로 배치':'세로 배치'):'컷 수와 배치는 다음 단계에서 선택해요.');
   renderFilterChoices();
   renderStickerChoices();
 }
@@ -136,9 +141,9 @@ function go(step) {
 function renderSteps() {
   document.body.dataset.step = String(state.step);
   $('step-list').replaceChildren();
-  [0,1,2,3,4].forEach((step,index)=>{const li=document.createElement('li');li.className=step===state.step?'active':step<state.step?'done':'';if(step===state.step)li.setAttribute('aria-current','step');const n=document.createElement('span');n.className='step-number';n.textContent=step<state.step?'✓':String(index+1).padStart(2,'0');const label=document.createElement('span');label.className='step-label';label.textContent=['용도','프레임','촬영','꾸미기','저장·공유'][index];li.append(n,label);$('step-list').append(li);});
+  [0,1,2,3,4].forEach((step,index)=>{const li=document.createElement('li');li.className=step===state.step?'active':step<state.step?'done':'';if(step===state.step)li.setAttribute('aria-current','step');const n=document.createElement('span');n.className='step-number';n.textContent=step<state.step?'✓':String(index+1).padStart(2,'0');const label=document.createElement('span');label.className='step-label';label.textContent=['프레임','용도·배치','촬영','꾸미기','저장·공유'][index];li.append(n,label);$('step-list').append(li);});
   document.querySelectorAll('.step-content').forEach(el => el.hidden = Number(el.dataset.step) !== state.step);
-  $('step-title').textContent = titles[state.step]; $('step-kicker').textContent = `STEP ${String([0,1,2,3,4].indexOf(state.step)+1).padStart(2, '0')} / ${['LAYOUT', 'FRAME', 'CAPTURE', 'DECORATE', 'KEEP'][state.step]}`;
+  $('step-title').textContent = titles[state.step]; $('step-kicker').textContent = `STEP ${String([0,1,2,3,4].indexOf(state.step)+1).padStart(2, '0')} / ${['FRAME', 'LAYOUT', 'CAPTURE', 'DECORATE', 'KEEP'][state.step]}`;
   $('step-description').textContent = descriptions[state.step]; $('step-counter').textContent = `${[0,1,2,3,4].indexOf(state.step)+1} / 5`;
   $('back').hidden = state.step === 0;labelButton($('back'),'back',state.step===4?'꾸미기로 돌아가기':state.step===3?'사진 다시 찍기':'이전'); $('next').hidden = state.step===4;$('restart-corner').hidden=state.step!==4;
   $('expand-preview').hidden = state.step !== 3 && state.step !== 4;
@@ -191,7 +196,7 @@ function decorationBox(d, g) {
   return { x: d.x * g.width, y: d.y * g.height, w: Math.max(w, 20), h: Math.max(h, 20), font };
 }
 function geometryFor(preset, count=state.count, frame=state.event.frames[state.frame]) {
-  return layout(count,state.event,{frame,orientation:state.orientation,width:preset.width,height:preset.height,padding:preset.padding,caption:false,captureDate:$('show-date').checked});
+  return layout(count,state.event,{frame,orientation:frame?.layoutCount?frame.orientation:state.orientation,width:preset.width,height:preset.height,padding:preset.padding,caption:false,captureDate:$('show-date').checked});
 }
 function spaceGeometryFor(preset,count=state.count,frame=state.event.frames[state.frame]) { const g=geometryFor(preset,count,frame);return (frame?.layoutCount || frame?.preserveAspect)?fitLayoutGuide(g,preset):g; }
 function currentGeometry() { return geometryFor(EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{}); }

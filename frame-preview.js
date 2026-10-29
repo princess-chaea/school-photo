@@ -2,13 +2,15 @@ import {drawFrameOverlay} from './frame-overlay.js';
 import {loadFont,loadTextFonts} from './fonts.js';
 import { layout, imageFromURL, brandingModel, brandEntries } from './core.js';
 import { drawBranding } from './branding.js';
+function scaledGeometry(g,s){return{...g,...Object.fromEntries(['width','height','pad','brandH','brandY','footerH','footerY','photoW','photoH'].map(k=>[k,g[k]*s])),slots:g.slots.map(r=>({x:r.x*s,y:r.y*s,w:r.w*s,h:r.h*s})),brandAreas:Object.fromEntries(Object.entries(g.brandAreas).map(([key,r])=>[key,{...r,y:r.y*s,h:r.h*s}])),brandReference:g.brandReference?scaledGeometry(g.brandReference,s):null};}
 const images = new Map(), loading = new Map(), versions = new WeakMap();
 async function load(url) { if (!url || images.has(url)) return; if (!loading.has(url)) loading.set(url, imageFromURL(url).then(img => images.set(url, img)).catch(() => {}).finally(() => loading.delete(url))); await loading.get(url); }
-export async function paintFramePreview(canvas, event, { count = 4, frameIndex = 0, selected = null, guides = false, orientation, preset = {} } = {}) {
+export async function paintFramePreview(canvas, event, { count = 4, frameIndex = 0, selected = null, guides = false, orientation, preset = {}, maxDimension=0 } = {}) {
   const version = (versions.get(canvas) || 0) + 1; versions.set(canvas, version);
   const frame = event.frames[Math.min(frameIndex, event.frames.length - 1)];
   if (frame.layoutCount) count = frame.layoutCount;
-  const g = layout(count, event, { frame, orientation, width:preset.width, height:preset.height, padding:preset.padding, captureDate: brandingModel(event).captureDate });
+  let g = layout(count, event, { frame, orientation, width:preset.width, height:preset.height, padding:preset.padding, captureDate: brandingModel(event).captureDate });
+  if(maxDimension>0&&Math.max(g.width,g.height)>maxDimension)g=scaledGeometry(g,maxDimension/Math.max(g.width,g.height));
   await Promise.all([load(event.logo), load(frame.overlay),...brandEntries(event).filter(item=>item.key!=='logo').map(item=>loadTextFonts(item.settings))]); if (versions.get(canvas) !== version) return null;
   canvas.width = g.width; canvas.height = g.height; const ctx = canvas.getContext('2d');
   ctx.fillStyle = frame.bg; ctx.fillRect(0, 0, canvas.width, canvas.height);

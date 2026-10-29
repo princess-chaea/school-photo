@@ -12,7 +12,7 @@ export function renderFrameGroups(root,frames,{renderCard,filter=()=>true,studen
  root.classList.remove('selection-grid','frame-grid','asset-library');root.classList.add('frame-groups');root.replaceChildren();
  for(const group of groupFrames(frames)){
   const section=document.createElement('section');section.className=`frame-group frame-group--${group.id}${library?' frame-group--library':''}`;section.dataset.frameGroup=group.id;
-  const title=document.createElement('h3');title.className='frame-group-heading';title.textContent=group.name;const grid=document.createElement('div');grid.className='frame-group-grid';grid.setAttribute('role','group');grid.setAttribute('aria-label',group.name);
+  const title=document.createElement('h3');title.className='frame-group-heading';const groupName=student&&group.id==='personal'?'교사 제작 프레임':group.name;title.textContent=groupName;const grid=document.createElement('div');grid.className='frame-group-grid';grid.setAttribute('role','group');grid.setAttribute('aria-label',groupName);
   const entries=group.items.filter(({frame})=>filter(frame));const count=document.createElement('span');count.textContent=entries.length+'개';title.append(count);section.append(title,grid);
   for(const {frame,index}of entries)grid.append(renderCard(frame,index,group.id));
   if(!entries.length){const empty=document.createElement('p');empty.className='frame-group-empty';empty.textContent=group.items.length?'선택한 컷 수·배치에서 사용할 수 있는 프레임이 없어요.':group.id==='theme'?'준비된 테마 프레임이 없어요.':group.id==='personal'?(student?'선생님이 추가한 프레임이 없어요.':'프레임 보관함에 직접 추가한 프레임이 여기에 표시돼요.'):'선택된 기본 색상 프레임이 없어요.';grid.append(empty);}

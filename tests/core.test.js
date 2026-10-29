@@ -93,3 +93,14 @@ test('업로드 프레임의 사진 공간 안내는 실제 저장 여백과 위
     }
   }
 });
+
+test('이미지 프레임은 저장한 비율·컷·방향만 지원하고 단색은 모든 용도에 맞춘다',()=>{
+ const frame=normalizeEvent({...DEFAULT_EVENT,frames:[{id:'teacher',name:'교사 제작',layoutCount:6,orientation:'landscape',frameFormat:'print-4x6',preserveAspect:true,clearPhotoSlots:true,photoSlots:Array.from({length:6},(_,i)=>({x:.05+(i%3)*.31,y:.2+Math.floor(i/3)*.3,w:.2,h:.2}))}]}).frames[0];
+ assert(compatibleFrame(frame,6,'landscape',{width:1800,height:1200}));
+ assert(compatibleFrame(frame,6,'landscape',{width:1620,height:1080}));
+ assert(!compatibleFrame(frame,4,'landscape',{width:1800,height:1200}));
+ assert(!compatibleFrame(frame,6,'portrait',{width:1800,height:1200}));
+ assert(!compatibleFrame(frame,6,'landscape',{width:1080,height:1080}));
+ assert(compatibleFrame({layoutCount:0},8,'portrait',{width:1080,height:1920}));
+ const g=layout(6,DEFAULT_EVENT,{frame,orientation:'landscape'});assert.equal(g.slots[0].w,g.width*.2);assert.equal(g.slots[5].h,g.height*.2);
+});

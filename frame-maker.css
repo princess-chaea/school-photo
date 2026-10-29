@@ -1,0 +1,45 @@
+body #frame-maker{width:min(1120px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:94dvh;padding:24px;text-align:left;overflow:auto}
+body #frame-maker>header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+body #frame-maker h2{margin:0;font-size:23px}
+body #frame-maker h3{font-size:15px;margin:22px 0 12px}
+body #frame-maker button{word-break:keep-all;line-height:1.5}
+body .maker-kind-options{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+body .maker-kind-options>button{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:12px;padding:18px;border:1px solid #ccd7bd;border-radius:14px;background:#fffefa;text-align:left}
+body .maker-kind-options>button>span{grid-row:1/3;font-size:36px;color:#738b55}
+body .maker-kind-options strong{font-size:17px}
+body .maker-kind-options small{font-size:12px;color:#748168}
+body .maker-color-icon{width:38px;height:38px;border-radius:50%;background:linear-gradient(120deg,#d7e5c8 0 50%,#d2c6e2 50%)}
+body #frame-maker [aria-pressed="true"]{border-color:#6e8c4c;background:#edf4e3;box-shadow:inset 0 0 0 1px #6e8c4c}
+body .maker-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:24px;align-items:start}
+body .maker-purpose-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+body .maker-purpose,body .maker-cut{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-width:0;padding:12px 6px;border:1px solid #dce1d1;border-radius:12px;background:white;text-align:center}
+body .maker-purpose canvas{width:80px;height:88px;max-width:100%}
+body .maker-purpose strong{font-size:12px}
+body .maker-purpose small{font-size:10px;color:#71815d}
+body .maker-cut-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+body .maker-cut canvas{width:86px;height:80px;max-width:100%}
+body .maker-orientation-options{display:flex;gap:10px}
+body .maker-orientation-options button{flex:1;border:1px solid #dce1d1;border-radius:9px;background:white;min-height:44px}
+body .maker-preview-panel{position:sticky;top:0;display:flex;flex-direction:column;align-items:center;text-align:center;border:1px solid #dce1d1;border-radius:14px;background:#f4f7ed;padding:16px;min-width:0}
+body #maker-preview{display:block;width:100%;height:min(42dvh,400px);object-fit:contain}
+body #maker-summary{font-size:14px;line-height:1.6}
+body #maker-image-guide{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:12px}
+body #maker-image-guide button{width:100%;font-size:12px;white-space:normal}
+body .maker-image-instructions{border:1px solid #dce1d1;border-radius:12px;padding:4px 18px 14px;margin-top:22px;background:#f7faf2}
+body .maker-image-instructions ol{font-size:12px;line-height:1.9;padding-left:20px}
+body #frame-maker .asset-upload{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:16px}
+body #frame-maker .palette-builder{border:1px solid #dce1d1;border-radius:12px;padding:18px;align-items:end}
+body #frame-maker .palette-builder label{display:flex;flex-direction:column;align-items:flex-start;font-size:12px}
+@media(max-width:850px){body .maker-purpose-grid{grid-template-columns:repeat(2,minmax(0,1fr))}body .maker-layout{gap:14px;grid-template-columns:minmax(0,1fr) minmax(230px,1fr)}}
+@media(max-width:600px){body #frame-maker{padding:16px;max-height:96dvh}body .maker-layout{display:flex;flex-direction:column}body .maker-preview-panel{position:static;width:100%;box-sizing:border-box}body .maker-kind-options{gap:9px}body .maker-kind-options>button{display:flex;flex-direction:column;text-align:center;padding:12px 8px;gap:5px}body .maker-kind-options strong{font-size:14px}body .maker-kind-options small{font-size:11px}body .maker-choices{width:100%}body #frame-maker .asset-upload{grid-template-columns:1fr}body #maker-preview{height:280px}body .maker-cut-grid{gap:6px}body #frame-maker .asset-upload .button{width:100%}}
+body .shared-frame-maker-launch{padding:20px;margin:20px 0;border:1px solid #dce1d1;border-radius:12px;background:#fffefa}
+body .maker-photo-size{display:flex;align-items:center;gap:12px}
+body .maker-photo-size button{min-width:44px;font-size:20px;padding:5px 12px}
+body .maker-photo-size output{min-width:60px;text-align:center}
+body #frame-maker>header{position:sticky;top:0;z-index:3;background:#fffefa;padding:8px 0;border-bottom:1px solid #dce1d1}
+body .maker-choices .asset-upload{grid-template-columns:minmax(0,1fr);padding:16px}
+body .maker-choices .asset-upload .button{width:100%}
+body .maker-image-instructions summary{cursor:pointer;font-size:13px;font-weight:700;padding:12px 0}
+body .maker-preview-panel{top:66px}
+@media(max-width:600px){body .maker-choices{display:contents}body .maker-preview-panel{order:1}body .maker-image-instructions,body #frame-form,body #palette-workspace{order:2;width:100%}}
+@media(min-width:601px) and (max-height:550px){body .maker-preview-panel{position:static}body #maker-preview{height:150px}}

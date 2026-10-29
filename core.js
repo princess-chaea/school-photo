@@ -115,7 +115,11 @@ export function layout(count, event = DEFAULT_EVENT, options = {}) {
   return { brandReference, brandScale, width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:topH},bottom:{y:bottomY,h:bottomH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoSlots,count)?.map(s=>({x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
 }
 export function templateGeometry(count, orientation = 'portrait', frameFormat='print-4x6') { return layout(count, DEFAULT_EVENT, { frame: { layoutCount: count, orientation,frameFormat }, orientation }); }
-export function compatibleFrame(frame, count, orientation) { return !frame.layoutCount || (frame.layoutCount === count && (!orientation || (frame.orientation || 'portrait') === orientation)); }
+export function compatibleFrame(frame,count,orientation,preset={}){
+ if(frame.layoutCount&&(frame.layoutCount!==count||(orientation&&(frame.orientation||'portrait')!==orientation)))return false;
+ if((frame.layoutCount||frame.preserveAspect)&&preset.width&&preset.height){const size=frameSize(frame.frameFormat,frame.orientation||'portrait');if(Math.abs(size.width/size.height-preset.width/preset.height)>.005)return false;}
+ return true;
+}
 export function crop(imageW, imageH, targetW, targetH, zoom = 1, panX = 0, panY = 0) {
   const scale = Math.max(targetW / imageW, targetH / imageH) * zoom;
   const w = targetW / scale, h = targetH / scale;
