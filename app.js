@@ -1,3 +1,4 @@
+import {createToolPanel} from './tool-panel.js';
 import {labelCollectionButton,renderCollectionBrand} from './collection-brand.js';
 import {renderFrameGroups} from './frame-groups.js';
 import './frame-groups.css';
@@ -33,6 +34,7 @@ const decorationEditor = $('decoration-editor'), previewHome = canvas.parentElem
 const cropCanvas = $('crop-preview'), cropPointers = new Map();
 let cropGesture = null;
 const editorView=createEditorView(decorationEditor,canvas,{isDecorationTarget:e=>pointers.size>0||decorationAt(e)!==null});
+const toolPanel=createToolPanel(decorationEditor,{onSelect:selectEditorTool});
 const saveCanvas=$('save-preview');
 for(const group of [...new Set(EXPORT_FORMATS.map(f=>f.group))]){const optgroup=document.createElement('optgroup');optgroup.label=group;for(const f of EXPORT_FORMATS.filter(f=>f.group===group))optgroup.append(Object.assign(document.createElement('option'),{value:f.id,textContent:f.name}));$('export-format').append(optgroup);}
 $('export-format').value='print-4x6';
@@ -286,6 +288,7 @@ function updateAdjustment() {
   $('photo-zoom-out').disabled=!photo||photo.zoom<=1;$('photo-zoom-in').disabled=!photo||photo.zoom>=2.5;
   $('delete-decoration').disabled=state.selectedDeco===null;$('rotate-decoration').disabled=state.selectedDeco===null;$('undo-decoration').disabled=!deletedDecoration||state.decorations.length>=40;
   const d = state.decorations[state.selectedDeco]; $('decoration-edit').hidden = !d; if(d?.type==='text'){$('text-font').value=d.font||'baeum';refreshFontSelect($('text-font'));}
+  decorationEditor.dataset.hasSelection=String(Boolean(d||deletedDecoration));
   if(d)$('rotation-value').textContent=Math.round(d.rotation||0)+'°';
   $('selected-text-controls').hidden=d?.type!=='text';if(d?.type==='text'){Object.assign(d,textColorSettings(d.text,d));if($('selected-decoration-text').value!==d.text)$('selected-decoration-text').value=d.text;}studentTextStyles.refresh();
   if (d) { $('decoration-color').value = d.color; $('decoration-color').closest('label').hidden=d.type==='image'; }
@@ -299,19 +302,19 @@ function renderPhotoPicker() {
     $('photo-picker').append(b);
   });
 }
-function selectEditorTool(tool) {
+function selectEditorTool(tool,{openPanel=true}={}) {
   decorationEditor.dataset.tool = tool;pointers.clear();gesture=null;cropPointers.clear();cropGesture=null;if(!canEditDecoration(state.decorations[state.selectedDeco]))state.selectedDeco=null;if(tool==='filter')renderFilterChoices();
   canvas.hidden = tool === 'photo'; cropCanvas.hidden = tool !== 'photo';
   $('edit-title').textContent = { stickers: '스티커로 꾸미기', text: '마음을 적어요', photo: '사진을 크게 보고 조정해요', filter: '오늘의 분위기' }[tool];
   $('edit-help').textContent = tool === 'photo' ? '사진을 끌어 구도 이동 · 두 손가락 또는 +/−로 확대·축소' : tool==='filter'?'색감 필터를 눌러 비교해요. 모든 사진에 적용되며 원본은 유지돼요.':tool==='text'?'문구를 추가하고 끌어 이동해요. 모서리·두 손가락으로 크기와 회전을 조절해요.':'빈 곳은 끌어 화면 이동 · 스티커·글자는 눌러 편집 · 두 손가락으로 크기·회전';
   document.querySelectorAll('[data-editor-tool]').forEach(b => { b.classList.toggle('selected', b.dataset.editorTool === tool); b.setAttribute('aria-pressed', String(b.dataset.editorTool === tool)); });
-  renderPhotoPicker(); updateAdjustment(); render(); editorView.refresh();
+  toolPanel.setOpen(openPanel);renderPhotoPicker(); updateAdjustment(); render(); editorView.refresh();
 }
 function openEditorTool(tool = 'stickers') {
   if (state.step !== 3) return;
-  if (decorationEditor.hidden) { $('editor-viewport').prepend(canvas); $('expanded-tools').append($('decoration-tools')); decorationEditor.hidden=false; editorView.reset(); }
-  $('expanded-tools').hidden=false;
-  selectEditorTool(tool);
+  if (decorationEditor.hidden) { $('editor-viewport').prepend(canvas); $('mobile-tool-content').append($('decoration-tools')); decorationEditor.hidden=false; editorView.reset(); }
+  selectEditorTool(tool,{openPanel:!toolPanel.compact});
+  toolPanel.reset();
 }
 function closeEditor() {
   decorationEditor.hidden=true;
@@ -335,10 +338,14 @@ cropCanvas.addEventListener('pointermove', e => {
   else if (cropPointers.size === 2) { const [a, b] = [...cropPointers.values()]; photo.zoom = clamp(cropGesture.zoom * distance(a, b) / Math.max(1, cropGesture.distance), 1, 2.5); }
   updateAdjustment(); render();
 });
-for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) cropCanvas.addEventListener(type, e => { cropPointers.delete(e.pointerId); cropGesture = null; });
+for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) cropCanvas.addEventListener(type, e => {
+  if (!cropPointers.delete(e.pointerId)) return;
+  const p = [...cropPointers.values()][0], photo = state.photos[state.selectedPhoto];
+  cropGesture = p ? { mode: 'pan', start: p, x: photo.panX, y: photo.panY, crop: crop(photo.image.width, photo.image.height, cropCanvas.width, cropCanvas.height, photo.zoom, photo.panX, photo.panY) } : null;
+});
 function addDecoration(data) {
   if (state.decorations.length >= 40) { toast('꾸미기 요소는 최대 40개까지 추가할 수 있어요.'); return; }
-  state.decorations.push({ ...data,id:crypto.randomUUID(),...textColorSettings(data.text||''), font:$('text-font').value, rotation:0, x: .5, y: .5 + (state.decorations.length % 4) * .035, size: data.type === 'text' ? .055 : .10 }); state.selectedDeco = state.decorations.length - 1; updateAdjustment(); render();
+  state.decorations.push({ ...data,id:crypto.randomUUID(),...textColorSettings(data.text||''), font:$('text-font').value, rotation:0, x: .5, y: .5 + (state.decorations.length % 4) * .035, size: data.type === 'text' ? .055 : .10 }); state.selectedDeco = state.decorations.length - 1; updateAdjustment(); render();if(data.type!=='text')toolPanel.close();
 }
 function point(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) * canvas.width / r.width, y: (e.clientY - r.top) * canvas.height / r.height }; }
 function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -351,7 +358,7 @@ function decorationAt(e){
 }
 function pointerDown(e) {
   if (state.step !== 3 || decorationEditor.hidden || decorationEditor.dataset.tool==='photo') return;
-  let switched=false;const target=decorationAt(e);if(!pointers.size&&target!==null){const tool=state.decorations[target].type==='text'?'text':'stickers';if(decorationEditor.dataset.tool!==tool){selectEditorTool(tool);switched=true;}}
+  let switched=false;const target=decorationAt(e);if(!pointers.size&&target!==null){const tool=state.decorations[target].type==='text'?'text':'stickers';if(decorationEditor.dataset.tool!==tool){selectEditorTool(tool,{openPanel:false});switched=true;}}
   e.preventDefault(); canvas.setPointerCapture(e.pointerId); const p = point(e); pointers.set(e.pointerId, p); const g = currentGeometry();
   if(switched){state.selectedDeco=target;const d=state.decorations[target];gesture={mode:'move',dx:p.x/g.width-d.x,dy:p.y/g.height-d.y};updateAdjustment();render();return;}
   if (pointers.size === 2 && state.selectedDeco !== null) { const [a, b] = [...pointers.values()]; const d = state.decorations[state.selectedDeco]; gesture = { mode: 'pinch', distance: distance(a,b),size:d.size,angle:degrees(Math.atan2(b.y-a.y,b.x-a.x)),rotation:d.rotation||0 }; return; }
@@ -369,11 +376,11 @@ function pointerMove(e) {
   if (!pointers.has(e.pointerId)) return; e.preventDefault(); const p = point(e); pointers.set(e.pointerId, p); const d = state.decorations[state.selectedDeco]; if (!gesture || !d) return; const g = currentGeometry();
   if (gesture.mode === 'move') { const b = decorationBox(d, g); d.x = clamp(p.x / g.width - gesture.dx, Math.min(.48, b.w / 2 / g.width), Math.max(.52, 1 - b.w / 2 / g.width)); d.y = clamp(p.y / g.height - gesture.dy, b.h / 2 / g.height, 1 - b.h / 2 / g.height); }
   else if(gesture.mode==='rotate')d.rotation=gesture.rotation+rotationDelta(gesture.angle,degrees(Math.atan2(p.y-d.y*g.height,p.x-d.x*g.width)));
-  else if (gesture.mode === 'resize') d.size = clamp(gesture.size * distance(p, { x: d.x * g.width, y: d.y * g.height }) / Math.max(gesture.distance, 1), .03, .22);
-  else if (gesture.mode === 'pinch' && pointers.size === 2) { const [a, b] = [...pointers.values()]; d.size=clamp(gesture.size*distance(a,b)/Math.max(gesture.distance,1),.03,.22);d.rotation=gesture.rotation+rotationDelta(gesture.angle,degrees(Math.atan2(b.y-a.y,b.x-a.x))); }
+  else if (gesture.mode === 'resize') d.size = clamp(gesture.size * distance(p, { x: d.x * g.width, y: d.y * g.height }) / Math.max(gesture.distance, 1), d.type==='text'?.015:.03, d.type==='text'?.35:.45);
+  else if (gesture.mode === 'pinch' && pointers.size === 2) { const [a, b] = [...pointers.values()]; d.size=clamp(gesture.size*distance(a,b)/Math.max(gesture.distance,1),d.type==='text'?.015:.03,d.type==='text'?.35:.45);d.rotation=gesture.rotation+rotationDelta(gesture.angle,degrees(Math.atan2(b.y-a.y,b.x-a.x))); }
   updateAdjustment(); render();
 }
-function pointerEnd(e) { pointers.delete(e.pointerId); if (pointers.size < 2 && gesture?.mode === 'pinch') gesture = null; if (!pointers.size) gesture = null; }
+function pointerEnd(e) { pointers.delete(e.pointerId);if(pointers.size===1&&gesture?.mode==='pinch'){const p=[...pointers.values()][0],d=state.decorations[state.selectedDeco],g=currentGeometry();gesture=d?{mode:'move',dx:p.x/g.width-d.x,dy:p.y/g.height-d.y}:null;}if(!pointers.size)gesture=null; }
 async function exportImage() {
   if (!state.photos.every(Boolean)) throw new Error('사진을 모두 채워 주세요.');
   await assetReady;await Promise.all([...brandEntries(state.event).filter(item=>item.key!=='logo').map(item=>loadTextFonts(item.settings)),...state.decorations.filter(d=>d.type==='text').map(d=>loadTextFonts(d))]);
@@ -503,13 +510,12 @@ $('undo-decoration').onclick=()=>{if(!deletedDecoration||state.decorations.lengt
 $('rotate-decoration').replaceChildren(icon('refresh'));$('rotate-decoration').onclick=()=>{const d=state.decorations[state.selectedDeco];if(d){d.rotation=(d.rotation||0)+15;updateAdjustment();render();}};
 $('delete-decoration').replaceChildren(icon('trash'));$('undo-decoration').replaceChildren(icon('undo'));
 $('delete-decoration').addEventListener('click', () => { if (state.selectedDeco === null) return; deletedDecoration={item:state.decorations[state.selectedDeco],index:state.selectedDeco};state.decorations.splice(state.selectedDeco, 1); state.selectedDeco = null; updateAdjustment(); render(); });
-canvas.addEventListener('clear-selection',()=>{state.selectedDeco=null;updateAdjustment();render();});
+canvas.addEventListener('clear-selection',()=>{state.selectedDeco=null;toolPanel.close();updateAdjustment();render();});
 canvas.addEventListener('pointerdown', pointerDown); canvas.addEventListener('pointermove', pointerMove); for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(event, pointerEnd);
 
 $('expand-preview').addEventListener('click', () => {if(state.step===4)go(3);openEditorTool();});
 $('change-layout').addEventListener('click', () => go(0));
 document.querySelectorAll('[data-open-tool]').forEach(b => b.addEventListener('click', () => openEditorTool(b.dataset.openTool)));
-document.querySelectorAll('[data-editor-tool]').forEach(b => b.addEventListener('click', () => selectEditorTool(b.dataset.editorTool)));
 $('close-edit').addEventListener('click',()=>go(2));
 $('finish-edit').addEventListener('click',()=>go(4));
 canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3 || decorationEditor.hidden || !canEditDecoration(d)) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if(e.key.toLowerCase()==='r'){e.preventDefault();d.rotation=(d.rotation||0)+(e.shiftKey?-15:15);updateAdjustment();render();} if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
