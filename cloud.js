@@ -1,3 +1,4 @@
+import {storeFrameMetadata,readFrameAsset} from './frame-metadata.js';
 import {usageDay} from './usage-data.js';
 // 운영자 전용 모듈입니다. 참가자는 public-event.js의 읽기 기능만 사용합니다.
 import { initializeApp } from 'firebase/app';
@@ -43,7 +44,7 @@ export async function saveEvent(uid, id, event, published) {
 export async function removeEvent(id) { await deleteDoc(doc(firebase().db, 'events', id)); }
 export async function listAssets(uid) {
   const snap = await getDocs(collection(firebase().db, 'users', uid, 'assets'));
-  return snap.docs.map(d => ({ ...d.data(), id: d.id }));
+  return snap.docs.map(d => ({ ...readFrameAsset(d.data()), id: d.id }));
 }
 export async function savePalette(uid, palette) {
   const id = crypto.randomUUID();
@@ -58,9 +59,9 @@ export async function uploadAsset(uid, file, kind, name, metadata = {}) {
   await uploadBytes(object, file, { contentType: file.type });
   try {
     const url = await getDownloadURL(object);
-    const asset = { name: (name || file.name).slice(0, 60), kind, url, path, ...metadata };
+    const asset = { name: (name || file.name).slice(0, 60), kind, url, path, ...storeFrameMetadata(metadata) };
     await setDoc(doc(firebase().db, 'users', uid, 'assets', id), asset);
-    return { ...asset, id };
+    return { ...readFrameAsset(asset), id };
   } catch (error) { await deleteObject(object).catch(() => {}); throw error; }
 }
 export async function removeAsset(uid, asset) {
@@ -71,7 +72,7 @@ export async function removeAsset(uid, asset) {
 export async function listSharedAssets(all = false) {
   const source = collection(firebase().db, 'sharedAssets');
   const snap = await getDocs(all ? source : query(source, where('active', '==', true)));
-  return snap.docs.map(d => ({ ...d.data(), id: d.id, shared: true }));
+  return snap.docs.map(d => ({ ...readFrameAsset(d.data()), id: d.id, shared: true }));
 }
 export async function saveSharedPalette(palette){
  if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');
@@ -83,7 +84,7 @@ export async function uploadSharedAsset(file, kind, name, metadata) {
   if (!['frame','sticker'].includes(kind) || file.type !== 'image/webp' || file.size >= 4 * 1024 * 1024) throw new Error('최적화한 프레임 또는 스티커만 올릴 수 있어요.');
   const id = crypto.randomUUID(), path = `shared/assets/${id}`, object = ref(firebase().storage, path);
   await uploadBytes(object, file, { contentType: 'image/webp' });
-  try { const url = await getDownloadURL(object), asset = { name: name.slice(0,60), kind, path, url, active: true, ...metadata }; await setDoc(doc(firebase().db, 'sharedAssets', id), asset); return { ...asset, id, shared: true }; }
+  try { const url = await getDownloadURL(object), asset = { name: name.slice(0,60), kind, path, url, active: true, ...storeFrameMetadata(metadata) }; await setDoc(doc(firebase().db, 'sharedAssets', id), asset); return { ...readFrameAsset(asset), id, shared: true }; }
   catch (error) { await deleteObject(object).catch(() => {}); throw error; }
 }
 export async function setSharedActive(id, active) { if (!isSiteAdmin(firebase().auth.currentUser)) throw new Error('운영자 전용입니다.'); await updateDoc(doc(firebase().db, 'sharedAssets', id), { active: Boolean(active) }); }

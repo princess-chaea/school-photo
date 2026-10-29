@@ -18,7 +18,7 @@ export function paintFrameChoice(button,frame,{selected=false,preview}={}){
    if(line){lines.push(line);line='';}for(const char of Array.from(word)){if(line&&c.measureText(line+char).width>w-12){lines.push(line);line='';}line+=char;}
   }if(line)lines.push(line);
   const y=preview?110:66;lines.slice(0,3).forEach((label,i)=>c.fillText(label,w/2,y+(i-(Math.min(3,lines.length)-1)/2)*14,w-10));
-  if(frame.layoutCount){c.font='10px Arial, "Malgun Gothic", sans-serif';c.fillText(`${frame.layoutCount}컷 · ${frame.orientation==='landscape'?'가로':'세로'}`,w/2,138,w-10);}
+  if(frame.layoutCount){c.font='10px Arial, "Malgun Gothic", sans-serif';c.fillText(`${frame.photoLayouts?Object.keys(frame.photoLayouts).join('·'):frame.layoutCount}컷 · ${frame.orientation==='landscape'?'가로':'세로'}`,w/2,138,w-10);}
   if(selected){c.fillStyle='#4b6b2f';c.font='bold 13px Arial';c.textAlign='right';c.fillText('✓',w-6,12);}
  }
  painters.set(button,paint);requestAnimationFrame(paint);return paint;

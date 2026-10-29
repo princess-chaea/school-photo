@@ -43,3 +43,32 @@ body .maker-image-instructions summary{cursor:pointer;font-size:13px;font-weight
 body .maker-preview-panel{top:66px}
 @media(max-width:600px){body .maker-choices{display:contents}body .maker-preview-panel{order:1}body .maker-image-instructions,body #frame-form,body #palette-workspace{order:2;width:100%}}
 @media(min-width:601px) and (max-height:550px){body .maker-preview-panel{position:static}body #maker-preview{height:150px}}
+body .asset-upload.upload-three-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:end}
+body .asset-upload.upload-three-steps>div:not([hidden]){min-width:0;width:100%}
+body .asset-upload.upload-three-steps .button{width:100%;min-height:46px;max-width:none;font-size:12px;padding:10px}
+body .asset-upload.upload-three-steps input[type=file]{display:block;width:100%;min-height:46px;font:inherit;font-size:12px;white-space:normal}
+body .asset-upload.upload-three-steps input[type=file]::file-selector-button{font:inherit;font-weight:700;min-height:46px;padding:10px 14px;margin-right:8px;color:#252820;border:1px solid #b6c5a3;border-radius:9px;background:#edf3e4;cursor:pointer}
+body #frame-maker #palette-workspace{padding:12px 0}
+body #frame-maker .palette-builder{display:grid;grid-template-columns:2fr 1fr 1fr;gap:18px}
+body #frame-maker .palette-builder .button{grid-column:1/-1;max-width:280px}
+body #frame-maker .palette-builder input[type=color]{width:100%;height:46px}
+body .maker-enabled-cuts{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+body .maker-enabled-cuts label{display:flex;gap:6px;align-items:center;font-size:12px;padding:6px;border:1px solid #dce1d1;border-radius:8px}
+body .maker-slot-controls{padding:12px 0}
+body .maker-slot-controls label{display:flex;flex-direction:column;gap:4px;font-size:12px}
+body .maker-slot-controls select{width:100%;min-height:40px}
+body .maker-slot-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+body .maker-slot-fields input{width:100%;min-width:0;padding:8px;border:1px solid #dce1d1;border-radius:7px;font:inherit;background:white;color:#252820}
+body #maker-preview{touch-action:none;cursor:move;user-select:none}
+body #maker-change-kind{margin:12px 0}
+@media(max-width:700px){body .asset-upload.upload-three-steps{grid-template-columns:1fr;gap:12px}body #frame-maker .palette-builder{grid-template-columns:1fr 1fr}body #frame-maker .palette-builder>label:first-child{grid-column:1/-1}body .maker-slot-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+body #frame-maker .asset-upload.upload-three-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:700px){body #frame-maker .asset-upload.upload-three-steps{grid-template-columns:1fr}}
+@media(max-width:600px){body #maker-photo-area{order:2;width:100%}}
+body .upload-file-picker{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;height:46px;padding:0 14px;border:1px solid #b6c5a3;border-radius:9px;background:#edf3e4;color:#252820;font-size:12px;font-weight:700;overflow:hidden}
+body .upload-file-picker>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body .asset-upload.upload-three-steps .upload-file-picker input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1}
+body .upload-file-picker:focus-within{outline:3px solid #728a50;outline-offset:3px}
+body .upload-three-steps input:not([type=file]):not([type=hidden]){min-height:46px}
+body .upload-file-picker{gap:8px}
+body .upload-file-picker .ui-icon{width:20px;height:20px;flex:none;pointer-events:none}

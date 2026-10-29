@@ -1,3 +1,5 @@
+import {supportedFrameCounts} from './core.js';
+import {transformPhotoSlot} from './photo-slots.js';
 import {observeFrameChoices,paintFrameChoice} from './frame-choice-preview.js';
 import {createJourneyHeader} from './journey-header.js';
 import {createToolPanel} from './tool-panel.js';
@@ -56,7 +58,7 @@ function toast(message) { $('toast').textContent = message; $('toast').classList
 function createButton(className, text, handler) { const el = document.createElement('button'); el.className = className; el.textContent = text; el.type = 'button'; el.addEventListener('click', handler); return el; }
 function renderChoices() {
   const selectedFrame=state.event.frames[state.frame]||state.event.frames[0];
-  if(selectedFrame.layoutCount){if(state.count!==selectedFrame.layoutCount){state.count=selectedFrame.layoutCount;state.photos=Array(state.count).fill(null);state.selectedPhoto=0;}state.orientation=selectedFrame.orientation||'portrait';}
+  if(selectedFrame.layoutCount){if(!supportedFrameCounts(selectedFrame).includes(state.count)){state.count=supportedFrameCounts(selectedFrame)[0];state.photos=Array(state.count).fill(null);state.selectedPhoto=0;}state.orientation=selectedFrame.orientation||'portrait';}
   const current=EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{};
   if(!compatibleFrame(selectedFrame,state.count,state.orientation,current))$('export-format').value=(EXPORT_FORMATS.find(f=>f.id!=='original'&&compatibleFrame(selectedFrame,state.count,state.orientation,f))||EXPORT_FORMATS[0]).id;
   $('cut-options').replaceChildren();
@@ -72,7 +74,7 @@ function renderChoices() {
     const cols = state.orientation === 'landscape' ? ({2:2,4:2,6:3,8:4}[count]) : count === 2 ? 1 : 2;
     const strip = document.createElement('canvas'); strip.width=100;strip.height=80;strip.className='cut-layout-guide';strip.setAttribute('aria-hidden','true');
     const preset=EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{};
-    const frame=selectedFrame.layoutCount&&selectedFrame.layoutCount!==count?undefined:selectedFrame;
+    const frame=!supportedFrameCounts(selectedFrame).includes(count)?undefined:selectedFrame;
     drawLayoutGuide(strip,spaceGeometryFor(preset,count,frame));
     const title = document.createElement('strong'); title.textContent = `${count}컷`;
     const desc = document.createElement('small'); desc.textContent = `${cols} × ${count / cols}`;
@@ -82,19 +84,19 @@ function renderChoices() {
   }
   $('orientation-options').replaceChildren(...[['portrait','세로 구성'],['landscape','가로 구성']].map(([value,label]) => { const b = createButton(state.orientation === value ? 'selected' : '',label,()=>{state.orientation=value;state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}});renderChoices();renderThumbnails();render();});b.setAttribute('aria-pressed',String(state.orientation===value));b.disabled=!compatibleFrame(selectedFrame,state.count,value,EXPORT_FORMATS.find(f=>f.id===$('export-format').value));return b; }));
   renderFrameGroups($('frame-options'),state.event.frames,{student:true,renderCard:(frame,index,group)=>{
-    const button=createButton(`frame-option ${state.frame===index?'selected':''}`,'',async()=>{if(frame.layoutCount&&frame.layoutCount!==state.count&&state.photos.some(Boolean)&&!await confirmAction('다른 컷 수의 프레임을 선택하면 촬영한 사진과 꾸미기가 초기화돼요. 바꿀까요?'))return;if(frame.layoutCount&&frame.layoutCount!==state.count){state.decorations=[];state.selectedDeco=null;deletedDecoration=null;}state.frame=index;state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}});renderChoices();renderThumbnails();render();});button.setAttribute('aria-pressed',String(state.frame===index));button.setAttribute('aria-label',frame.name+' 프레임 선택');
+    const button=createButton(`frame-option ${state.frame===index?'selected':''}`,'',async()=>{if(frame.layoutCount&&!supportedFrameCounts(frame).includes(state.count)&&state.photos.some(Boolean)&&!await confirmAction('다른 컷 수의 프레임을 선택하면 촬영한 사진과 꾸미기가 초기화돼요. 바꿀까요?'))return;if(frame.layoutCount&&!supportedFrameCounts(frame).includes(state.count)){state.decorations=[];state.selectedDeco=null;deletedDecoration=null;}state.frame=index;state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}});renderChoices();renderThumbnails();render();});button.setAttribute('aria-pressed',String(state.frame===index));button.setAttribute('aria-label',frame.name+' 프레임 선택');
     let preview,repaint=()=>{};
     if(group!=='base'){
       const guide=document.createElement('canvas');preview=guide;guide.width=160;guide.height=120;
       const geometry=layout(frame.layoutCount||4,state.event,{frame,orientation:frame.orientation||'portrait'});
-      const paint=image=>{drawLayoutGuide(guide,geometry,{background:frame.bg,ink:frame.ink});if(image){const scale=Math.min(guide.width/geometry.width,guide.height/geometry.height),small={width:geometry.width*scale,height:geometry.height*scale,slots:geometry.slots.map(s=>({x:s.x*scale,y:s.y*scale,w:s.w*scale,h:s.h*scale}))},context=guide.getContext('2d');context.save();context.translate((guide.width-small.width)/2,(guide.height-small.height)/2);drawFrameOverlay(context,image,frame,small);context.restore();}repaint();};
+      const paint=image=>{drawLayoutGuide(guide,geometry,{background:frame.bg,ink:frame.ink});if(image){const scale=Math.min(guide.width/geometry.width,guide.height/geometry.height),small={width:geometry.width*scale,height:geometry.height*scale,slots:geometry.slots.map(s=>({x:s.x*scale,y:s.y*scale,w:s.w*scale,h:s.h*scale,...(s.rotation?{rotation:s.rotation}:{})}))},context=guide.getContext('2d');context.save();context.translate((guide.width-small.width)/2,(guide.height-small.height)/2);drawFrameOverlay(context,image,frame,small);context.restore();}repaint();};
       paint(assetImages.get(frame.overlay));
       if(frame.overlay&&!assetImages.has(frame.overlay))imageFromURL(frame.overlay).then(image=>{if(button.isConnected)paint(image);}).catch(()=>{});
     }
     repaint=paintFrameChoice(button,frame,{selected:state.frame===index,preview});return button;
   }});
   $('frame-name').textContent = state.event.frames[state.frame].name;
-  $('chosen-purpose').textContent='선택한 프레임: '+selectedFrame.name+' · '+(selectedFrame.layoutCount?selectedFrame.layoutCount+'컷 · '+(selectedFrame.orientation==='landscape'?'가로 배치':'세로 배치'):'컷 수와 배치는 다음 단계에서 선택해요.');
+  $('chosen-purpose').textContent='선택한 프레임: '+selectedFrame.name+' · '+(selectedFrame.layoutCount?supportedFrameCounts(selectedFrame).join('·')+'컷 지원 · '+(selectedFrame.orientation==='landscape'?'가로 배치':'세로 배치'):'컷 수와 배치는 다음 단계에서 선택해요.');
   renderFilterChoices();
   renderStickerChoices();
 }
@@ -226,7 +228,7 @@ function render(exporting = false) {
   if (canvas.width !== g.width || canvas.height !== g.height) { canvas.width = g.width; canvas.height = g.height; }
   ctx.filter = 'none'; ctx.fillStyle = frame.bg; ctx.fillRect(0, 0, g.width, g.height);
   g.slots.forEach((slot, i) => {
-    const photo = state.photos[i]; ctx.save(); ctx.beginPath(); ctx.rect(slot.x, slot.y, slot.w, slot.h); ctx.clip();
+    const photo = state.photos[i]; ctx.save();transformPhotoSlot(ctx,slot); ctx.beginPath(); ctx.rect(slot.x, slot.y, slot.w, slot.h); ctx.clip();
     if (photo) {
       const c = crop(photo.image.width, photo.image.height, slot.w, slot.h, photo.zoom, photo.panX, photo.panY);
       ctx.filter = photoFilter(photo).css; ctx.drawImage(photo.image, c.x, c.y, c.w, c.h, slot.x, slot.y, slot.w, slot.h);
@@ -249,7 +251,7 @@ function render(exporting = false) {
         const handle=rotationHandle(b,d,g),edge=rotatedPoint(0,-b.h/2-gap,b,d.rotation||0);ctx.save();ctx.strokeStyle='#52882d';ctx.lineWidth=1.5*scale;ctx.beginPath();ctx.moveTo(edge.x,edge.y);ctx.lineTo(handle.x,handle.y);ctx.stroke();ctx.beginPath();ctx.arc(handle.x,handle.y,14*scale,0,Math.PI*2);ctx.fillStyle='#fffefa';ctx.fill();ctx.stroke();ctx.fillStyle='#415c2c';ctx.font=`${20*scale}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('↻',handle.x,handle.y);ctx.restore();
       }
     }
-    else if(decorationEditor.dataset.tool!=='filter'||state.filterScope==='photo') { const s = g.slots[state.selectedPhoto]; ctx.strokeStyle = '#98bb63'; ctx.lineWidth = 5; ctx.strokeRect(s.x + 2, s.y + 2, s.w - 4, s.h - 4); }
+    else if(decorationEditor.dataset.tool!=='filter'||state.filterScope==='photo') { const s = g.slots[state.selectedPhoto]; ctx.strokeStyle = '#98bb63'; ctx.lineWidth = 5;ctx.save();transformPhotoSlot(ctx,s); ctx.strokeRect(s.x + 2, s.y + 2, s.w - 4, s.h - 4);ctx.restore(); }
   }
   $('preview-layout').textContent = `${state.count} CUTS · ${g.width} × ${g.height}`; $('output-size').textContent = `${g.width} × ${g.height}px · 300dpi`;
   if (decorationEditor.hidden) {canvas.hidden=state.step===4;saveCanvas.hidden=state.step!==4;}

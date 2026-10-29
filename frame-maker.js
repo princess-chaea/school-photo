@@ -2,50 +2,45 @@ import {FRAME_SIZES} from './frame-sizes.js';
 import {templateGeometry,imageFromURL} from './core.js';
 import {drawLayoutGuide} from './layout-guide.js';
 import {drawFrameOverlay} from './frame-overlay.js';
+import {containPhotoSlot} from './photo-slots.js';
+import {createPhotoSlotEditor} from './photo-slot-editor.js';
 const PURPOSES={
- 'print-4x6':['사진 인화 · 기본','추억을 사진으로 뽑아요'],
- 'print-3x5':['사진 인화 · 슬림','길쭉한 기념사진'],
- 'print-5x7':['사진 인화 · 와이드','넉넉한 기념사진'],
- square:['정사각형 · 프로필','카톡 프로필·정사각 피드'],
- feed:['인스타 세로 피드','SNS에 올리는 세로 사진'],
- story:['스토리 · 릴스','휴대폰 화면에 길게'],
- a4:['문서 · 학습지','A4로 출력해요'],
- screen:['발표 · 영상 화면','발표 자료·화면 배경']
+ 'print-4x6':['사진 인화 · 기본','추억을 사진으로 뽑아요'],'print-3x5':['사진 인화 · 슬림','길쭉한 기념사진'],'print-5x7':['사진 인화 · 와이드','넉넉한 기념사진'],square:['정사각형 · 프로필','카톡 프로필·정사각 피드'],feed:['인스타 세로 피드','SNS에 올리는 세로 사진'],story:['스토리 · 릴스','휴대폰 화면에 길게'],a4:['문서 · 학습지','A4로 출력해요'],screen:['발표 · 영상 화면','발표 자료·화면 배경']
 };
 export function createFrameMaker({onChange,onDownload}){
  const $=id=>document.getElementById(id),format=$('template-format'),orientation=$('template-orientation'),preview=$('maker-preview');
- document.querySelector('.maker-choices').append(document.querySelector('.maker-image-instructions'),$('frame-form'),$('palette-workspace'));
- let kind='',count=4,photoScale=1,draftImage=null,draftClear=true,version=0;
- const selection=()=>{const g=geometry();return{frameFormat:format.value,orientation:orientation.value,layoutCount:count,kind,photoSlots:g.slots.map(s=>({x:s.x/g.width,y:s.y/g.height,w:s.w/g.width,h:s.h/g.height}))};};
- function geometry(){const g=templateGeometry(count,orientation.value,format.value);return{...g,slots:g.slots.map(s=>({x:s.x+s.w*(1-photoScale)/2,y:s.y+s.h*(1-photoScale)/2,w:s.w*photoScale,h:s.h*photoScale}))};}
- function refresh(){
-  $('maker-workspace').hidden=!kind;$('maker-photo-area').hidden=kind!=='image';$('maker-photo-scale').textContent=Math.round(photoScale*100)+'%';$('maker-photo-smaller').disabled=photoScale<=.55;$('maker-photo-larger').disabled=photoScale>=1;$('frame-form').hidden=kind!=='image';$('palette-workspace').hidden=kind!=='palette';$('maker-image-guide').hidden=kind!=='image';document.querySelector('.maker-image-instructions').hidden=kind!=='image';
-  for(const button of document.querySelectorAll('[data-maker-kind]'))button.setAttribute('aria-pressed',String(button.dataset.makerKind===kind));
-  $('frame-upload-format').value=format.value;
-  $('maker-purposes').replaceChildren(...FRAME_SIZES.map(size=>{
-   const button=document.createElement('button');button.type='button';button.className='maker-purpose';button.dataset.format=size.id;button.setAttribute('aria-pressed',String(size.id===format.value));
-   const canvas=document.createElement('canvas');canvas.width=100;canvas.height=110;canvas.setAttribute('aria-hidden','true');drawLayoutGuide(canvas,templateGeometry(count,orientation.value,size.id));
-   const name=document.createElement('strong');name.textContent=PURPOSES[size.id][0];const note=document.createElement('small');note.textContent=PURPOSES[size.id][1];button.append(canvas,name,note);button.onclick=()=>{format.value=size.id;changed();};return button;
-  }));
-  $('maker-cuts').replaceChildren(...[2,4,6,8].map(n=>{
-   const button=document.createElement('button');button.type='button';button.className='maker-cut';button.dataset.count=n;button.setAttribute('aria-pressed',String(n===count));const canvas=document.createElement('canvas');canvas.width=100;canvas.height=92;canvas.setAttribute('aria-hidden','true');drawLayoutGuide(canvas,templateGeometry(n,orientation.value,format.value));const label=document.createElement('strong');label.textContent=n+'컷';button.append(canvas,label);button.onclick=()=>{count=n;changed();};return button;
-  }));
-  for(const button of document.querySelectorAll('[data-maker-orientation]'))button.setAttribute('aria-pressed',String(button.dataset.makerOrientation===orientation.value));
-  const g=geometry(),color=kind==='palette'?$('palette-bg').value:'#fffdf6',ink=kind==='palette'?$('palette-ink').value:'#41572c';
-  drawLayoutGuide(preview,g,{background:color,ink});
-  if(kind==='image'&&draftImage){const scale=Math.min(preview.width/g.width,preview.height/g.height),ctx=preview.getContext('2d');ctx.save();ctx.translate((preview.width-g.width*scale)/2,(preview.height-g.height*scale)/2);ctx.scale(scale,scale);drawFrameOverlay(ctx,draftImage,{clearPhotoSlots:draftClear},g);ctx.restore();}
-  const purpose=PURPOSES[format.value][0],direction=orientation.value==='landscape'?'가로':'세로';
-  $('maker-summary').textContent=`${purpose} · ${count}컷 · ${direction} 배치`;
-  $('maker-dimensions').textContent=`${g.width} × ${g.height}px · ${FRAME_SIZES.find(s=>s.id===format.value).name}`;
-  $('maker-scope').textContent=kind==='image'?'이 이미지 프레임은 같은 비율·컷 수·가로/세로 배치를 고른 학생에게만 표시돼요.':'단색 프레임은 학생이 고른 모든 용도·컷 수·배치에 맞춰 사용할 수 있어요. 아래 배치는 확인용이에요.';
+ document.querySelector('.maker-choices').append(document.querySelector('.maker-image-instructions'),$('frame-form'));
+ $('frame-maker').append($('palette-workspace'));
+ let kind='',count=4,index=0,draftImage=null,draftClear=true,version=0;
+ const drafts=new Map(),enabled=new Set([2,4,6,8]);
+ const key=n=>`${format.value}-${orientation.value}-${n}`;
+ function slots(n=count){if(!drafts.has(key(n))){const g=templateGeometry(n,orientation.value,format.value);drafts.set(key(n),g.slots.map(s=>({x:s.x/g.width,y:s.y/g.height,w:s.w/g.width,h:s.h/g.height})));}return drafts.get(key(n));}
+ function geometry(){const g=templateGeometry(count,orientation.value,format.value);return{...g,slots:slots().map(s=>({...s,x:s.x*g.width,y:s.y*g.height,w:s.w*g.width,h:s.h*g.height}))};}
+ const selection=()=>({frameFormat:format.value,orientation:orientation.value,layoutCount:count,kind,photoSlots:structuredClone(slots()),photoLayouts:Object.fromEntries([...enabled].sort((a,b)=>a-b).map(n=>[n,structuredClone(slots(n))]))});
+ const controls=document.createElement('div');controls.className='maker-slot-controls';controls.innerHTML='<label>선택한 사진 칸<select id="maker-slot-select"></select></label><div class="maker-slot-fields"><label>가운데 X (%)<input id="maker-slot-x" type="number" min="0" max="100" step="1"></label><label>가운데 Y (%)<input id="maker-slot-y" type="number" min="0" max="100" step="1"></label><label>너비 (%)<input id="maker-slot-w" type="number" min="3" max="98" step="1"></label><label>높이 (%)<input id="maker-slot-h" type="number" min="3" max="98" step="1"></label><label>회전 (°)<input id="maker-slot-rotation" type="number" min="-180" max="180" step="1"></label></div><div class="compact-actions"><button type="button" class="button" id="maker-turn-left">↶ 5°</button><button type="button" class="button" id="maker-turn-right">↷ 5°</button><button type="button" class="text-button" id="maker-reset-slot">선택 칸 초기화</button></div>';$('maker-photo-area').append(controls);
+ const slotEditor=createPhotoSlotEditor(preview,{geometry,getIndex:()=>index,setIndex:i=>{index=i;},change:(i,s)=>{slots()[i]=s;commit(false);},refresh:paint});
+ function paint(){if(kind!=='image')return;const g=geometry();drawLayoutGuide(preview,g);if(draftImage){const k=Math.min(preview.width/g.width,preview.height/g.height),c=preview.getContext('2d');c.save();c.translate((preview.width-g.width*k)/2,(preview.height-g.height*k)/2);drawFrameOverlay(c,draftImage,{clearPhotoSlots:draftClear},{width:g.width*k,height:g.height*k,slots:g.slots.map(s=>({...s,x:s.x*k,y:s.y*k,w:s.w*k,h:s.h*k}))});c.restore();}slotEditor.draw();
+  const s=slots()[index];$('maker-slot-select').replaceChildren(...slots().map((_,i)=>Object.assign(document.createElement('option'),{value:i,textContent:`${i+1}번 사진`})));$('maker-slot-select').value=index;
+  const values={x:(s.x+s.w/2)*100,y:(s.y+s.h/2)*100,w:s.w*100,h:s.h*100,rotation:s.rotation||0};for(const[k,v]of Object.entries(values))$(`maker-slot-${k}`).value=Math.round(v*10)/10;
+  $('maker-photo-scale').textContent=`${index+1}번 사진`;const purpose=PURPOSES[format.value][0];$('maker-summary').textContent=`${purpose} · ${count}컷 편집 · ${orientation.value==='landscape'?'가로':'세로'}`;$('maker-dimensions').textContent=`${g.width} × ${g.height}px`;$('maker-scope').textContent=`학생에게 ${[...enabled].sort((a,b)=>a-b).join('·')}컷을 제공해요. 각 컷의 사진 배치는 따로 저장됩니다.`;
  }
- function clearDraft(){version++;draftImage=null;refresh();}
- function changed(){clearDraft();onChange(selection());}
- $('maker-photo-smaller').onclick=()=>{photoScale=Math.max(.55,Math.round((photoScale-.05)*100)/100);changed();};$('maker-photo-larger').onclick=()=>{photoScale=Math.min(1,Math.round((photoScale+.05)*100)/100);changed();};
- for(const button of document.querySelectorAll('[data-maker-kind]'))button.onclick=()=>{kind=button.dataset.makerKind;refresh();};
- for(const button of document.querySelectorAll('[data-maker-orientation]'))button.onclick=()=>{orientation.value=button.dataset.makerOrientation;changed();};
- $('maker-guide-download').onclick=()=>onDownload(count,true);$('maker-blank-download').onclick=()=>onDownload(count,false);
- for(const id of ['palette-bg','palette-ink'])$(id).addEventListener('input',refresh);
- refresh();
- return{selection,refresh,clearDraft,begin(){kind='';refresh();},async setDraft(draft){const ticket=++version,url=URL.createObjectURL(draft.file);try{const image=await imageFromURL(url);if(ticket===version){draftImage=image;draftClear=draft.clearPhotoSlots;refresh();}}finally{URL.revokeObjectURL(url);}}};
+ function refresh(){
+  $('maker-intro').textContent=kind==='palette'?'이름·배경색·글자색만 고르면 모든 용도와 컷 수에 공통으로 적용돼요.':kind==='image'?'용도와 제공할 컷을 고른 뒤 사진 칸을 직접 배치하세요.':'먼저 만드는 방법을 고르세요.';
+  $('maker-workspace').hidden=kind!=='image';$('palette-workspace').hidden=kind!=='palette';document.querySelector('.maker-kind-options').hidden=Boolean(kind);$('maker-change-kind').hidden=!kind;$('frame-form').hidden=kind!=='image';$('maker-image-guide').hidden=kind!=='image';document.querySelector('.maker-image-instructions').hidden=kind!=='image';$('frame-upload-format').value=format.value;
+  $('maker-purposes').replaceChildren(...FRAME_SIZES.map(size=>{const b=document.createElement('button');b.type='button';b.className='maker-purpose';b.dataset.format=size.id;b.setAttribute('aria-pressed',String(size.id===format.value));const c=document.createElement('canvas');c.width=100;c.height=110;c.setAttribute('aria-hidden','true');drawLayoutGuide(c,templateGeometry(count,orientation.value,size.id));const name=document.createElement('strong');name.textContent=PURPOSES[size.id][0];const note=document.createElement('small');note.textContent=PURPOSES[size.id][1];b.append(c,name,note);b.onclick=()=>{format.value=size.id;index=0;commit(true,true);};return b;}));
+  $('maker-enabled-cuts').replaceChildren(...[2,4,6,8].map(n=>{const label=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.checked=enabled.has(n);check.dataset.enableCount=n;check.onchange=()=>{if(check.checked)enabled.add(n);else if(enabled.size>1)enabled.delete(n);if(!enabled.has(count)){count=[...enabled][0];index=0;}commit();};label.append(check,document.createTextNode(`${n}컷 제공`));return label;}));
+  $('maker-cuts').replaceChildren(...[2,4,6,8].map(n=>{const b=document.createElement('button');b.type='button';b.className='maker-cut';b.dataset.count=n;b.setAttribute('aria-pressed',String(n===count));const c=document.createElement('canvas');c.width=100;c.height=92;c.setAttribute('aria-hidden','true');const g=templateGeometry(n,orientation.value,format.value);drawLayoutGuide(c,{...g,slots:slots(n).map(s=>({...s,x:s.x*g.width,y:s.y*g.height,w:s.w*g.width,h:s.h*g.height}))});const label=document.createElement('strong');label.textContent=n+'컷 편집';b.append(c,label);b.onclick=()=>{count=n;enabled.add(n);index=0;commit();};return b;}));
+  for(const b of document.querySelectorAll('[data-maker-orientation]'))b.setAttribute('aria-pressed',String(b.dataset.makerOrientation===orientation.value));paint();
+ }
+ function commit(rebuild=true,reposition=false){if(reposition){version++;draftImage=null;}if(rebuild)refresh();else paint();onChange(selection(),{reposition});}
+ function changeSelected(part){const g=geometry(),s={...slots()[index],...part};slots()[index]=containPhotoSlot(s,g.width/g.height);commit(false);}
+ $('maker-slot-select').onchange=e=>{index=Number(e.target.value);paint();};
+ for(const k of['x','y','w','h','rotation'])$(`maker-slot-${k}`).onchange=e=>{const value=Number(e.target.value);if(!Number.isFinite(value))return paint();const s=slots()[index];if(k==='rotation')changeSelected({rotation:Math.max(-180,Math.min(180,value))});else if(k==='x'||k==='y')changeSelected({[k]:value/100-s[k==='x'?'w':'h']/2});else{const v=Math.max(.03,Math.min(.98,value/100));changeSelected({[k]:v,[k==='w'?'x':'y']:s[k==='w'?'x':'y']+(s[k]-v)/2});}};
+ for(const[id,factor]of[['maker-photo-smaller',.9],['maker-photo-larger',1.1]])$(id).onclick=()=>{const s=slots()[index],w=Math.max(.03,s.w*factor),h=Math.max(.03,s.h*factor);changeSelected({w,h,x:s.x+(s.w-w)/2,y:s.y+(s.h-h)/2});};
+ $('maker-turn-left').onclick=()=>changeSelected({rotation:Math.max(-180,(slots()[index].rotation||0)-5)});$('maker-turn-right').onclick=()=>changeSelected({rotation:Math.min(180,(slots()[index].rotation||0)+5)});
+ $('maker-reset-slot').onclick=()=>{const g=templateGeometry(count,orientation.value,format.value),s=g.slots[index];slots()[index]={x:s.x/g.width,y:s.y/g.height,w:s.w/g.width,h:s.h/g.height};commit(false);};
+ for(const b of document.querySelectorAll('[data-maker-kind]'))b.onclick=()=>{kind=b.dataset.makerKind;refresh();};
+ $('maker-change-kind').onclick=()=>{kind='';refresh();};for(const b of document.querySelectorAll('[data-maker-orientation]'))b.onclick=()=>{orientation.value=b.dataset.makerOrientation;index=0;commit(true,true);};
+ $('maker-guide-download').onclick=()=>onDownload(count,true);
+ refresh();return{selection,geometry,refresh,clearDraft(){version++;draftImage=null;refresh();},begin(){kind='';refresh();},async setDraft(draft){const ticket=++version,url=URL.createObjectURL(draft.file);try{const image=await imageFromURL(url);if(ticket===version){draftImage=image;draftClear=draft.clearPhotoSlots;refresh();}}finally{URL.revokeObjectURL(url);}}};
 }

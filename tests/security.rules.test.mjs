@@ -1,3 +1,4 @@
+import {storeFrameMetadata} from '../frame-metadata.js';
 import { test, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -199,4 +200,16 @@ test('공용 단색 프레임은 인증된 운영자만 등록·노출 변경하
  await assertFails(setDoc(doc(admin,'sharedAssets','bad'),{...palette,bg:'url(evil)'}));
  await assertFails(setDoc(doc(admin,'sharedAssets','mint'),{...palette,ink:'#ffffff'}));
  await assertSucceeds(setDoc(doc(admin,'sharedAssets','mint'),{...palette,active:false}));
+});
+
+test('stored multi-count configuration is bounded, owner-only and frame-only',async()=>{
+ const a=env.authenticatedContext('teacher-a').firestore(),b=env.authenticatedContext('teacher-b').firestore();
+ const slots=n=>Array.from({length:n},(_,i)=>({x:.1+(i%2)*.4,y:.1+Math.floor(i/2)*.2,w:.25,h:.15,rotation:i===0?25:0}));
+ const value={name:'여러 컷',kind:'frame',url:'https://example.com/multi.webp',path:'users/teacher-a/assets/multi',layoutCount:4,orientation:'portrait',preserveAspect:true,clearPhotoSlots:true,photoLayouts:{2:slots(2),4:slots(4),6:slots(6),8:slots(8)}};
+ const stored=storeFrameMetadata(value),target=doc(a,'users/teacher-a/assets/multi');await assertSucceeds(setDoc(target,stored));await assertFails(getDoc(doc(b,'users/teacher-a/assets/multi')));
+ for(const patch of[{photoLayouts:{3:slots(3)}},{photoLayouts:{4:slots(2)}},{photoLayouts:{}},{photoLayouts:{2:slots(2)}},{photoLayouts:{4:slots(4).map((s,i)=>i? s:{...s,rotation:181})}},{photoLayouts:{4:slots(4).map((s,i)=>i?s:{...s,rotation:'15'})}},{kind:'sticker'},{photoLayouts:'x'.repeat(16001)}]){await assertSucceeds(deleteDoc(target));await assertFails(setDoc(target,{...stored,...patch}));await assertSucceeds(setDoc(target,stored));}
+});
+test('only the verified operator can create shared multi-count frames',async()=>{
+ const admin=env.authenticatedContext('admin',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore(),teacher=env.authenticatedContext('teacher-a').firestore();const s={x:.1,y:.1,w:.3,h:.3,rotation:15};const value={name:'공용 여러 컷',kind:'frame',url:'https://example.com/multi.webp',path:'shared/assets/multi',active:true,layoutCount:2,orientation:'portrait',photoLayouts:{2:[s,s],4:[s,s,s,s]}};
+ await assertFails(setDoc(doc(teacher,'sharedAssets/multi'),storeFrameMetadata(value)));await assertSucceeds(setDoc(doc(admin,'sharedAssets/multi'),storeFrameMetadata(value)));
 });

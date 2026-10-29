@@ -1,3 +1,4 @@
+import {supportedFrameCounts} from './core.js';
 import './frame-comparison.css';
 import {compatibleFrame} from './core.js';
 import {EXPORT_FORMATS,paintExport} from './export-formats.js';
@@ -10,8 +11,8 @@ export function createFrameComparison({getEvent,getSelection}){
  for(const group of [...new Set(EXPORT_FORMATS.filter(f=>f.width).map(f=>f.group))]){const options=document.createElement('optgroup');options.label=group;for(const f of EXPORT_FORMATS.filter(f=>f.width&&f.group===group))options.append(option(f.id,f.name));formatPicker.append(options);}
  function choices(event){
   framePicker.replaceChildren(...event.frames.map((f,i)=>option(i,f.name+(f.layoutCount?` · ${f.layoutCount}컷 ${f.orientation==='landscape'?'가로':'세로'} 전용`:''))));framePicker.value=String(frameIndex);
-  const frame=event.frames[frameIndex];if(frame.layoutCount)count=frame.layoutCount;
-  $('comparison-cuts').replaceChildren(...[2,4,6,8].map(n=>{const button=document.createElement('button');button.type='button';button.textContent=n+'컷';button.className='button';button.setAttribute('aria-pressed',String(count===n));button.disabled=Boolean(frame.layoutCount&&frame.layoutCount!==n);button.onclick=()=>{count=n;refresh();};return button;}));
+  const frame=event.frames[frameIndex];if(!supportedFrameCounts(frame).includes(count))count=supportedFrameCounts(frame)[0];
+  $('comparison-cuts').replaceChildren(...[2,4,6,8].map(n=>{const button=document.createElement('button');button.type='button';button.textContent=n+'컷';button.className='button';button.setAttribute('aria-pressed',String(count===n));button.disabled=!supportedFrameCounts(frame).includes(n);button.onclick=()=>{count=n;refresh();};return button;}));
  }
  async function refresh(){
   const event=getEvent();if(!event||!dialog.open)return;const ticket=++version;choices(event);const frame=event.frames[frameIndex],preset=EXPORT_FORMATS.find(f=>f.id===formatPicker.value)||EXPORT_FORMATS[0];$('comparison-status').textContent='미리보기를 불러오는 중…';

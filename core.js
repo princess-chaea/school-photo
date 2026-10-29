@@ -90,9 +90,16 @@ export function brandPart(event,key){return brandEntries(event).find(item=>item.
 export function changeBrandPart(event,key,part){const {hasContent,hasTop,hasBottom,...model}=brandingModel(event);if(BRAND_KEYS.includes(key))model[key]={...model[key],...part};else model.texts=model.texts.map(item=>item.id===key?{...item,...part}:item);return model;}
 export function normalizeSlots(slots, count) {
   if (!Array.isArray(slots) || slots.length !== count) return null;
-  if (!slots.every(s => s && ['x','y','w','h'].every(k => Number.isFinite(s[k])) && s.x >= 0 && s.y >= 0 && s.w >= .025 && s.h >= .025 && s.x + s.w <= 1.000001 && s.y + s.h <= 1.000001)) return null;
-  return slots.map(({x,y,w,h}) => ({x,y,w,h}));
+  if (!slots.every(s => s && ['x','y','w','h'].every(k => Number.isFinite(s[k])) && s.x >= 0 && s.y >= 0 && s.w >= .025 && s.h >= .025 && s.x + s.w <= 1.000001 && s.y + s.h <= 1.000001 && (s.rotation === undefined || Number.isFinite(s.rotation) && Math.abs(s.rotation)<=180))) return null;
+  return slots.map(({x,y,w,h,rotation}) => ({x,y,w,h,...(rotation?{rotation}:{})}));
 }
+export function normalizePhotoLayouts(value){
+ if(typeof value==='string'){if(value.length>16000)return null;try{value=JSON.parse(value);}catch{return null;}}
+ if(!value||typeof value!=='object'||Array.isArray(value))return null;
+ const entries=Object.entries(value);if(!entries.length||entries.length>4||entries.some(([k,v])=>!['2','4','6','8'].includes(k)||!normalizeSlots(v,Number(k))))return null;
+ return Object.fromEntries(entries.map(([k,v])=>[k,normalizeSlots(v,Number(k))]));
+}
+export function supportedFrameCounts(frame){const variants=normalizePhotoLayouts(frame?.photoLayouts);return variants?Object.keys(variants).map(Number):frame?.layoutCount?[frame.layoutCount]:[2,4,6,8];}
 export function layout(count, event = DEFAULT_EVENT, options = {}) {
   if (![2,4,6,8].includes(count)) throw new Error('지원하지 않는 컷 수');
   const orientation = options.orientation || (options.frame?.layoutCount ? options.frame.orientation : event.orientation) || 'portrait';
@@ -112,11 +119,11 @@ export function layout(count, event = DEFAULT_EVENT, options = {}) {
   const bottomSpace = fixed ? brandH : bottomH + footerH;
   const photoW = (width - pad * 2 - gap * (cols - 1)) / cols, photoH = (height - pad * 2 - topH - bottomSpace - gap * (rows - 1)) / rows;
   const top = pad + topH, bottomY = height - pad - bottomSpace;
-  return { brandReference, brandScale, width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:topH},bottom:{y:bottomY,h:bottomH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoSlots,count)?.map(s=>({x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
+  return { brandReference, brandScale, width, height, orientation, cols, rows, photoW, photoH, pad, brandH, footerH, brandY:event.logoPosition === 'bottom' ? bottomY : pad, brandAreas:{top:{y:pad,h:topH},bottom:{y:bottomY,h:bottomH},free:{y:0,h:height}}, footerY:height-pad-100, slots:normalizeSlots(options.frame?.photoLayouts?.[count]||options.frame?.photoSlots,count)?.map(s=>({...s,x:s.x*width,y:s.y*height,w:s.w*width,h:s.h*height})) || Array.from({length:count},(_,i)=>({x:pad+(i%cols)*(photoW+gap),y:top+Math.floor(i/cols)*(photoH+gap),w:photoW,h:photoH})) };
 }
 export function templateGeometry(count, orientation = 'portrait', frameFormat='print-4x6') { return layout(count, DEFAULT_EVENT, { frame: { layoutCount: count, orientation,frameFormat }, orientation }); }
 export function compatibleFrame(frame,count,orientation,preset={}){
- if(frame.layoutCount&&(frame.layoutCount!==count||(orientation&&(frame.orientation||'portrait')!==orientation)))return false;
+ if(!supportedFrameCounts(frame).includes(count)||frame.layoutCount&&orientation&&(frame.orientation||'portrait')!==orientation)return false;
  if((frame.layoutCount||frame.preserveAspect)&&preset.width&&preset.height){const size=frameSize(frame.frameFormat,frame.orientation||'portrait');if(Math.abs(size.width/size.height-preset.width/preset.height)>.005)return false;}
  return true;
 }
@@ -138,7 +145,7 @@ export function normalizeEvent(value) {
   const text = (v, max) => typeof v === 'string' ? v.slice(0, max) : '';
   const color = (v, fallback) => /^#[0-9a-f]{6}$/i.test(v || '') ? v : fallback;
   const safeURL = v => typeof v === 'string' && (/^https:\/\//.test(v) || /^data:image\/(png|jpeg|webp);base64,/.test(v) || /^\/stickers\/[a-z-]+\.(?:webp|svg)$/.test(v)) ? v : '';
-  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), source:frameSource(f), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', frameFormat:normalizeFrameFormat(f.frameFormat), ...(f.preserveAspect === true ? {preserveAspect:true,clearPhotoSlots:f.clearPhotoSlots === true} : {}), ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
+  const frames = Array.isArray(value.frames) ? value.frames.slice(0, 32).map((f, i) => ({ id: text(f.id, 100) || `frame-${i}`, name: text(f.name, 30), source:frameSource(f), bg: color(f.bg, '#fffdf6'), ink: color(f.ink, '#34372f'), overlay: safeURL(f.overlay), layoutCount: [2,4,6,8].includes(f.layoutCount) ? f.layoutCount : 0, orientation: f.orientation === 'landscape' ? 'landscape' : 'portrait', frameFormat:normalizeFrameFormat(f.frameFormat), ...(f.preserveAspect === true ? {preserveAspect:true,clearPhotoSlots:f.clearPhotoSlots === true} : {}), ...(normalizePhotoLayouts(f.photoLayouts)?{photoLayouts:normalizePhotoLayouts(f.photoLayouts)}:{}), ...(normalizeSlots(f.photoSlots,f.layoutCount) ? {photoSlots:normalizeSlots(f.photoSlots,f.layoutCount)} : {}) })) : [];
   const stickers = Array.isArray(value.stickers) ? value.stickers.slice(0, 256).map((s, i) => ({ id: text(s.id, 100) || `sticker-${i}`, name: text(s.name, 40), category: text(s.category,16), text: text(s.text, 8), url: safeURL(s.url) })).filter(s => s.url) : [];
   const event = { title: text(value.title, 80) || DEFAULT_EVENT.title, school: text(value.school, 60), schedule: text(value.schedule, 100), logo: safeURL(value.logo), logoPosition: value.logoPosition === 'bottom' ? 'bottom' : 'top', orientation: value.orientation === 'landscape' ? 'landscape' : 'portrait', frames: frames.length ? frames : DEFAULT_FRAMES, stickers };
   const { hasContent, hasTop, hasBottom, ...branding } = brandingModel({ ...event, branding: value.branding });
