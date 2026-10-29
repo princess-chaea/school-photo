@@ -29,3 +29,5 @@ export function fillFontSelect(select){
  }
  enhanceFontSelect(select,{fonts:FONTS,loadFont});
 }
+
+export async function loadTextFonts(settings={}){await Promise.all([...new Set([settings.font,...(settings.letterFonts||[]).filter(Boolean)])].map(loadFont));}

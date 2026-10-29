@@ -127,10 +127,11 @@ test('행사 텍스트의 학교안심폰트는 저장하고 임의 글꼴 값�
 
 test('확장 글꼴·글자별 색상·자유 배치 저장은 허용하고 잘못된 스타일은 차단한다',async()=>{
  const {FONTS}=await import('../fonts.js');const a=env.authenticatedContext('teacher-a').firestore();
- const e=normalizeEvent({...DEFAULT_EVENT,title:'우정',branding:{title:{position:'free',anchor:'top',x:.03,y:.05,font:FONTS.at(-1).id,styledText:'우정',letterColors:['#ff0000','#0000ff']}}});
+ const e=normalizeEvent({...DEFAULT_EVENT,title:'우정',branding:{title:{position:'free',anchor:'top',x:.03,y:.05,font:FONTS.at(-1).id,styledText:'우정',letterColors:['#ff0000','#0000ff'],letterFonts:['night','edge']}}});
  const data={...e,ownerId:'teacher-a',published:true,updatedAt:serverTimestamp()};await assertSucceeds(setDoc(doc(a,'events','letters'),data));
  const loaded=(await getDoc(doc(a,'events','letters'))).data();assert.deepEqual(loaded.branding.title.letterColors,['#ff0000','#0000ff']);
- for(const part of [{font:'not-a-font'},{letterColors:['url(evil)']},{letterColors:[1]},{letterColors:Array(101).fill('#ff0000')},{anchor:'outside'},{x:'0.5'},{y:false},{size:'large'},{color:123}]){
+ assert.deepEqual(loaded.branding.title.letterFonts,['night','edge']);
+ for(const part of [{letterFonts:['invalid']},{letterFonts:Array(101).fill('night')},{letterFonts:['url(evil)']},{font:'not-a-font'},{letterColors:['url(evil)']},{letterColors:[1]},{letterColors:Array(101).fill('#ff0000')},{anchor:'outside'},{x:'0.5'},{y:false},{size:'large'},{color:123}]){
   const bad={...data,branding:{...data.branding,title:{...data.branding.title,...part}}};await assertFails(setDoc(doc(a,'events','bad-style'),bad));
  }
 });

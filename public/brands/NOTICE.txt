@@ -1,0 +1,4 @@
+서비스 목적지를 식별하기 위한 로고입니다. 각 서비스의 상표권은 해당 권리자에게 있습니다.
+Google Drive: Google LLC. 공식 Google 제품 아이콘 https://www.gstatic.com/images/branding/product/2x/drive_2020q4_48dp.png
+Padlet: Padlet. padlet.com의 공식 favicon을 Google favicon 캐시에서 가져왔습니다. https://www.google.com/s2/favicons?domain=padlet.com&sz=128
+앱 배포본에 포함하여 학생 화면에서 외부 이미지 요청 없이 표시합니다.

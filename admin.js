@@ -91,7 +91,7 @@ function renderEditorChoices() {
 }
 function readEditor() {
   if (!editing) throw new Error('행사를 먼저 선택해 주세요.');
-  const title = $('event-title').value.trim(); if (!title) { $('event-title').focus(); throw new Error('행사명을 입력해 주세요.'); }
+  const title = $('event-title').value.trim(); if (!title) { $('event-title-style').querySelector('.rich-text-input').focus(); throw new Error('행사명을 입력해 주세요.'); }
   return { ...editing, ...normalizeEvent({ ...editing, sharing:readSharingSettings(), title, school: $('event-school').value.trim(), schedule: $('event-schedule').value.trim(), logo: $('event-logo').value, logoPosition: $('logo-position').value }) };
 }
 async function storeEvent(id, event, published) {
@@ -102,7 +102,7 @@ async function storeEvent(id, event, published) {
   return result;
 }
 async function saveEditor(publish) { const event = readEditor(); if(publish&&!demo&&['drive','padlet'].includes(event.sharing?.mode))await callCollectionRelay(event.sharing.relayUrl,{action:'verify',eventId:event.id,idToken:await user.getIdToken()}); const saved = await storeEvent(event.id, event, publish || event.published); toast(demo ? '이 탭에 체험 행사를 저장했어요. 클라우드에는 저장되지 않아요.' : saved.published ? '행사를 저장하고 게시했어요.' : '비공개로 저장했어요.'); if (publish && !demo) await showQR(saved); }
-function previewEvent() { return editing ? { ...editing, title: $('event-title').value || '행사 이름', school: $('event-school').value, schedule: $('event-schedule').value, logo: $('event-logo').value, logoPosition: $('logo-position').value } : null; }
+function previewEvent() { return editing ? { ...editing, title: $('event-title').value, school: $('event-school').value, schedule: $('event-schedule').value, logo: $('event-logo').value, logoPosition: $('logo-position').value } : null; }
 async function updatePreview() { const event = previewEvent(); if (!event) return; for(const key of ['title','school','schedule']){const select=$(`event-${key}-font`);select.value=brandingModel(event)[key].font;refreshFontSelect(select);select.style.fontFamily=fontFamily(select.value);$(`event-${key}`).style.fontFamily=fontFamily(select.value);} for(const controls of textStyleControls)controls.refresh();extraTextEditor?.refresh(); frameEditor?.refresh(); await paintFramePreview($('admin-preview'), event); }
 function renderAssets() { libraries?.render(); }
 async function removePrivateAsset(asset) {
@@ -182,6 +182,7 @@ for(const key of ['title','school','schedule']){
 }
 for(const [key,label] of [['title','행사명'],['school','학교명'],['schedule','행사 날짜']]){
  textStyleControls.push(createTextStyleControls($(`event-${key}-style`),{
+  textInput:$(`event-${key}`),fontSelect:$(`event-${key}-font`),
   getState:()=>editing?{key,label,text:$(`event-${key}`).value,settings:brandingModel(previewEvent())[key],ink:editing.frames[0]?.ink}:null,
   onChange:part=>{if(!editing)return;const {hasContent,hasTop,hasBottom,...model}=brandingModel(previewEvent());model[key]={...model[key],...part};editing.branding=model;dirty=true;updatePreview();}
  }));
@@ -213,7 +214,7 @@ $('copy-link').addEventListener('click', () => run(async () => { try { await nav
 window.addEventListener('beforeunload', e => { if (dirty || profileDirty) { e.preventDefault(); e.returnValue = ''; } });
 for (const [id, name, label] of [['new-event', 'plus', '새 행사 만들기'], ['preview-event', 'camera', '참가자 화면 미리보기'], ['save-draft', 'save', '임시 저장'], ['publish-event', 'check', '저장하고 게시'], ['close-editor', 'close', '닫기'], ['upload-asset', 'upload', '최적화 후 보관함에 추가'], ['download-qr', 'qr', 'QR 저장'], ['close-qr', 'close', '닫기'], ['enter-demo', 'camera', '관리 화면 체험하기']]) labelButton($(id), name, label);
 libraries = createLibraries({ getAssets: () => assets, getShared: () => sharedAssets, getUser: () => user, demo, run, toast, removePrivate: removePrivateAsset, added: asset => { assets.push(asset); persistDemo(); renderAssets(); renderEditorChoices(); }, sharedAdded: asset => { sharedAssets.push(asset); renderAssets(); renderEditorChoices(); }, sharedChanged: (id, active) => { sharedAssets = sharedAssets.map(a => a.id === id ? { ...a, active } : a); renderAssets(); renderEditorChoices(); } });
-frameEditor = createFrameEditor({ getEvent: previewEvent, onSave:()=>saveEditor(false), onChange: branding => { if (!editing) return; editing.branding = branding || undefined; dirty = true; updatePreview(); } });
+frameEditor = createFrameEditor({ getEvent: previewEvent, onTextChange:(key,text)=>{if(!editing)return;editing[key]=text;$(`event-${key}`).value=text;dirty=true;updatePreview();}, onSave:()=>saveEditor(false), onChange: branding => { if (!editing) return; editing.branding = branding || undefined; dirty = true; updatePreview(); } });
 document.fonts.ready.then(() => { if (editing) updatePreview(); });
 if (demo) {
   $('setup-banner').hidden = false; $('login-card').hidden = false; $('google-login').disabled = true; $('redirect-login').hidden = true; $('demo-login-note').hidden = false; $('enter-demo').hidden = false; $('admin-workspace').hidden = true; $('user-name').textContent = '체험 모드';

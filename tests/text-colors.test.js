@@ -30,3 +30,12 @@ test('추가 문구 상자와 글자별 크기는 정규화·재편집 뒤에도
 });
 
 test('추가 문구의 알 수 없는 필드와 글꼴·색상·크기는 안전하게 정규화한다',()=>{const e=normalizeEvent({...DEFAULT_EVENT,branding:{texts:[{id:'extra-test',text:'문구',apiKey:'private',font:'javascript:evil',color:'url(evil)',letterColors:['javascript:evil'],letterSizes:[Infinity,-1]}]}});const item=e.branding.texts[0];assert(!('apiKey' in item));assert.equal(item.font,'baeum');assert.equal(item.color,'');assert.deepEqual(item.letterColors,['','']);assert.deepEqual(item.letterSizes,[1,.5]);});
+
+test('부분 글꼴은 저장·삽입·삭제 뒤 유지하고 잘못된 글꼴은 제거한다',()=>{
+ const e=normalizeEvent({...DEFAULT_EVENT,title:'우정!',branding:{title:{styledText:'우정!',letterFonts:['night','edge','url(evil)']}}});
+ assert.deepEqual(e.branding.title.letterFonts,['night','edge','']);
+ assert.deepEqual(brandingModel({...e,title:'새우정!'}).title.letterFonts,['','night','edge','']);
+ const drawn=[],ctx={font:'500 20px KerisBaeum',fillStyle:'',save(){},restore(){},translate(){},scale(){},measureText(s){return{width:textLetters(s).length*10}},fillText(text,x,y){drawn.push({text,font:this.font,y})}};
+ paintColoredText(ctx,'우정!\n함께',0,0,100,{letterFonts:['night','edge','','','marker','']},'#111111');
+ assert(drawn[0].font.includes('School_night'));assert(drawn[1].font.includes('School_edge'));assert(drawn[3].font.includes('School_marker'));assert(drawn[3].y>drawn[0].y);
+});

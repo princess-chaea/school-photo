@@ -2,3 +2,17 @@
 .extra-text-card{padding:14px;margin:14px 0;border:1px solid #dce3d1;border-radius:12px;background:#f8faf4}.extra-text-card>label:not(.field-label){display:flex;gap:8px;align-items:center;margin-top:8px}.extra-text-card input[type=checkbox]{width:18px;height:18px}.letter-color-actions input[type=number]{width:100px;min-height:40px}
 
 .letter-color-button{position:relative;padding-bottom:10px;min-height:44px;color:#34372f}.letter-color-button::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:17px;height:4px;border:1px solid #9ba18f;border-radius:3px;background:var(--letter-color,#34372f)}
+/* Native text selection, composition and caret editing replace letter buttons. */
+body .rich-text-input{min-height:86px;max-height:240px;overflow:auto;border:1px solid #bdcba9;border-radius:9px;padding:12px;background:#fff;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;cursor:text;font-size:24px;user-select:text;-webkit-user-select:text;touch-action:auto;text-align:left}
+body .rich-text-input:focus{outline:2px solid #718b50;outline-offset:2px}
+body .rich-text-input:empty:before{content:'문구를 입력하세요';color:#858b7b;font-size:16px;pointer-events:none}
+body .rich-text-input::selection,body .rich-text-input *::selection{background:#c5def9;color:#172f55}
+body .rich-text-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 100px 64px;gap:9px;align-items:end;margin-top:12px}
+body .rich-text-toolbar>label{display:flex;flex-direction:column;gap:5px;font-size:11px;min-width:0}
+body .rich-text-toolbar>label:first-child{grid-column:1/-1}
+body .rich-text-toolbar>.font-picker-trigger{grid-column:1/-1;min-height:42px;font-size:14px}
+body .rich-text-toolbar input[type=number]{width:100%;min-width:0;min-height:40px;padding:6px}
+body .rich-text-toolbar input[type=color]{width:100%;height:40px;padding:3px}
+body .rich-text-toolbar>.text-button{font-size:11px;white-space:nowrap;min-height:38px}
+body .rich-selection-status{font-size:11px;color:#63794e;line-height:1.7;margin:8px 0 0;word-break:keep-all}
+@media(max-width:370px){body .rich-text-toolbar{grid-template-columns:minmax(0,1fr) 70px 55px;gap:6px}}

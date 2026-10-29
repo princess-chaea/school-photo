@@ -11,17 +11,17 @@ export function createExtraTextEditor(root,{getEvent,onChange}){
   for(const [index,item]of texts.entries()){
    let card=cards.get(item.id);
    if(!card){
-    const box=document.createElement('section');box.className='extra-text-card';const label=document.createElement('label'),input=document.createElement('input'),visible=document.createElement('input'),visibleLabel=document.createElement('label'),fontLabel=document.createElement('label'),font=document.createElement('select'),styles=document.createElement('div'),remove=document.createElement('button');
+    const box=document.createElement('section');box.className='extra-text-card';const label=document.createElement('label'),input=document.createElement('textarea'),visible=document.createElement('input'),visibleLabel=document.createElement('label'),fontLabel=document.createElement('label'),font=document.createElement('select'),styles=document.createElement('div'),remove=document.createElement('button');
     input.maxLength=100;input.id=item.id+'-content';label.htmlFor=input.id;label.className='field-label';visible.type='checkbox';visibleLabel.append(visible,document.createTextNode('프레임에 표시'));fontLabel.textContent='글꼴';fontLabel.className='field-label';font.id=item.id+'-font';fontLabel.htmlFor=font.id;fillFontSelect(font);styles.className='text-style-controls';remove.type='button';remove.className='text-button danger';remove.textContent='문구 삭제';box.append(label,input,visibleLabel,fontLabel,font,styles,remove);list.append(box);
     const change=part=>{if(brandPart(getEvent(),item.id))onChange(changeBrandPart(getEvent(),item.id,part));};
     input.oninput=()=>change({text:input.value});visible.onchange=()=>change({visible:visible.checked});font.onchange=async()=>{const id=font.value;try{await loadFont(id);change({font:id});}catch(error){font.value=brandPart(getEvent(),item.id)?.settings.font||'baeum';refreshFontSelect(font);note.textContent=error.message;}};
     remove.onclick=async()=>{if(await confirmAction('이 문구 상자를 삭제할까요?')){const value=model();value.texts=value.texts.filter(t=>t.id!==item.id);onChange(value);}};
-    const controls=createTextStyleControls(styles,{getState:()=>{const part=brandPart(getEvent(),item.id);return part?{key:item.id,label:'추가 문구',text:part.content,settings:part.settings,ink:getEvent().frames[0]?.ink}:null;},onChange:change});
+    const controls=createTextStyleControls(styles,{textInput:input,fontSelect:font,getState:()=>{const part=brandPart(getEvent(),item.id);return part?{key:item.id,label:'추가 문구',text:part.content,settings:part.settings,ink:getEvent().frames[0]?.ink}:null;},onChange:change});
     card={root:box,label,input,visible,font,controls};cards.set(item.id,card);
    }
    card.label.textContent=`추가 문구 ${index+1}`;if(card.input.value!==item.text)card.input.value=item.text;card.visible.checked=item.visible;card.font.value=item.font;refreshFontSelect(card.font);card.controls.refresh();
   }
  }
- add.onclick=()=>{const value=model();if(value.texts.length>=8)return;const id='extra-'+crypto.randomUUID();value.texts.push({id,text:'추가 문구',position:'free',x:value.texts.length%2?.72:.28,y:.35+Math.floor(value.texts.length/2)*.15,size:.027});onChange(value);cards.get(id)?.input.focus();cards.get(id)?.input.select();};
+ add.onclick=()=>{const value=model();if(value.texts.length>=8)return;const id='extra-'+crypto.randomUUID();value.texts.push({id,text:'추가 문구',position:'free',x:value.texts.length%2?.72:.28,y:.35+Math.floor(value.texts.length/2)*.15,size:.027});onChange(value);cards.get(id)?.controls.focus();cards.get(id)?.controls.selectAll();};
  return {refresh};
 }

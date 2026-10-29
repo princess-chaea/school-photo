@@ -64,3 +64,17 @@ body.booth-app .preview-panel{min-width:0;overflow:hidden}
  body.booth-app #edit-dialog .editor-quick-row{grid-column:2;grid-row:4;margin:0}
  body.booth-app #edit-dialog .edit-help{display:none}
 }
+/* Step 04 opens this editor directly; its own navigation completes the flow. */
+body.booth-app #edit-dialog{width:min(1400px,calc(100vw - 24px));height:96dvh;max-height:100dvh}
+body.booth-app #edit-dialog .edit-header{min-height:58px;height:auto;flex:none;padding:8px 16px}
+body.booth-app #finish-edit{white-space:nowrap;min-height:40px;padding:8px 14px;font-size:12px}
+body.booth-app .editor-quick-row .editor-selection-actions{display:flex;align-items:center;flex:none}
+body.booth-app #edit-dialog[data-tool="text"] .expanded-tools{height:min(40dvh,340px)}
+@media(max-width:600px){body.booth-app #edit-dialog{width:100%;height:100dvh;border-radius:0}body.booth-app #edit-dialog .edit-header{padding:6px 10px}body.booth-app #edit-dialog #close-edit{font-size:10px}body.booth-app #finish-edit{padding:7px 10px;font-size:11px}}
+@media(min-width:601px) and (max-width:1100px) and (max-height:550px){body.booth-app #edit-dialog .edit-header{min-height:0;padding:4px 12px}body.booth-app #edit-dialog[data-tool="text"] .expanded-tools{height:auto}}
+body.booth-app #edit-dialog:not([data-tool="photo"]) #preview{cursor:grab}
+body.booth-app #expanded-stage.view-pan #preview{cursor:grabbing}
+body.booth-app .collection-brand-icon{flex:none;width:25px;height:25px;object-fit:contain}
+body.booth-app .collection-brand{display:flex;align-items:center;justify-content:center;gap:12px;padding:15px;margin:12px 0;border:1px solid var(--line);border-radius:12px;background:#fff}
+body.booth-app .collection-brand img{width:40px;height:40px;object-fit:contain}
+body.booth-app .collection-brand strong{font-size:18px}

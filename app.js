@@ -1,3 +1,4 @@
+import {labelCollectionButton,renderCollectionBrand} from './collection-brand.js';
 import {renderFrameGroups} from './frame-groups.js';
 import './frame-groups.css';
 import {drawFrameOverlay} from './frame-overlay.js';
@@ -5,7 +6,7 @@ import {createUsageTracker} from './usage-data.js';
 import {createTextStyleControls} from './text-style-controls.js';
 import {textColorSettings,paintColoredText,measureStyledText} from './text-colors.js';
 import {confirmAction} from './app-dialog.js';
-import {fontFamily,fillFontSelect,refreshFontSelect,loadFont} from './fonts.js';
+import {fontFamily,fillFontSelect,refreshFontSelect,loadFont,loadTextFonts} from './fonts.js';
 import { decorationHit, rotatedPoint, radians, degrees, rotationDelta } from './decoration-geometry.js';
 import { normalizeSharing, callCollectionRelay, httpsURL, collectionName } from './sharing.js';
 import { drawLayoutGuide, fitLayoutGuide } from './layout-guide.js';
@@ -31,7 +32,7 @@ let blocked = false, assetReady = Promise.resolve();
 const editDialog = $('edit-dialog'), previewHome = canvas.parentElement, toolsHome = $('decoration-tools').parentElement;
 const cropCanvas = $('crop-preview'), cropPointers = new Map();
 let cropGesture = null;
-const editorView=createEditorView(editDialog,canvas);
+const editorView=createEditorView(editDialog,canvas,{isDecorationTarget:e=>pointers.size>0||decorationAt(e)!==null});
 const saveCanvas=$('save-preview');
 for(const group of [...new Set(EXPORT_FORMATS.map(f=>f.group))]){const optgroup=document.createElement('optgroup');optgroup.label=group;for(const f of EXPORT_FORMATS.filter(f=>f.group===group))optgroup.append(Object.assign(document.createElement('option'),{value:f.id,textContent:f.name}));$('export-format').append(optgroup);}
 $('export-format').value='print-4x6';
@@ -39,6 +40,7 @@ function changePurpose(){ state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.pan
 $('export-format').addEventListener('change',changePurpose);
 const exportPicker=createExportPicker(()=>canvas,changePurpose,preset=>spaceGeometryFor(preset));
 const studentTextStyles=createTextStyleControls($('student-text-style'),{
+ textInput:$('selected-decoration-text'),
  getState:()=>{const d=state.decorations[state.selectedDeco];return d?.type==='text'?{key:d.id,label:'문구',text:d.text,settings:{...d,...textColorSettings(d.text,d)},baseSize:.055,minSize:.015,maxSize:.35,ink:'#ffffff'}:null;},
  onChange:part=>{const d=state.decorations[state.selectedDeco];if(d?.type==='text'){Object.assign(d,part);updateAdjustment();render();}}
 });
@@ -116,15 +118,17 @@ function renderFilterChoices(){
     section.append(heading,cards);list.append(section);
   }
 }
-function canEditDecoration(d){return d&&(editDialog.dataset.tool==='text'?d.type==='text':editDialog.dataset.tool==='stickers'&&d.type!=='text');}
+function canEditDecoration(d){return Boolean(d)&&editDialog.dataset.tool!=='photo';}
 function go(step) {
   if (busy) return;
   if (step >= 3 && !state.photos.every(Boolean)) { toast('모든 칸에 사진을 채워 주세요.'); return; }
   if (state.step === 2 && step !== 2) stopCamera();
+  if(step!==3&&editDialog.open)closeEditor();
   if(step===2)usage.start();if(step===4)usage.complete();
   state.step = step; state.selectedDeco = null; pointers.clear(); gesture = null;
   renderSteps(); render(); updateAdjustment();
   if(step===2&&!$('web-capture-area').hidden&&!stream)startCamera();
+  if(step===3){openEditorTool(editDialog.dataset.tool||'stickers');return;}
   $('step-title').focus({ preventScroll: true });
   window.scrollTo({ top: Math.max(0, document.querySelector('.steps').getBoundingClientRect().top + scrollY - 15), behavior: 'smooth' });
 }
@@ -182,11 +186,11 @@ function branding(g, frame) {
 function decorationBox(d, g) {
   const font = d.size * g.width; let w, h;
   if (d.type === 'image') { const img = assetImages.get(d.url); h = font; w = img ? font * img.width / img.height : font; }
-  else { ctx.font = `700 ${font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; const metrics=measureStyledText(ctx,d.text,d);w=metrics.width;h=metrics.maxSize*1.2; }
+  else { ctx.font = `700 ${font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; const metrics=measureStyledText(ctx,d.text,d);w=metrics.width;h=metrics.height; }
   return { x: d.x * g.width, y: d.y * g.height, w: Math.max(w, 20), h: Math.max(h, 20), font };
 }
 function geometryFor(preset, count=state.count, frame=state.event.frames[state.frame]) {
-  return layout(count,state.event,{frame,orientation:state.orientation,width:preset.width,height:preset.height,padding:preset.padding,caption:Boolean($('caption').value.trim()),captureDate:$('show-date').checked});
+  return layout(count,state.event,{frame,orientation:state.orientation,width:preset.width,height:preset.height,padding:preset.padding,caption:false,captureDate:$('show-date').checked});
 }
 function spaceGeometryFor(preset,count=state.count,frame=state.event.frames[state.frame]) { const g=geometryFor(preset,count,frame);return (frame?.layoutCount || frame?.preserveAspect)?fitLayoutGuide(g,preset):g; }
 function currentGeometry() { return geometryFor(EXPORT_FORMATS.find(f=>f.id===$('export-format').value)||{}); }
@@ -214,7 +218,6 @@ function render(exporting = false) {
   });
   const overlay = assetImages.get(frame.overlay); if (overlay) drawFrameOverlay(ctx,overlay,frame,g);
   branding(g, frame);
-  fitText($('caption').value || ' ', g.width / 2, g.footerY + 48, g.width - 80, 23, frame.ink, '700',$('caption-font').value);
   if ($('show-date').checked) fitText(photoDate.toLocaleDateString('sv-SE').replaceAll('-', '. '), g.width / 2, g.footerY + 82, g.width - 80, 13, frame.ink);
   state.decorations.forEach(d => { const b = decorationBox(d, g); ctx.save();ctx.translate(b.x,b.y);ctx.rotate(radians(d.rotation||0)); ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.fillStyle = d.color; ctx.font = `700 ${b.font}px ${fontFamily(d.font)}, Arial, "Malgun Gothic", sans-serif`; if (d.type === 'image') { const image = assetImages.get(d.url); if (image) ctx.drawImage(image, -b.w / 2, -b.h / 2, b.w, b.h); } else paintColoredText(ctx,d.text,0,0,b.w,d,d.color); ctx.restore(); });
   if (!exporting && state.step === 3 && editDialog.open) {
@@ -294,7 +297,7 @@ function selectEditorTool(tool) {
   editDialog.dataset.tool = tool;pointers.clear();gesture=null;cropPointers.clear();cropGesture=null;if(!canEditDecoration(state.decorations[state.selectedDeco]))state.selectedDeco=null;if(tool==='filter')renderFilterChoices();
   canvas.hidden = tool === 'photo'; cropCanvas.hidden = tool !== 'photo';
   $('edit-title').textContent = { stickers: '스티커로 꾸미기', text: '마음을 적어요', photo: '사진을 크게 보고 조정해요', filter: '오늘의 분위기' }[tool];
-  $('edit-help').textContent = tool === 'photo' ? '사진을 끌어 구도 이동 · 두 손가락 또는 +/−로 확대·축소' : tool==='filter'?'색감 필터를 눌러 비교해요. 모든 사진에 적용되며 원본은 유지돼요.':tool==='text'?'문구를 추가하고 끌어 이동해요. 모서리·두 손가락으로 크기와 회전을 조절해요.':'스티커를 끌어 이동 · 두 손가락으로 크기·회전 · 동그라미로 회전';
+  $('edit-help').textContent = tool === 'photo' ? '사진을 끌어 구도 이동 · 두 손가락 또는 +/−로 확대·축소' : tool==='filter'?'색감 필터를 눌러 비교해요. 모든 사진에 적용되며 원본은 유지돼요.':tool==='text'?'문구를 추가하고 끌어 이동해요. 모서리·두 손가락으로 크기와 회전을 조절해요.':'빈 곳은 끌어 화면 이동 · 스티커·글자는 눌러 편집 · 두 손가락으로 크기·회전';
   document.querySelectorAll('[data-editor-tool]').forEach(b => { b.classList.toggle('selected', b.dataset.editorTool === tool); b.setAttribute('aria-pressed', String(b.dataset.editorTool === tool)); });
   renderPhotoPicker(); updateAdjustment(); render(); editorView.refresh();
 }
@@ -334,8 +337,17 @@ function addDecoration(data) {
 function point(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) * canvas.width / r.width, y: (e.clientY - r.top) * canvas.height / r.height }; }
 function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
 function rotationHandle(box,d,g){const scale=g.width/Math.max(1,canvas.getBoundingClientRect().width),p=rotatedPoint(0,-box.h/2-32*scale,box,d.rotation||0);return {x:clamp(p.x,16*scale,g.width-16*scale),y:clamp(p.y,16*scale,g.height-16*scale)};}
+function decorationAt(e){
+ const p=point(e),g=currentGeometry(),selected=state.decorations[state.selectedDeco],scale=g.width/Math.max(1,canvas.getBoundingClientRect().width);
+ if(selected){const box=decorationBox(selected,g);if(distance(p,rotationHandle(box,selected,g))<=22*scale)return state.selectedDeco;for(const dx of [-1,1])for(const dy of [-1,1]){const corner=rotatedPoint(dx*(box.w/2+4*scale),dy*(box.h/2+4*scale),box,selected.rotation||0);if(distance(p,corner)<=22*scale)return state.selectedDeco;}}
+ for(let i=state.decorations.length-1;i>=0;i--)if(decorationHit(p,decorationBox(state.decorations[i],g),state.decorations[i].rotation||0,10*scale))return i;
+ return null;
+}
 function pointerDown(e) {
-  if (state.step !== 3 || !editDialog.open || !['stickers','text'].includes(editDialog.dataset.tool)) return; e.preventDefault(); canvas.setPointerCapture(e.pointerId); const p = point(e); pointers.set(e.pointerId, p); const g = currentGeometry();
+  if (state.step !== 3 || !editDialog.open || editDialog.dataset.tool==='photo') return;
+  let switched=false;const target=decorationAt(e);if(!pointers.size&&target!==null){const tool=state.decorations[target].type==='text'?'text':'stickers';if(editDialog.dataset.tool!==tool){selectEditorTool(tool);switched=true;}}
+  e.preventDefault(); canvas.setPointerCapture(e.pointerId); const p = point(e); pointers.set(e.pointerId, p); const g = currentGeometry();
+  if(switched){state.selectedDeco=target;const d=state.decorations[target];gesture={mode:'move',dx:p.x/g.width-d.x,dy:p.y/g.height-d.y};updateAdjustment();render();return;}
   if (pointers.size === 2 && state.selectedDeco !== null) { const [a, b] = [...pointers.values()]; const d = state.decorations[state.selectedDeco]; gesture = { mode: 'pinch', distance: distance(a,b),size:d.size,angle:degrees(Math.atan2(b.y-a.y,b.x-a.x)),rotation:d.rotation||0 }; return; }
   if (pointers.size > 1) return;
   const selected = canEditDecoration(state.decorations[state.selectedDeco])?state.decorations[state.selectedDeco]:null;
@@ -358,7 +370,7 @@ function pointerMove(e) {
 function pointerEnd(e) { pointers.delete(e.pointerId); if (pointers.size < 2 && gesture?.mode === 'pinch') gesture = null; if (!pointers.size) gesture = null; }
 async function exportImage() {
   if (!state.photos.every(Boolean)) throw new Error('사진을 모두 채워 주세요.');
-  await assetReady;await Promise.all([...brandEntries(state.event).filter(item=>item.key!=='logo').map(item=>loadFont(item.settings.font)),loadFont($('caption-font').value),...state.decorations.filter(d=>d.type==='text').map(d=>loadFont(d.font))]);
+  await assetReady;await Promise.all([...brandEntries(state.event).filter(item=>item.key!=='logo').map(item=>loadTextFonts(item.settings)),...state.decorations.filter(d=>d.type==='text').map(d=>loadTextFonts(d))]);
   const required = [state.event.frames[state.frame].overlay, ...(brandingModel(state.event).logo.visible ? [state.event.logo] : []), ...state.decorations.filter(d => d.type === 'image').map(d => d.url)].filter(Boolean);
   if (required.some(url => failedAssets.has(url))) throw new Error('선택한 디자인을 불러오지 못했어요. 다른 프레임을 선택하거나 네트워크를 확인해 주세요.');
   render(true);
@@ -366,7 +378,7 @@ async function exportImage() {
   finally { render(); }
 }
 async function loadAssets() {
-  await Promise.all(brandEntries(state.event).filter(item=>item.key!=='logo').map(item=>loadFont(item.settings.font)));
+  await Promise.all(brandEntries(state.event).filter(item=>item.key!=='logo').map(item=>loadTextFonts(item.settings)));
   const urls = [state.event.logo, ...state.event.frames.map(f => f.overlay), ...state.event.stickers.map(s => s.url)].filter(Boolean);
   await Promise.all([...new Set(urls)].map(async url => { try { assetImages.set(url, await imageFromURL(url)); } catch { failedAssets.add(url); } }));
   if (failedAssets.size) toast('일부 행사 디자인을 불러오지 못했어요. 다른 디자인을 선택할 수 있어요.');
@@ -374,7 +386,7 @@ async function loadAssets() {
 }
 function renderCollection(){
   const s=normalizeSharing(state.event.sharing),name=collectionName(s);$('event-collection').hidden=s.mode==='none';document.querySelector('.private-badge').lastChild.textContent=s.mode==='none'?' 내 기기에서만':' 제출은 선택';
-  labelButton($('submit-result'),'upload',name==='Padlet'?'Padlet에 올리기':name==='Google Drive'?'Google Drive에 공유':'행사 게시판에 공유');
+  labelCollectionButton($('submit-result'),s,name==='Padlet'?'Padlet에 올리기':name==='Google Drive'?'Google Drive에 공유':'행사 게시판에 공유');
   $('collection-note').textContent=['drive','padlet'].includes(s.mode)?`제출 버튼을 누르면 이 완성 이미지 한 장이 선생님의 Google Drive${s.mode==='padlet'?'와 Padlet 게시판에':''}로 전송돼요.${s.mode==='padlet'?' 첨부 이미지 링크는 링크를 가진 사람이 볼 수 있어요.':''}`:'먼저 완성 이미지를 저장한 뒤 게시판·폴더를 열어 올려요. 기기 공유창은 열지 않아요.';
 }
 async function submissionImage(){
@@ -388,7 +400,7 @@ async function downloadFinishedImage(){
   lastDownloadedSignature=signature&&signature===currentResultSignature()?signature:null;
   return Boolean(lastDownloadedSignature);
 }
-function prepareCollectionLink(s){const link=$('collection-open');link.href=s.url;link.textContent='2. '+collectionName(s)+' 열고 올리기 ↗';}
+function prepareCollectionLink(s){const link=$('collection-open');link.href=s.url;labelCollectionButton(link,s,'2. '+collectionName(s)+' 열고 올리기 ↗');renderCollectionBrand($('collection-brand'),s);}
 function openCollectionLink(s){
   const link=document.createElement('a');link.href=s.url;link.target='_blank';link.rel='noopener noreferrer';document.body.append(link);link.click();link.remove();usage.record('shares');
   $('collection-status').textContent=collectionName(s)+'를 열었어요. 다운로드한 이미지를 선택해 올려 주세요. 제출 완료 여부는 게시판에서 확인해 주세요.';
@@ -450,7 +462,7 @@ async function bootEvent() {
 }
 
 $('next').addEventListener('click', () => go(state.step+1)); $('back').addEventListener('click', () => go(state.step-1));
-$('caption').addEventListener('input', () => render()); $('show-date').addEventListener('change', () => render());
+$('show-date').addEventListener('change', () => render());
 $('camera-start').addEventListener('click', startCamera); $('camera-flip').addEventListener('click', () => { facing = facing === 'user' ? 'environment' : 'user'; startCamera(); });
 $('capture').setAttribute('aria-label','남은 컷 연속 촬영');$('capture').addEventListener('click', () => capture(true)); $('auto-capture').addEventListener('click', () => capture(true));
 $('cancel-capture').addEventListener('click', () => { captureEpoch++; busy = false; $('countdown').textContent = ''; renderThumbnails(); });
@@ -493,16 +505,17 @@ $('expand-preview').addEventListener('click', () => {if(state.step===4)go(3);ope
 $('change-layout').addEventListener('click', () => go(0));
 document.querySelectorAll('[data-open-tool]').forEach(b => b.addEventListener('click', () => openEditorTool(b.dataset.openTool)));
 document.querySelectorAll('[data-editor-tool]').forEach(b => b.addEventListener('click', () => selectEditorTool(b.dataset.editorTool)));
-$('close-edit').addEventListener('click', closeEditor);
-editDialog.addEventListener('cancel', e => { e.preventDefault(); closeEditor(); });
+$('close-edit').addEventListener('click',()=>go(2));
+$('finish-edit').addEventListener('click',()=>go(4));
+editDialog.addEventListener('cancel', e => { e.preventDefault();e.stopPropagation();go(2); });
 canvas.tabIndex = 0; canvas.addEventListener('keydown', e => { const d = state.decorations[state.selectedDeco]; if (!d || state.step !== 3 || !editDialog.open || !canEditDecoration(d)) return; if (e.key.startsWith('Arrow')) { e.preventDefault(); d.x = clamp(d.x + (e.key === 'ArrowRight' ? .01 : e.key === 'ArrowLeft' ? -.01 : 0), .03, .97); d.y = clamp(d.y + (e.key === 'ArrowDown' ? .01 : e.key === 'ArrowUp' ? -.01 : 0), .02, .98); render(); } if(e.key.toLowerCase()==='r'){e.preventDefault();d.rotation=(d.rotation||0)+(e.shiftKey?-15:15);updateAdjustment();render();} if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); $('delete-decoration').click(); } });
 $('download').addEventListener('click', async () => { try { await downloadFinishedImage(); toast('다운로드를 시작했어요. 기기의 저장 위치를 확인해 주세요.'); } catch (error) { toast(`저장 실패: ${error.message}`); } });
 $('share').addEventListener('click', async () => { try { const blob = await exportImage(), file = new File([blob], 'moment.png', { type: 'image/png' }); if (navigator.canShare?.({ files: [file] })) {await navigator.share({ files: [file], title: state.event.title });usage.record('shares');} else { if (downloadURL) URL.revokeObjectURL(downloadURL); downloadURL = URL.createObjectURL(blob); const link = Object.assign(document.createElement('a'), { href: downloadURL, target: '_blank', rel: 'noopener' }); link.click();usage.record('shares'); toast('이미지를 길게 눌러 저장하거나 PNG 저장 버튼을 이용해 주세요.'); } } catch (error) { if (error.name !== 'AbortError') toast('공유하지 못했어요. PNG 저장 버튼을 이용해 주세요.'); } });
 $('restart').addEventListener('click', async () => { if (!await confirmAction('새로 시작할까요? 저장하지 않은 사진과 꾸미기는 사라져요.')) return;usage.restart(); stopCamera();lastDownloadedSignature=null; state.photos = Array(state.count).fill(null); state.decorations = []; deletedDecoration=null;state.selectedPhoto = 0; state.filter = 'original'; renderChoices(); renderThumbnails(); go(0); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopCamera(); }); window.addEventListener('pagehide', stopCamera);
 window.addEventListener('beforeunload', e => { if (state.photos.some(Boolean)) { e.preventDefault(); e.returnValue = ''; } });
-for (const [id, name, label] of [['back', 'back', '이전'], ['native-capture', 'camera', '기본 카메라로 촬영'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '돌아가기'], ['expand-preview', 'expand', '크게 편집'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);
+for (const [id, name, label] of [['back', 'back', '이전'], ['native-capture', 'camera', '기본 카메라로 촬영'], ['camera-start', 'camera', '카메라 켜기'], ['camera-flip', 'flip', '카메라 전환'], ['download', 'save', 'PNG 이미지 저장'], ['share', 'share', '이미지 공유 / 기기에 저장'], ['restart', 'refresh', '새로운 순간 담기'], ['close-edit', 'back', '사진 다시 찍기'], ['expand-preview', 'expand', '크게 편집'], ['change-layout', 'frame', '컷 변경'], ['demo', 'camera', '카메라 없이 샘플로 체험하기']]) labelButton($(id), name, label);
 document.querySelectorAll('[data-open-tool], [data-editor-tool]').forEach(b => { const tool = b.dataset.openTool || b.dataset.editorTool; const name = { stickers: 'sticker', text: 'text', photo: 'crop', filter: 'filter' }[tool]; labelButton(b, name, { stickers: '스티커', text: '문구', photo: '사진 구도', filter: '필터' }[tool]); });
-for(const id of ['text-font','caption-font']){fillFontSelect($(id));$(id).onchange=async()=>{const font=$(id).value;try{await loadFont(font);const d=state.decorations[state.selectedDeco];if(id==='text-font'&&d?.type==='text')d.font=font;render();}catch(error){toast(error.message);}};}
+for(const id of ['text-font']){fillFontSelect($(id));$(id).onchange=async()=>{const font=$(id).value;try{await loadFont(font);const d=state.decorations[state.selectedDeco];if(id==='text-font'&&d?.type==='text')d.font=font;render();}catch(error){toast(error.message);}};}
 renderChoices(); renderThumbnails(); renderSteps(); render(); bootEvent();
 document.fonts.ready.then(() => render());

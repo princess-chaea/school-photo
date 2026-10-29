@@ -1,5 +1,5 @@
 import {drawFrameOverlay} from './frame-overlay.js';
-import {loadFont} from './fonts.js';
+import {loadFont,loadTextFonts} from './fonts.js';
 import { layout, imageFromURL, brandingModel, brandEntries } from './core.js';
 import { drawBranding } from './branding.js';
 const images = new Map(), loading = new Map(), versions = new WeakMap();
@@ -9,7 +9,7 @@ export async function paintFramePreview(canvas, event, { count = 4, frameIndex =
   const frame = event.frames[Math.min(frameIndex, event.frames.length - 1)];
   if (frame.layoutCount) count = frame.layoutCount;
   const g = layout(count, event, { frame, orientation, width:preset.width, height:preset.height, padding:preset.padding, captureDate: brandingModel(event).captureDate });
-  await Promise.all([load(event.logo), load(frame.overlay),...brandEntries(event).filter(item=>item.key!=='logo').map(item=>loadFont(item.settings.font))]); if (versions.get(canvas) !== version) return null;
+  await Promise.all([load(event.logo), load(frame.overlay),...brandEntries(event).filter(item=>item.key!=='logo').map(item=>loadTextFonts(item.settings))]); if (versions.get(canvas) !== version) return null;
   canvas.width = g.width; canvas.height = g.height; const ctx = canvas.getContext('2d');
   ctx.fillStyle = frame.bg; ctx.fillRect(0, 0, canvas.width, canvas.height);
   for (const [i, slot] of g.slots.entries()) { ctx.fillStyle = ['#dce5d0', '#e8d6ca', '#d9e3ee', '#e2d9eb'][i % 4]; ctx.fillRect(slot.x, slot.y, slot.w, slot.h); ctx.fillStyle = '#9eaf8b'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `${slot.w * .12}px KerisBaeum, Arial`; ctx.fillText(['✿', '☺', '✧', '♡'][i % 4], slot.x + slot.w / 2, slot.y + slot.h / 2); }

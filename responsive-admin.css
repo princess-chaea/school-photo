@@ -4,3 +4,10 @@
 @media(max-width:370px){.admin-page .sticker-picker-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 /* Keep the setup notice in the document flow on short login/demo screens. */
 body.admin-page:not(.signed-in){height:auto;min-height:100dvh;overflow-y:auto}body.admin-page:not(.signed-in) .admin-main{height:auto;min-height:80dvh;flex-direction:column;gap:16px;padding:20px 18px}body.admin-page:not(.signed-in) .setup-banner{position:static;order:1;flex:none;width:min(100%,600px);margin:0 auto}
+/* Follow the actual editor scroll container without stretching the grid item. */
+@media(min-width:601px){
+ body.admin-page .editor-columns{align-items:start}
+ body.admin-page .editor-side{position:sticky;top:18px;align-self:start;min-width:0;max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain;padding-top:0;margin-top:22px}
+ body.admin-page .editor-preview{min-height:0;padding:24px}
+ body.admin-page .editor-preview canvas{max-height:min(320px,calc(100dvh - 230px));object-fit:contain}
+}

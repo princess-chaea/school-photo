@@ -6,13 +6,13 @@ import { brandingModel, brandEntries, brandPart, changeBrandPart, BRAND_KEYS, BR
 import { paintFramePreview } from './frame-preview.js';
 import { labelButton } from './icons.js';
 const $ = id => document.getElementById(id);
-export function createFrameEditor({ getEvent, onChange, onSave }) {
+export function createFrameEditor({ getEvent, onChange, onSave, onTextChange }) {
   const dialog = $('frame-editor'), canvas = $('frame-editor-canvas'), stage = $('frame-editor-stage');
   let fontRequest=0;let focusSelection = true; const pointers=new Map();
   let count = 4, frameIndex = 0, selected = 'school', zoom = 1, last = null, gesture = null, version = 0;
   createFrameComparison({getEvent,getSelection:()=>({count,frameIndex})});
   function cleanModel(model) { const { hasContent, hasTop, hasBottom, ...clean } = model; return clean; }
-  const textStyles=createTextStyleControls($('frame-text-style'),{getState:()=>{const event=getEvent();return event&&selected&&brandPart(event,selected)?{key:selected,label:brandPart(event,selected).label,text:brandPart(event,selected).content||'',settings:brandPart(event,selected).settings,ink:event.frames[frameIndex]?.ink}:null;},onChange:part=>{if(selected)changePart(selected,part);}});
+  const textStyles=createTextStyleControls($('frame-text-style'),{fontSelect:$('frame-element-font'),onTextChange:text=>{if(selected?.startsWith('extra-'))changePart(selected,{text});else if(selected)onTextChange?.(selected,text);},getState:()=>{const event=getEvent();return event&&selected&&brandPart(event,selected)?{key:selected,label:brandPart(event,selected).label,text:brandPart(event,selected).content||'',settings:brandPart(event,selected).settings,ink:event.frames[frameIndex]?.ink}:null;},onChange:part=>{if(selected)changePart(selected,part);}});
   function changePart(key, part) { const event = getEvent(); if (!event) return; onChange(changeBrandPart(event,key,part)); }
   function updateSize() {
     if (!last) return;
@@ -29,7 +29,7 @@ export function createFrameEditor({ getEvent, onChange, onSave }) {
     if (!event.frames[frameIndex] || !compatibleFrame(event.frames[frameIndex],count)) frameIndex = event.frames.findIndex(f => compatibleFrame(f,count));
     $('frame-selected').replaceChildren();
     for (const {key,label,settings,content} of brandEntries(event)) { const option = document.createElement('option'); option.value = key; option.textContent = label; option.disabled = !settings.visible || !content; $('frame-selected').append(option); }
-    if(selected&&(!brandPart(event,selected)?.content||!brandPart(event,selected)?.settings.visible))selected=brandEntries(event).find(item=>item.content&&item.settings.visible)?.key||null;
+    if(selected&&(!brandPart(event,selected)||!brandPart(event,selected)?.settings.visible))selected=brandEntries(event).find(item=>item.content&&item.settings.visible)?.key||null;
     $('frame-selected').value = selected || ''; $('frame-item-controls').hidden = !selected; $('frame-no-selection').hidden = Boolean(selected);
     if (selected) { const item = brandPart(event,selected).settings;$('frame-element-font').value=item.font;$('frame-element-font').disabled=selected==='logo';refreshFontSelect($('frame-element-font')); $('frame-size-value').textContent = `${Math.round(item.size / (BRAND_SIZES[selected]||BRAND_SIZES.title) * 100)}%`; }
     textStyles.refresh();

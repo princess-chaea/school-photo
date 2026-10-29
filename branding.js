@@ -32,7 +32,7 @@ export function brandItems(ctx, event, geometry, images) {
       const scale = Math.min(1, (g.width - 2 * g.pad) / w, area.h * .9 / h); w *= scale; h *= scale;
     } else {
       do { ctx.font = `${key === 'school' ? 700 : 500} ${size}px ${fontFamily(settings.font)}, Arial, sans-serif`; w = measureStyledText(ctx,content,settings).width; if (w <= g.width - g.pad * 2) break; size -= 1; } while (size > 9);
-      w = Math.min(w, g.width - 2 * g.pad); h = measureStyledText(ctx,content,settings).maxSize * 1.25;
+      w = Math.min(w, g.width - 2 * g.pad); h = measureStyledText(ctx,content,settings).height;
     }
     const x = clamp(settings.x * g.width, g.pad + w / 2, g.width - g.pad - w / 2);
     const y = clamp(area.y + settings.y * area.h, area.y + h / 2, area.y + area.h - h / 2);
