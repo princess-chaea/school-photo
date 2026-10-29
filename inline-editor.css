@@ -66,3 +66,21 @@ body.booth-app #decoration-editor .stickers{max-height:none;overflow:visible}
 body.booth-app #decoration-editor .expanded-stage{display:block;padding:0;touch-action:none;overscroll-behavior:contain}
 body.booth-app #decoration-editor #preview{flex:none}
 body.booth-app #decoration-editor #crop-preview{width:auto;height:auto;max-width:100%;max-height:100%}
+/* Keep every tool available; composition previews use a larger centered fit. */
+body.booth-app #decoration-editor .editor-quick-row{justify-content:center}
+body.booth-app #decoration-editor[data-tool="photo"] #editor-viewport{padding:6px}
+body.booth-app #decoration-editor #crop-preview{flex:none;max-width:none;max-height:none;object-fit:contain}
+body.booth-app #decoration-editor .photo-picker{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;overflow:visible;margin:0 0 16px;padding:4px}
+body.booth-app #decoration-editor .photo-picker button{flex:0 0 48px;width:48px;height:48px}
+body.booth-app #decoration-editor .photo-actions{justify-content:center;flex-wrap:wrap;gap:8px}
+body.booth-app #decoration-editor .filter-category-label{display:flex;align-items:center;gap:10px;font-size:12px;margin:0 0 8px}
+body.booth-app #decoration-editor .filter-category-label select{flex:1;min-width:0;min-height:40px}
+body.booth-app #decoration-editor #filter-options{display:block}
+body.booth-app #decoration-editor .filter-category{margin:14px 0 20px}
+body.booth-app #decoration-editor .filter-category h3{margin-bottom:8px;font-size:12px}
+body.booth-app #decoration-editor .filter-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+body.booth-app #decoration-editor .filter-chip{padding:5px;gap:5px}
+body.booth-app #decoration-editor .filter-chip canvas{height:64px}
+body.booth-app #decoration-editor .filter-chip span{white-space:normal;word-break:keep-all;font-size:11px;line-height:1.5}
+@media(min-width:701px){body.booth-app #decoration-editor .photo-picker button{flex-basis:56px;width:56px;height:56px}}
+@media(min-width:1101px){body.booth-app #decoration-editor[data-tool="photo"]:not([hidden]){height:clamp(560px,78dvh,850px)}}

@@ -74,7 +74,7 @@
           <div id="decoration-tools">
           <div class="tool-group" data-tool="filter">
           <p class="field-label">사진 분위기</p>
-          <p class="small muted">모든 사진에 적용돼요. 미리보기를 눌러 색감을 비교해 보세요.</p><div class="filter-options" id="filter-options"></div>
+          <p class="small muted">모든 사진에 적용돼요. 미리보기를 눌러 색감을 비교해 보세요.</p><label class="filter-category-label" for="filter-category">분위기별로 보기<select id="filter-category"><option value="전체">전체 · 40가지</option></select></label><p id="filter-current" class="small muted" aria-live="polite"></p><div class="filter-options" id="filter-options"></div>
           </div>
           <div class="tool-group" data-tool="photo">
           <div class="photo-picker" id="photo-picker" aria-label="조정할 사진 선택"></div>
@@ -115,7 +115,7 @@
   <section id="decoration-editor" data-tool="stickers" aria-labelledby="edit-title" hidden>
     <header class="edit-header"><button class="text-button" id="close-edit">돌아가기</button><strong id="edit-title" tabindex="-1">사진 꾸미기</strong><button type="button" class="button primary" id="finish-edit">저장·공유로</button></header>
     <div id="editor-view-controls" class="editor-view-controls"><button id="editor-view-minus" aria-label="프레임 보기 축소">−</button><span class="view-label">보기</span><output id="editor-view-value">100%</output><button id="editor-view-plus" aria-label="프레임 보기 확대">+</button><button id="editor-view-fit">전체</button></div><section class="expanded-stage" id="expanded-stage"><div id="editor-viewport"><canvas id="crop-preview" width="1000" height="750" aria-label="선택한 사진 구도 조정" hidden></canvas></div></section>
-    <div class="editor-quick-row"><div class="editor-selection-actions"><button class="icon-button" id="undo-decoration" aria-label="스티커·문구 삭제 되돌리기" title="삭제 되돌리기" disabled></button><button class="icon-button" id="rotate-decoration" aria-label="선택한 요소 15도 회전" title="15도 회전" disabled></button><button class="icon-button danger" id="delete-decoration" aria-label="선택한 스티커·문구 삭제" title="선택한 스티커·문구 삭제" disabled></button></div><button type="button" class="tool-tray-toggle" id="toggle-editor-tools" aria-expanded="true" aria-controls="expanded-tools">도구 접기 ⌄</button></div><p class="edit-help" id="edit-help">스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.</p>
+    <div class="editor-quick-row"><div class="editor-selection-actions"><button class="icon-button" id="undo-decoration" aria-label="스티커·문구 삭제 되돌리기" title="삭제 되돌리기" disabled></button><button class="icon-button" id="rotate-decoration" aria-label="선택한 요소 15도 회전" title="15도 회전" disabled></button><button class="icon-button danger" id="delete-decoration" aria-label="선택한 스티커·문구 삭제" title="선택한 스티커·문구 삭제" disabled></button></div></div><p class="edit-help" id="edit-help">스티커를 끌어 옮기고, 꼭지점이나 두 손가락으로 크기를 바꿔요.</p>
     <nav class="edit-tool-tabs" aria-label="꾸미기 도구"><button data-editor-tool="stickers">✿ 스티커</button><button data-editor-tool="text">가 문구</button><button data-editor-tool="photo">⤢ 사진 구도</button><button data-editor-tool="filter">◐ 필터</button></nav>
     <section class="expanded-tools" id="expanded-tools"></section>
   </section>

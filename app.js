@@ -106,8 +106,8 @@ function renderStickerChoices(){
 }
 $('sticker-category').addEventListener('change',renderStickerChoices);
 function renderFilterChoices(){
-  const list=$('filter-options');list.replaceChildren();const photo=state.photos[state.selectedPhoto]||state.photos.find(Boolean);
-  for(const group of [...new Set(FILTERS.map(f=>f.group))]){
+  const category=$('filter-category'),previous=category.value,groups=[...new Set(FILTERS.map(f=>f.group))];category.replaceChildren(...['전체',...groups].map(value=>Object.assign(document.createElement('option'),{value,textContent:value==='전체'?`전체 · ${FILTERS.length}가지`:`${value} · ${FILTERS.filter(f=>f.group===value).length}가지`})) );category.value=['전체',...groups].includes(previous)?previous:'전체';$('filter-current').textContent='선택한 필터: '+FILTERS.find(f=>f.id===state.filter).name;const list=$('filter-options');list.replaceChildren();const photo=state.photos[state.selectedPhoto]||state.photos.find(Boolean);
+  for(const group of groups.filter(g=>category.value==='전체'||g===category.value)){
     const section=document.createElement('section');section.className='filter-category';const heading=document.createElement('h3');heading.textContent=group;const cards=document.createElement('div');cards.className='filter-cards';
     for(const filter of FILTERS.filter(f=>f.group===group)){
       const button=createButton(`filter-chip ${state.filter===filter.id?'selected':''}`,'',()=>{state.filter=filter.id;renderFilterChoices();render();});button.setAttribute('aria-label',filter.name);button.setAttribute('aria-pressed',String(state.filter===filter.id));
@@ -118,6 +118,7 @@ function renderFilterChoices(){
     section.append(heading,cards);list.append(section);
   }
 }
+$('filter-category').addEventListener('change',renderFilterChoices);
 function canEditDecoration(d){return Boolean(d)&&decorationEditor.dataset.tool!=='photo';}
 function go(step) {
   if (busy) return;
@@ -304,7 +305,7 @@ function selectEditorTool(tool) {
 function openEditorTool(tool = 'stickers') {
   if (state.step !== 3) return;
   if (decorationEditor.hidden) { $('editor-viewport').prepend(canvas); $('expanded-tools').append($('decoration-tools')); decorationEditor.hidden=false; editorView.reset(); }
-  $('expanded-tools').hidden=false;$('toggle-editor-tools').setAttribute('aria-expanded','true');$('toggle-editor-tools').textContent='도구 접기 ⌄';
+  $('expanded-tools').hidden=false;
   selectEditorTool(tool);
 }
 function closeEditor() {
@@ -490,7 +491,6 @@ $('demo').addEventListener('click', async () => {
 for(const [id,delta] of [['photo-zoom-in',.15],['photo-zoom-out',-.15]])$(id).onclick=()=>{const p=state.photos[state.selectedPhoto];if(p){p.zoom=clamp(p.zoom+delta,1,2.5);updateAdjustment();render();}};
 $('photo-reset').onclick=()=>{const p=state.photos[state.selectedPhoto];if(p){p.zoom=1;p.panX=0;p.panY=0;updateAdjustment();render();}};
 cropCanvas.addEventListener('wheel',e=>{e.preventDefault();const p=state.photos[state.selectedPhoto];if(p){p.zoom=clamp(p.zoom*(e.deltaY<0?1.1:1/1.1),1,2.5);updateAdjustment();render();}},{passive:false});
-$('toggle-editor-tools').onclick=()=>{const hidden=!$('expanded-tools').hidden;$('expanded-tools').hidden=hidden;$('toggle-editor-tools').setAttribute('aria-expanded',String(!hidden));$('toggle-editor-tools').textContent=hidden?'도구 펼치기 ⌃':'도구 접기 ⌄';editorView.refresh();};
 $('add-text').addEventListener('click', () => { const text = $('decoration-text').value.trim(); if (!text) return toast('문구를 먼저 입력해 주세요.'); addDecoration({ type: 'text', text, color: '#ffffff' }); $('decoration-text').value = ''; });
 $('selected-decoration-text').addEventListener('input',e=>{const d=state.decorations[state.selectedDeco];if(d?.type==='text'){d.text=e.target.value;updateAdjustment();render();}});
 $('decoration-color').addEventListener('input', e => { const d = state.decorations[state.selectedDeco]; if (d) { d.color = e.target.value;d.letterColors=[];updateAdjustment(); render(); } });

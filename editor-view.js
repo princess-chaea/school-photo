@@ -1,7 +1,22 @@
 import { clamp } from './core.js';
 export function createEditorView(editor,canvas,{isDecorationTarget=()=>false}={}){
  const stage=document.getElementById('expanded-stage'),wrap=document.getElementById('editor-viewport'),bar=document.getElementById('editor-view-controls'),output=document.getElementById('editor-view-value');let zoom=1,drag=null;const points=new Map();
- function refresh(){if(editor.hidden)return;const photo=editor.dataset.tool==='photo';bar.hidden=photo;wrap.style.width=photo?'100%':Math.max(stage.clientWidth,canvas.width*Math.min((stage.clientWidth-24)/canvas.width,(stage.clientHeight-24)/canvas.height)*zoom+24)+'px';wrap.style.height=photo?'100%':Math.max(stage.clientHeight,canvas.height*Math.min((stage.clientWidth-24)/canvas.width,(stage.clientHeight-24)/canvas.height)*zoom+24)+'px';if(!photo){const fit=Math.min((stage.clientWidth-24)/canvas.width,(stage.clientHeight-24)/canvas.height);canvas.style.width=canvas.width*fit*zoom+'px';canvas.style.height=canvas.height*fit*zoom+'px';}output.textContent=Math.round(zoom*100)+'%';stage.classList.toggle('view-pan',points.size>0);}
+ function refresh(){
+  if(editor.hidden)return;
+  const photo=editor.dataset.tool==='photo';bar.hidden=photo;
+  if(photo){
+   const cropCanvas=document.getElementById('crop-preview'),inset=12;
+   wrap.style.width=stage.clientWidth+'px';wrap.style.height=stage.clientHeight+'px';
+   const fit=Math.max(.01,Math.min((stage.clientWidth-inset)/cropCanvas.width,(stage.clientHeight-inset)/cropCanvas.height));
+   cropCanvas.style.width=cropCanvas.width*fit+'px';cropCanvas.style.height=cropCanvas.height*fit+'px';
+   stage.scrollLeft=0;stage.scrollTop=0;
+  }else{
+   const fit=Math.max(.01,Math.min((stage.clientWidth-24)/canvas.width,(stage.clientHeight-24)/canvas.height));
+   wrap.style.width=Math.max(stage.clientWidth,canvas.width*fit*zoom+24)+'px';wrap.style.height=Math.max(stage.clientHeight,canvas.height*fit*zoom+24)+'px';
+   canvas.style.width=canvas.width*fit*zoom+'px';canvas.style.height=canvas.height*fit*zoom+'px';
+  }
+  output.textContent=Math.round(zoom*100)+'%';stage.classList.toggle('view-pan',points.size>0);
+ }
  function setZoom(value){const x=(stage.scrollLeft+stage.clientWidth/2)/Math.max(1,wrap.clientWidth),y=(stage.scrollTop+stage.clientHeight/2)/Math.max(1,wrap.clientHeight);zoom=clamp(value,1,4);refresh();stage.scrollLeft=x*wrap.clientWidth-stage.clientWidth/2;stage.scrollTop=y*wrap.clientHeight-stage.clientHeight/2;}
  document.getElementById('editor-view-plus').onclick=()=>setZoom(zoom+.25);document.getElementById('editor-view-minus').onclick=()=>setZoom(zoom-.25);document.getElementById('editor-view-fit').onclick=()=>setZoom(1);
  stage.addEventListener('pointerdown',e=>{
