@@ -5,6 +5,7 @@
 /* Native text selection, composition and caret editing replace letter buttons. */
 body .rich-text-input{min-height:86px;max-height:240px;overflow:auto;border:1px solid #bdcba9;border-radius:9px;padding:12px;background:#fff;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;cursor:text;font-size:24px;user-select:text;-webkit-user-select:text;touch-action:auto;text-align:left}
 body .rich-text-input:focus{outline:2px solid #718b50;outline-offset:2px}
+body .rich-text-input{caret-color:#34372f}
 body .rich-text-input:empty:before{content:'문구를 입력하세요';color:#858b7b;font-size:16px;pointer-events:none}
 body .rich-text-input::selection,body .rich-text-input *::selection{background:#c5def9;color:#172f55}
 body .rich-text-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 100px 64px;gap:9px;align-items:end;margin-top:12px}

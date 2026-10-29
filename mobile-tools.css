@@ -6,7 +6,7 @@
  body.booth-app #decoration-editor #close-edit{font-size:10px;white-space:nowrap}
  body.booth-app #decoration-editor #finish-edit{min-height:34px;font-size:10px;padding:6px 8px}
  body.booth-app #decoration-editor .editor-view-controls{position:static;flex:0 0 38px;min-height:38px;padding:2px 8px}
- body.booth-app #decoration-editor .editor-view-controls button{min-height:32px;height:32px;padding:3px 10px}
+ body.booth-app #decoration-editor .editor-view-controls button{min-height:32px;height:32px;padding:3px 10px;line-height:1;display:inline-grid;place-items:center}
  body.booth-app #decoration-editor .expanded-stage{position:relative;flex:1 1 0;min-height:0;grid-row:auto;border:0}
  body.booth-app #decoration-editor .edit-help{display:none}
  body.booth-app #decoration-editor .editor-quick-row{flex:0 0 36px;min-height:36px;border-top:1px solid var(--line);padding:2px 8px}

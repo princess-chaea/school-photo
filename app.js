@@ -303,7 +303,7 @@ function updateAdjustment() {
   const photo = state.photos[state.selectedPhoto]; $('photo-zoom-value').textContent=Math.round((photo?.zoom||1)*100)+'%';
   $('photo-zoom-out').disabled=!photo||photo.zoom<=1;$('photo-zoom-in').disabled=!photo||photo.zoom>=2.5;
   $('delete-decoration').disabled=state.selectedDeco===null;$('rotate-decoration').disabled=state.selectedDeco===null;$('undo-decoration').disabled=!deletedDecoration||state.decorations.length>=40;
-  const d = state.decorations[state.selectedDeco]; $('decoration-edit').hidden = !d; if(d?.type==='text'){$('text-font').value=d.font||'baeum';refreshFontSelect($('text-font'));}
+  const d = state.decorations[state.selectedDeco]; $('decoration-edit').hidden = !d || d.type==='text'; if(d?.type==='text'){$('text-font').value=d.font||'baeum';refreshFontSelect($('text-font'));}
   decorationEditor.dataset.hasSelection=String(Boolean(d||deletedDecoration));
   if(d)$('rotation-value').textContent=Math.round(d.rotation||0)+'°';
   $('selected-text-controls').hidden=d?.type!=='text';if(d?.type==='text'){Object.assign(d,textColorSettings(d.text,d));if($('selected-decoration-text').value!==d.text)$('selected-decoration-text').value=d.text;}studentTextStyles.refresh();
