@@ -60,7 +60,6 @@ body .maker-slot-controls select{width:100%;min-height:40px}
 body .maker-slot-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
 body .maker-slot-fields input{width:100%;min-width:0;padding:8px;border:1px solid #dce1d1;border-radius:7px;font:inherit;background:white;color:#252820}
 body #maker-preview{touch-action:none;cursor:move;user-select:none}
-body #maker-change-kind{margin:12px 0}
 @media(max-width:700px){body .asset-upload.upload-three-steps{grid-template-columns:1fr;gap:12px}body #frame-maker .palette-builder{grid-template-columns:1fr 1fr}body #frame-maker .palette-builder>label:first-child{grid-column:1/-1}body .maker-slot-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
 body #frame-maker .asset-upload.upload-three-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:700px){body #frame-maker .asset-upload.upload-three-steps{grid-template-columns:1fr}}
@@ -72,3 +71,64 @@ body .upload-file-picker:focus-within{outline:3px solid #728a50;outline-offset:3
 body .upload-three-steps input:not([type=file]):not([type=hidden]){min-height:46px}
 body .upload-file-picker{gap:8px}
 body .upload-file-picker .ui-icon{width:20px;height:20px;flex:none;pointer-events:none}
+
+/* Keep each maker sized to its task instead of leaving a large blank form. */
+body #frame-maker{padding:18px;height:fit-content;min-height:0}
+body #frame-maker>header{padding:4px 0 10px;min-height:42px}
+body #frame-maker h2{font-size:21px}
+body #frame-maker #maker-intro{margin:8px 0 12px;line-height:1.6}
+body #frame-maker h3{margin:14px 0 8px}
+body #frame-maker .maker-kind-options{margin:12px 0 0;gap:12px}
+body #frame-maker .maker-kind-options>button{padding:14px}
+body #frame-maker .maker-layout{gap:18px}
+body #frame-maker .maker-purpose,body #frame-maker .maker-cut{padding:8px 5px;gap:5px}
+body #frame-maker .maker-purpose canvas{width:68px;height:70px}
+body #frame-maker .maker-cut canvas{height:65px}
+body #frame-maker .maker-preview-panel{top:54px;padding:12px}
+body #frame-maker .maker-image-instructions{margin-top:14px}
+body #frame-maker[data-maker-mode="palette"]{width:min(680px,calc(100vw - 24px))}
+body #frame-maker[data-maker-mode="palette"] #palette-workspace{padding:0}
+body #frame-maker[data-maker-mode="palette"] .palette-builder{grid-template-columns:minmax(160px,1fr) 120px auto;gap:12px;padding:14px}
+body #frame-maker[data-maker-mode="palette"] .palette-builder label{gap:5px;min-width:0}
+body #frame-maker[data-maker-mode="palette"] .palette-builder input{width:100%;min-width:0;height:44px}
+body #frame-maker[data-maker-mode="palette"] .palette-builder .button{grid-column:auto;width:100%;max-width:none;min-height:44px;margin:0;font-size:12px}
+@media(max-width:700px){
+ body #frame-maker{padding:14px}
+ body #frame-maker h2{font-size:18px}
+ body #frame-maker[data-maker-mode="palette"] .palette-builder{grid-template-columns:1fr 1fr;gap:12px;padding:12px}
+ body #frame-maker[data-maker-mode="palette"] .palette-builder>label:first-child,body #frame-maker[data-maker-mode="palette"] .palette-builder .button{grid-column:1/-1}
+}
+
+
+@media(max-width:700px){
+ body #frame-maker[data-maker-mode="palette"] .palette-builder{grid-template-columns:minmax(0,1fr) 90px}
+ body #frame-maker[data-maker-mode="palette"] .palette-builder>label:first-child{grid-column:auto}
+ body #frame-maker[data-maker-mode="palette"] .palette-builder .button{grid-column:1/-1}
+}
+/* Scroll inside the rounded dialog shell; the header and outer corners never scroll. */
+body #frame-maker{overflow:hidden;padding:0;outline:none}
+body #frame-maker[open]{display:flex;flex-direction:column}
+body #frame-maker>header{position:relative;flex:none;padding:14px 20px;margin:0;min-height:60px}
+body #frame-maker .maker-scroll{flex:1 1 auto;min-height:0;overflow:auto;max-height:calc(94dvh - 62px);padding:0 18px 18px;overscroll-behavior:contain;scrollbar-gutter:stable}
+body #frame-maker .maker-preview-panel{top:0}
+body .maker-size-spec{font-size:10px;line-height:1.5;color:#4d6240;word-break:keep-all}
+body .maker-layer-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+body .maker-layer-actions .button{padding:7px 4px;font-size:11px;min-height:38px}
+body #save-frame-draft{width:100%;margin-top:10px;min-height:42px;justify-content:center;gap:8px}
+body #frame-draft-status{margin:6px 0 0;font-size:10px}
+body .upload-placement-actions{grid-column:1/-1;display:flex;justify-content:flex-end;border-top:1px solid #e0e5d9;padding-top:7px;min-width:0}
+body .upload-placement-actions .text-button{min-height:36px}
+body .frame-draft-section{margin:18px 0;padding:14px;border:1px solid #dce1d1;border-radius:12px;background:#fffefa}
+body .frame-draft-section h3{font-size:14px;margin:0 0 6px}
+body .frame-draft-section>p{font-size:11px;margin:0 0 10px;color:#78836a}
+body .frame-draft-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+body .frame-draft-card{display:grid;grid-template-columns:56px minmax(0,1fr);gap:8px;padding:10px;border:1px solid #dce1d1;border-radius:9px}
+body .frame-draft-card canvas{width:56px;height:72px;object-fit:contain;grid-row:1/3}
+body .frame-draft-card strong{font-size:12px;overflow-wrap:anywhere}
+body .frame-draft-card p{font-size:10px;margin:3px 0;color:#78836a}
+body .frame-draft-card .compact-actions{grid-column:1/-1;justify-content:flex-end;gap:8px}
+body .frame-draft-card .button{font-size:11px;min-height:36px;padding:6px 10px}
+@media(max-width:600px){body #frame-maker>header{padding:12px 14px}body #frame-maker .maker-scroll{padding:0 12px 12px}body .maker-layer-actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
+body #frame-maker .maker-scroll{margin:0 6px 6px;max-height:calc(94dvh - 68px)}
+@media(min-width:601px){body #frame-maker #maker-preview{height:min(36dvh,340px)}}
+body .frame-draft-list{max-height:260px;overflow:auto}

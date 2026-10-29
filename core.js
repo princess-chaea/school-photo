@@ -90,8 +90,8 @@ export function brandPart(event,key){return brandEntries(event).find(item=>item.
 export function changeBrandPart(event,key,part){const {hasContent,hasTop,hasBottom,...model}=brandingModel(event);if(BRAND_KEYS.includes(key))model[key]={...model[key],...part};else model.texts=model.texts.map(item=>item.id===key?{...item,...part}:item);return model;}
 export function normalizeSlots(slots, count) {
   if (!Array.isArray(slots) || slots.length !== count) return null;
-  if (!slots.every(s => s && ['x','y','w','h'].every(k => Number.isFinite(s[k])) && s.x >= 0 && s.y >= 0 && s.w >= .025 && s.h >= .025 && s.x + s.w <= 1.000001 && s.y + s.h <= 1.000001 && (s.rotation === undefined || Number.isFinite(s.rotation) && Math.abs(s.rotation)<=180))) return null;
-  return slots.map(({x,y,w,h,rotation}) => ({x,y,w,h,...(rotation?{rotation}:{})}));
+  if (!slots.every(s => s && ['x','y','w','h'].every(k => Number.isFinite(s[k])) && s.x >= 0 && s.y >= 0 && s.w >= .025 && s.h >= .025 && s.x + s.w <= 1.000001 && s.y + s.h <= 1.000001 && (s.rotation === undefined || Number.isFinite(s.rotation) && Math.abs(s.rotation)<=180) && (s.z === undefined || Number.isInteger(s.z)&&s.z>=0&&s.z<count))) return null;
+  return slots.map(({x,y,w,h,rotation,z}) => ({x,y,w,h,...(rotation?{rotation}:{}),...(z!==undefined?{z}:{})}));
 }
 export function normalizePhotoLayouts(value){
  if(typeof value==='string'){if(value.length>16000)return null;try{value=JSON.parse(value);}catch{return null;}}

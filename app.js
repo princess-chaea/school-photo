@@ -1,5 +1,5 @@
 import {supportedFrameCounts} from './core.js';
-import {transformPhotoSlot} from './photo-slots.js';
+import {transformPhotoSlot,orderedPhotoSlots} from './photo-slots.js';
 import {observeFrameChoices,paintFrameChoice} from './frame-choice-preview.js';
 import {createJourneyHeader} from './journey-header.js';
 import {createToolPanel} from './tool-panel.js';
@@ -227,7 +227,7 @@ function render(exporting = false) {
   $('export-format-note').textContent=(frame.layoutCount || frame.preserveAspect)?'이미지 프레임은 원래 디자인을 보존해 선택한 용도에 맞춰 저장해요.':'선택한 용도에 맞춰 처음부터 사진을 크게 배치해요.';
   if (canvas.width !== g.width || canvas.height !== g.height) { canvas.width = g.width; canvas.height = g.height; }
   ctx.filter = 'none'; ctx.fillStyle = frame.bg; ctx.fillRect(0, 0, g.width, g.height);
-  g.slots.forEach((slot, i) => {
+  orderedPhotoSlots(g.slots).forEach(({slot,index:i}) => {
     const photo = state.photos[i]; ctx.save();transformPhotoSlot(ctx,slot); ctx.beginPath(); ctx.rect(slot.x, slot.y, slot.w, slot.h); ctx.clip();
     if (photo) {
       const c = crop(photo.image.width, photo.image.height, slot.w, slot.h, photo.zoom, photo.panX, photo.panY);

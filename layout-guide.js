@@ -1,4 +1,4 @@
-import {transformPhotoSlot} from './photo-slots.js';
+import {transformPhotoSlot,orderedPhotoSlots} from './photo-slots.js';
 // 실제 출력과 같은 공통 좌표로 사진 영역을 표시합니다.
 export function drawLayoutGuide(canvas, geometry, { background = '#fffdf6', ink = '#41572c', numbers = true } = {}) {
   const ctx = canvas.getContext('2d'), g = geometry;
@@ -6,7 +6,7 @@ export function drawLayoutGuide(canvas, geometry, { background = '#fffdf6', ink 
   const scale = Math.min(canvas.width / g.width, canvas.height / g.height);
   ctx.save(); ctx.translate((canvas.width-g.width*scale)/2,(canvas.height-g.height*scale)/2);ctx.scale(scale,scale);
   ctx.fillStyle=background;ctx.fillRect(0,0,g.width,g.height);
-  for (const [i,s] of g.slots.entries()) {
+  for (const {slot:s,index:i} of orderedPhotoSlots(g.slots)) {
     ctx.save();transformPhotoSlot(ctx,s);ctx.fillStyle=['#dce8cf','#ecdbd1','#d7e4ed','#e6dcef'][i%4];ctx.fillRect(s.x,s.y,s.w,s.h);
     ctx.strokeStyle=ink;ctx.lineWidth=1/scale;ctx.strokeRect(s.x,s.y,s.w,s.h);
     if(numbers){ctx.fillStyle=ink;ctx.font=`${Math.min(s.w,s.h)*.20}px KerisBaeum,Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(i+1,s.x+s.w/2,s.y+s.h/2);}

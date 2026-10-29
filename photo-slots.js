@@ -6,3 +6,8 @@ export function containPhotoSlot(slot,aspect=1){
  for(let i=0;i<8;i++){const{hx,hy}=bounds(),fit=Math.min(1,.98/(2*hx),.98/(2*hy));if(fit>=1)break;s.w=Math.max(.025,s.w*fit);s.h=Math.max(.025,s.h*fit);}
  const{hx,hy}=bounds(),cx=Math.min(1-hx,Math.max(hx,slot.x+slot.w/2)),cy=Math.min(1-hy,Math.max(hy,slot.y+slot.h/2));s.x=cx-s.w/2;s.y=cy-s.h/2;return s;
 }
+export function orderedPhotoSlots(slots){return slots.map((slot,index)=>({slot,index})).sort((a,b)=>(a.slot.z??a.index)-(b.slot.z??b.index)||a.index-b.index);}
+export function movePhotoSlotLayer(slots,index,direction){
+ const order=orderedPhotoSlots(slots).map(s=>s.index),from=order.indexOf(index),to=direction==='front'?order.length-1:direction==='back'?0:Math.max(0,Math.min(order.length-1,from+(direction==='up'?1:-1)));
+ if(from<0||from===to)return slots.map(s=>({...s}));order.splice(from,1);order.splice(to,0,index);const result=slots.map(s=>({...s}));order.forEach((i,z)=>{result[i].z=z;});return result;
+}

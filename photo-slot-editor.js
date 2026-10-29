@@ -1,4 +1,4 @@
-import {containPhotoSlot,transformPhotoSlot} from './photo-slots.js';
+import {containPhotoSlot,transformPhotoSlot,orderedPhotoSlots} from './photo-slots.js';
 export function createPhotoSlotEditor(canvas,{geometry,getIndex,setIndex,change,refresh}){
  const points=new Map();let gesture=null;
  const scale=g=>Math.min(canvas.width/g.width,canvas.height/g.height);
@@ -6,11 +6,11 @@ export function createPhotoSlotEditor(canvas,{geometry,getIndex,setIndex,change,
  const local=(p,s)=>{const r=-(s.rotation||0)*Math.PI/180,x=p.x-s.x-s.w/2,y=p.y-s.y-s.h/2;return{x:x*Math.cos(r)-y*Math.sin(r),y:x*Math.sin(r)+y*Math.cos(r)};};
  function mode(p,s,g){const q=local(p,s),hit=18/scale(g);if(Math.hypot(q.x,q.y+s.h/2+30/scale(g))<hit)return'rotate';for(const x of[-1,1])for(const y of[-1,1])if(Math.hypot(q.x-x*s.w/2,q.y-y*s.h/2)<hit)return'resize';return Math.abs(q.x)<=s.w/2&&Math.abs(q.y)<=s.h/2?'move':null;}
  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
- function update(next,g){const n=containPhotoSlot({x:next.x/g.width,y:next.y/g.height,w:next.w/g.width,h:next.h/g.height,rotation:next.rotation||0},g.width/g.height);change(getIndex(),n);}
+ function update(next,g){const n=containPhotoSlot({x:next.x/g.width,y:next.y/g.height,w:next.w/g.width,h:next.h/g.height,rotation:next.rotation||0,...(next.z!==undefined?{z:next.z}:{})},g.width/g.height);change(getIndex(),n);}
  canvas.addEventListener('pointerdown',e=>{const g=geometry(),p=point(e);if(!g)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);points.set(e.pointerId,p);let index=getIndex(),s=g.slots[index],action=s&&mode(p,s,g);
   if(points.size===2&&s){const[a,b]=[...points.values()];gesture={action:'pinch',slot:{...s},distance:distance(a,b),angle:Math.atan2(b.y-a.y,b.x-a.x)};return;}
   if(points.size>1)return;
-  if(!action){index=g.slots.findLastIndex(s=>{const q=local(p,s);return Math.abs(q.x)<=s.w/2&&Math.abs(q.y)<=s.h/2;});if(index<0){gesture=null;return;}setIndex(index);s=g.slots[index];action='move';}
+  if(!action||action==='move'){index=orderedPhotoSlots(g.slots).findLast(({slot:s})=>{const q=local(p,s);return Math.abs(q.x)<=s.w/2&&Math.abs(q.y)<=s.h/2;})?.index??-1;if(index<0){gesture=null;return;}setIndex(index);s=g.slots[index];action='move';}
   gesture={action,point:p,slot:{...s},distance:distance(p,{x:s.x+s.w/2,y:s.y+s.h/2}),angle:Math.atan2(p.y-s.y-s.h/2,p.x-s.x-s.w/2)};refresh();
  });
  canvas.addEventListener('pointermove',e=>{if(!points.has(e.pointerId)||!gesture)return;e.preventDefault();const p=point(e),g=geometry(),s=gesture.slot;points.set(e.pointerId,p);let next={...s};

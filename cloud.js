@@ -1,3 +1,4 @@
+import {normalizeFrameDraft} from './frame-draft.js';
 import {storeFrameMetadata,readFrameAsset} from './frame-metadata.js';
 import {usageDay} from './usage-data.js';
 // 운영자 전용 모듈입니다. 참가자는 public-event.js의 읽기 기능만 사용합니다.
@@ -131,3 +132,14 @@ export async function getOperationsEvent(id){
  if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');const snap=await getDoc(doc(firebase().db,'events',id));if(!snap.exists())throw new Error('삭제된 행사입니다.');return {...normalizeEvent(snap.data()),id:snap.id,ownerId:snap.data().ownerId,published:snap.data().published,updatedAt:snap.data().updatedAt};
 }
 export async function listModerationActions(){if(!isSiteAdmin(firebase().auth.currentUser))throw new Error('운영자 전용입니다.');const snap=await getDocs(query(collection(firebase().db,'moderationActions'),orderBy('createdAt','desc'),limit(50)));return snap.docs.map(d=>({...d.data(),id:d.id}));}
+
+export async function listFrameDrafts(uid){
+ const snapshot=await getDocs(collection(firebase().db,'users',uid,'frameDrafts'));return snapshot.docs.map(d=>({...d.data(),id:d.id}));
+}
+export async function saveFrameDraft(uid,{id,name,scope='private',config}){
+ const clean=normalizeFrameDraft(config);if(!clean)throw new Error('배치를 확인해 주세요.');
+ if(scope==='shared'&&!isSiteAdmin(firebase().auth.currentUser))throw new Error('공용 프레임 배치는 운영자만 저장할 수 있어요.');
+ const draftId=id||crypto.randomUUID(),record={name:name.slice(0,60),scope,config:JSON.stringify(clean),updatedAt:serverTimestamp()};
+ await setDoc(doc(firebase().db,'users',uid,'frameDrafts',draftId),record);return{...record,config:clean,id:draftId,updatedAt:new Date().toISOString()};
+}
+export async function deleteFrameDraft(uid,id){await deleteDoc(doc(firebase().db,'users',uid,'frameDrafts',id));}

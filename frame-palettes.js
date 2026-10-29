@@ -14,3 +14,8 @@ export const FRAME_PALETTES=[
  {id:'slate',name:'미스티 그레이',bg:'#bfcbd2',ink:'#3f535f'},
  {id:'navy',name:'딥 네이비',bg:'#33465b',ink:'#fff5de'},
 ].map(frame=>({...frame,source:'base'}));
+
+export function paletteDefaultInk(background){
+ const rgb=background.slice(1).match(/../g).map(h=>parseInt(h,16)/255).map(n=>n<=.04045?n/12.92:((n+.055)/1.055)**2.4),luminance=.2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
+ return luminance>.179?'#000000':'#ffffff';
+}

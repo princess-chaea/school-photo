@@ -1,3 +1,4 @@
+import {normalizeFrameDraft} from '../frame-draft.js';
 import {storeFrameMetadata} from '../frame-metadata.js';
 import { test, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -212,4 +213,14 @@ test('stored multi-count configuration is bounded, owner-only and frame-only',as
 test('only the verified operator can create shared multi-count frames',async()=>{
  const admin=env.authenticatedContext('admin',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore(),teacher=env.authenticatedContext('teacher-a').firestore();const s={x:.1,y:.1,w:.3,h:.3,rotation:15};const value={name:'공용 여러 컷',kind:'frame',url:'https://example.com/multi.webp',path:'shared/assets/multi',active:true,layoutCount:2,orientation:'portrait',photoLayouts:{2:[s,s],4:[s,s,s,s]}};
  await assertFails(setDoc(doc(teacher,'sharedAssets/multi'),storeFrameMetadata(value)));await assertSucceeds(setDoc(doc(admin,'sharedAssets/multi'),storeFrameMetadata(value)));
+});
+
+test('frame layout drafts are private, bounded metadata and can be resumed by the owner',async()=>{
+ const a=env.authenticatedContext('teacher-a').firestore(),b=env.authenticatedContext('teacher-b').firestore(),guest=env.unauthenticatedContext().firestore();
+ const config={version:1,format:'square',orientation:'portrait',count:2,index:0,enabled:[2],layouts:{2:[{x:.1,y:.1,w:.3,h:.3,rotation:15,z:1},{x:.2,y:.2,w:.3,h:.3,z:0}]}},value={name:'가을 배치',scope:'private',config:JSON.stringify(config),updatedAt:serverTimestamp()},target=doc(a,'users/teacher-a/frameDrafts/draft');
+ await assertSucceeds(setDoc(target,value));const stored=await assertSucceeds(getDoc(target));assert.deepEqual(normalizeFrameDraft(stored.data().config),config);await assertSucceeds(getDocs(collection(a,'users/teacher-a/frameDrafts')));await assertFails(getDoc(doc(b,'users/teacher-a/frameDrafts/draft')));await assertFails(getDoc(doc(guest,'users/teacher-a/frameDrafts/draft')));await assertFails(setDoc(doc(b,'users/teacher-a/frameDrafts/draft'),value));
+ for(const patch of[{scope:'shared'},{scope:'invalid'},{config:{}},{config:'x'.repeat(16001)},{imageBase64:'not allowed'},{name:''}])await assertFails(setDoc(target,{...value,...patch}));await assertSucceeds(setDoc(target,{...value,name:'배치 수정'}));await assertSucceeds(deleteDoc(target));
+});
+test('verified operator shared draft stays in the operator private account',async()=>{
+ const admin=env.authenticatedContext('admin',{email:'dltjdrms320@gmail.com',email_verified:true}).firestore(),teacher=env.authenticatedContext('teacher-a').firestore(),value={name:'공용 배치',scope:'shared',config:'{}',updatedAt:serverTimestamp()};await assertSucceeds(setDoc(doc(admin,'users/admin/frameDrafts/shared'),value));await assertFails(getDoc(doc(teacher,'users/admin/frameDrafts/shared')));
 });

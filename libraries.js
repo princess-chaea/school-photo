@@ -1,3 +1,7 @@
+import {observeFrameChoices,paintFrameChoice} from './frame-choice-preview.js';
+import {normalizeFrameDraft} from './frame-draft.js';
+import {confirmAction} from './app-dialog.js';
+import {paletteDefaultInk} from './frame-palettes.js';
 import {drawLayoutGuide} from './layout-guide.js';
 import {createFrameMaker} from './frame-maker.js';
 import {renderFrameGroups} from './frame-groups.js';
@@ -18,6 +22,22 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
     const input=$(id),cell=input.parentElement,picker=element('div','','upload-file-picker'),caption=element('span','파일 첨부');cell.classList.add('upload-file-cell');input.before(picker);picker.append(icon('attachment'),caption,input);
     const sync=()=>{caption.textContent=input.files[0]?.name||'파일 첨부';picker.title=caption.textContent;};input.addEventListener('change',sync);input.addEventListener('file-label-update',sync);input.form.addEventListener('reset',()=>queueMicrotask(sync));
   }
+  let frameDrafts=[],draftUser='',draftLoadVersion=0,currentFrameDraftId=null;
+  const draftSections=[false,true].map(shared=>{const section=element('section','','frame-draft-section');section.hidden=true;section.dataset.draftScope=shared?'shared':'private';section.append(element('h3','임시 저장한 배치'),element('p',demo?'이 브라우저에 배치만 보관해요. 이미지는 나중에 첨부하세요.':'내 계정에 배치만 보관해요. 다른 기기에서도 이어서 만들 수 있어요.'));section.append(element('div','','frame-draft-list'));if(shared)$('shared-frame-maker-launch').append(section);else $('frame-library').before(section);return section;});
+  function localDraftKey(){return 'moment-frame-drafts:'+(getUser()?.uid||'demo');}
+  function renderDrafts(){
+    for(const [i,section]of draftSections.entries()){
+      const stamp=d=>d.updatedAt?.toMillis?.()||Date.parse(d.updatedAt)||0,rows=frameDrafts.filter(d=>d.scope===(i?'shared':'private')).sort((a,b)=>stamp(b)-stamp(a)),list=section.querySelector('.frame-draft-list');section.hidden=!rows.length;list.replaceChildren();
+      for(const row of rows){const config=normalizeFrameDraft(row.config);if(!config)continue;const card=element('article','','frame-draft-card'),canvas=document.createElement('canvas');canvas.width=100;canvas.height=120;const base=templateGeometry(config.count,config.orientation,config.format);drawLayoutGuide(canvas,{...base,slots:config.layouts[config.count].map(s=>({...s,x:s.x*base.width,y:s.y*base.height,w:s.w*base.width,h:s.h*base.height}))});const info=element('div','');info.append(element('strong',row.name),element('p',`${FRAME_SIZES.find(f=>f.id===config.format).name} · ${config.enabled.join('·')}컷`));const date=row.updatedAt?.toDate?.()||new Date(row.updatedAt);if(Number.isFinite(date.getTime()))info.append(element('p',date.toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})));const actions=element('div','','compact-actions'),resume=element('button','이어서 만들기','button'),remove=element('button','삭제','text-button danger');resume.type=remove.type='button';resume.onclick=()=>run(()=>openMaker(Boolean(i),{...row,config}));remove.onclick=()=>run(async()=>{if(!await confirmAction('임시 저장한 배치를 삭제할까요?'))return;if(demo){frameDrafts=frameDrafts.filter(d=>d.id!==row.id);localStorage.setItem(localDraftKey(),JSON.stringify(frameDrafts));}else{await cloud.deleteFrameDraft(getUser().uid,row.id);frameDrafts=frameDrafts.filter(d=>d.id!==row.id);}if(currentFrameDraftId===row.id)currentFrameDraftId=null;renderDrafts();});actions.append(resume,remove);card.append(canvas,info,actions);list.append(card);}
+    }
+  }
+  function loadDrafts(){const uid=getUser()?.uid||(demo?'demo':'');if(uid===draftUser)return;draftUser=uid;const ticket=++draftLoadVersion;frameDrafts=[];renderDrafts();if(!uid)return;if(demo){try{frameDrafts=JSON.parse(localStorage.getItem(localDraftKey())||'[]').filter(d=>normalizeFrameDraft(d.config));}catch{frameDrafts=[];}renderDrafts();}else cloud.listFrameDrafts(uid).then(rows=>{if(ticket!==draftLoadVersion)return;frameDrafts=rows.filter(d=>normalizeFrameDraft(d.config));renderDrafts();}).catch(()=>{if(ticket===draftLoadVersion)toast('임시 저장 배치를 불러오지 못했어요. 새로고침해 주세요.');});}
+  $('save-frame-draft').onclick=()=>run(async()=>{
+    const draftOwner=getUser()?.uid,config=frameMaker.snapshot(),name=$('frame-upload-name').value.trim()||FRAME_SIZES.find(f=>f.id===config.format).name+' 배치',value={id:currentFrameDraftId||crypto.randomUUID(),name,scope:makerShared?'shared':'private',config};let saved;
+    if(demo){saved={...value,updatedAt:new Date().toISOString()};const next=[saved,...frameDrafts.filter(d=>d.id!==value.id)];localStorage.setItem(localDraftKey(),JSON.stringify(next));frameDrafts=next;}else{saved=await cloud.saveFrameDraft(draftOwner,value);if(getUser()?.uid!==draftOwner)return;frameDrafts=[saved,...frameDrafts.filter(d=>d.id!==saved.id)];}
+    currentFrameDraftId=saved.id;renderDrafts();$('frame-draft-status').textContent=demo?'이 브라우저에 배치를 저장했어요. 보관함에서 이어서 만들 수 있어요.':'내 계정에 배치를 저장했어요. 보관함에서 이어서 만들 수 있어요.';toast('배치를 임시 저장했어요.');
+  });labelButton($('save-frame-draft'),'save','배치 임시 저장');
+  observeFrameChoices($('frame-library'));
   const designFilters=document.createElement('div');designFilters.className='sticker-library-filters';designFilters.innerHTML='<label>디자인 검색<input type="search" placeholder="이름으로 찾기" data-design-search></label><label>테마<select data-design-category><option>전체</option></select></label>';$('asset-library').before(designFilters);
   const designSearch=designFilters.querySelector('input'),designCategory=designFilters.querySelector('select');designSearch.oninput=render;designCategory.onchange=render;
   function element(tag, value, className = '') { const el = document.createElement(tag); el.textContent = value; el.className = className; return el; }
@@ -30,6 +50,7 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
     $('library-preview').showModal();
   }
   function assetCard(asset, manage = false) {
+    if(asset.base&&asset.kind==='palette'){const card=element('article','','asset-card design-choice palette-library-card');card.setAttribute('aria-label',asset.name);paintFrameChoice(card,asset,{compact:true});return card;}
     const card = element('article', '', 'asset-card'), image = element('button', '', 'asset-image library-image'); image.type = 'button'; image.setAttribute('aria-label', `${asset.name} 크게 보기`);
     if(asset.kind==='frame'&&asset.url){const sample=document.createElement('canvas');sample.className='palette-preview';image.append(sample);paintFramePreview(sample,frameEvent(asset),{count:asset.layoutCount||4,orientation:asset.orientation,maxDimension:360}).catch(()=>{});image.onclick=()=>showAsset(asset);}
     else if (asset.url) { const img = new Image(); img.src = asset.url; img.alt = asset.name; img.loading='lazy';image.append(img); image.addEventListener('click', () => showAsset(asset)); }
@@ -42,6 +63,7 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
     card.append(image, info); return card;
   }
   function render() {
+    loadDrafts();renderDrafts();
     const own = getAssets(), shared = getShared().filter(a => a.active);
     const frames = [...DEFAULT_FRAMES.map(f => ({ ...f, kind: 'palette', base: true })), ...shared.filter(a => ['frame','palette'].includes(a.kind)), ...own.filter(a => ['frame','palette'].includes(a.kind))];
     const designs = [...DEFAULT_STICKERS.filter(s => s.url).map(s => ({ ...s, kind: 'sticker', base: true })), ...shared.filter(a => a.kind === 'sticker'), ...own.filter(a => a.kind === 'sticker')];
@@ -85,7 +107,7 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
     const form=$(shared?'shared-form':'frame-form'),input=$(shared?'shared-file':'frame-upload-file'),format=$(shared?'shared-format':'frame-upload-format');
     input.addEventListener('change',()=>{if(!shared||$('shared-kind').value==='frame')run(()=>prepareFrame(form,shared));});
     format.addEventListener('change',()=>{drafts.delete(form);if(input.files[0])run(()=>prepareFrame(form,shared));});
-    const preview=element('button','위치 다시 조절','text-button');preview.type='button';preview.onclick=()=>run(()=>prepareFrame(form,shared));input.closest('.upload-file-cell').append(preview);
+    const preview=element('button','위치 다시 조절','text-button');preview.type='button';preview.onclick=()=>run(()=>prepareFrame(form,shared));const actions=element('div','','upload-placement-actions');actions.append(preview);form.append(actions);const syncAction=()=>{actions.hidden=!input.files[0]||(shared&&$('shared-kind').value!=='frame');};input.addEventListener('change',syncAction);input.addEventListener('file-label-update',syncAction);form.addEventListener('reset',()=>queueMicrotask(syncAction));syncAction();
     if(shared)document.querySelectorAll('[data-library-target="shared-kind"]').forEach(tab=>tab.addEventListener('click',()=>{preview.hidden=$('shared-kind').value!=='frame';drafts.delete(form);}));
     preview.hidden=shared&&$('shared-kind').value!=='frame';
   }
@@ -95,8 +117,15 @@ export function createLibraries({ getAssets, getShared, getUser, demo, run, adde
   for(const id of ['template-format','frame-upload-format','shared-format'])$(id).replaceChildren(...FRAME_SIZES.map(s=>Object.assign(document.createElement('option'),{value:s.id,textContent:s.name})));
   frameMaker=createFrameMaker({onChange:(selection,{reposition}={})=>{const form=$('frame-form'),draft=drafts.get(form);if(reposition){drafts.delete(form);if($('frame-upload-file').files[0])run(()=>prepareFrame(form,makerShared));}else if(draft)drafts.set(form,{...draft,...selection});},onDownload:count=>run(()=>template(count))});
   function syncSharedKind(){const frame=$('shared-kind').value==='frame';$('shared-frame-maker-launch').hidden=!frame;$('shared-form').hidden=frame;$('shared-count-wrap').hidden=true;}
-  function openMaker(shared=false){if(shared&&!isAdmin())throw new Error('운영자 전용입니다.');if(makerShared!==shared){$('frame-form').reset();drafts.delete($('frame-form'));frameMaker.clearDraft();}makerShared=shared;$('frame-maker-title').textContent=shared?'공용 프레임 만들기·추가':'프레임 만들기·추가';document.querySelector('label[for=frame-upload-name]').textContent=shared?'공용 프레임 이름':'내 프레임 이름';$('upload-frame').textContent=shared?'공용 프레임 등록':'내 프레임 등록';$('add-palette').textContent=shared?'공용 단색 프레임 등록':'단색 프레임 등록';frameMaker.begin();$('frame-maker').showModal();}
-  $('add-palette').addEventListener('click',()=>run(async()=>{const name=$('palette-name').value.trim();if(!name)return toast('프레임 이름을 입력해 주세요.');if(makerShared&&!isAdmin())throw new Error('운영자 전용입니다.');const value={name,bg:$('palette-bg').value,ink:$('palette-ink').value};const asset=demo?{...value,id:crypto.randomUUID(),kind:'palette',...(makerShared?{shared:true,active:true}:{})}:makerShared?await cloud.saveSharedPalette(value):await cloud.savePalette(getUser().uid,value);makerShared?sharedAdded(asset):added(asset);$('palette-name').value='';toast(makerShared?'모든 교사에게 제공할 단색 프레임을 등록했어요.':'단색 프레임을 등록했어요.');}));
+  function openMaker(shared=false,saved){
+    if(shared&&!isAdmin())throw new Error('운영자 전용입니다.');
+    $('frame-form').reset();drafts.delete($('frame-form'));makerShared=shared;currentFrameDraftId=saved?.id||null;
+    $('frame-maker-title').textContent=shared?'공용 프레임 만들기·추가':'프레임 만들기·추가';document.querySelector('label[for=frame-upload-name]').textContent=shared?'공용 프레임 이름':'내 프레임 이름';$('upload-frame').textContent=shared?'공용 프레임 등록':'내 프레임 등록';$('add-palette').textContent=shared?'공용 단색 프레임 등록':'단색 프레임 등록';frameMaker.begin();
+    if(saved){frameMaker.restore(saved.config);$('frame-upload-name').value=saved.name;}
+    $('frame-draft-status').textContent=saved?'저장한 배치를 불러왔어요. 완성 이미지를 첨부해 등록하세요.':'배치만 저장합니다. 제작한 이미지는 나중에 첨부할 수 있어요.';
+    $('frame-maker').showModal();$('maker-scroll').scrollTop=0;
+  }
+  $('add-palette').addEventListener('click',()=>run(async()=>{const name=$('palette-name').value.trim();if(!name)return toast('프레임 이름을 입력해 주세요.');if(makerShared&&!isAdmin())throw new Error('운영자 전용입니다.');const value={name,bg:$('palette-bg').value,ink:paletteDefaultInk($('palette-bg').value)};const asset=demo?{...value,id:crypto.randomUUID(),kind:'palette',...(makerShared?{shared:true,active:true}:{})}:makerShared?await cloud.saveSharedPalette(value):await cloud.savePalette(getUser().uid,value);makerShared?sharedAdded(asset):added(asset);$('palette-name').value='';toast(makerShared?'모든 교사에게 제공할 단색 프레임을 등록했어요.':'단색 프레임을 등록했어요.');}));
   document.querySelectorAll('[data-library-kind]').forEach(b=>b.onclick=()=>{const id=b.dataset.libraryTarget;$(id).value=b.dataset.libraryKind;document.querySelectorAll(`[data-library-target="${id}"]`).forEach(tab=>tab.setAttribute('aria-selected',String(tab===b)));syncSharedKind();render();});
   syncSharedKind();
   $('open-frame-maker').addEventListener('click',()=>openMaker());$('open-shared-frame-maker').onclick=()=>run(()=>openMaker(true)); $('close-frame-maker').addEventListener('click',()=>$('frame-maker').close());

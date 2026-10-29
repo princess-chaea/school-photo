@@ -5,8 +5,8 @@ export const FRAME_SIZES=[
  {id:'square',name:'정사각형 · 1:1',width:1080,height:1080},
  {id:'feed',name:'SNS 피드 · 4:5',width:1080,height:1350},
  {id:'story',name:'스토리 · 9:16',width:1080,height:1920},
- {id:'a4',name:'A4',width:2480,height:3508},
- {id:'screen',name:'화면용 · 세로/가로',width:1080,height:1920}
+ {id:'a4',name:'A4 · 210×297mm',width:2480,height:3508},
+ {id:'screen',name:'발표·영상 · 9:16 / 16:9',width:1080,height:1920}
 ];
 export function normalizeFrameFormat(value){return FRAME_SIZES.some(s=>s.id===value)?value:'print-4x6';}
 export function frameSize(format,orientation='portrait'){

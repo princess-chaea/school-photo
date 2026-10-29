@@ -10,3 +10,5 @@ body.booth-app .frame-group-grid .frame-option .palette-dot{align-self:center;ma
 .color-safe-frame .frame-choice-accessible{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .frame-group-grid :is(.frame-option,.design-choice).color-safe-frame:focus-visible{outline:3px solid #607f40;outline-offset:2px}
 @media(forced-colors:active){.frame-group-grid :is(.frame-option,.design-choice).color-safe-frame{outline:1px solid ButtonText}.frame-group-grid :is(.frame-option,.design-choice).color-safe-frame[aria-pressed="true"]{outline:3px solid Highlight}}
+.frame-group--library .palette-library-card.color-safe-frame{min-height:0;height:auto;cursor:default}
+.frame-group--library .palette-library-card .frame-choice-bitmap{height:auto}

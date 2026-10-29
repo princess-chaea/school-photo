@@ -4,7 +4,7 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function siteAdmin() { return signedIn() && request.auth.token.email == 'dltjdrms320@gmail.com' && request.auth.token.email_verified == true; }
     function owns(data) { return signedIn() && data.ownerId == request.auth.uid; }
-    function validPhotoRect(s) { return s is map && s.keys().hasOnly(['x','y','w','h','rotation']) && s.x is number && s.y is number && s.w is number && s.h is number && s.x >= 0 && s.y >= 0 && s.w >= 0.025 && s.h >= 0.025 && s.x+s.w <= 1.000001 && s.y+s.h <= 1.000001 && (!('rotation' in s) || (s.rotation is number && s.rotation >= -180 && s.rotation <= 180)); }
+    function validPhotoRect(s) { return s is map && s.keys().hasOnly(['x','y','w','h','rotation','z']) && s.x is number && s.y is number && s.w is number && s.h is number && s.x >= 0 && s.y >= 0 && s.w >= 0.025 && s.h >= 0.025 && s.x+s.w <= 1.000001 && s.y+s.h <= 1.000001 && (!('rotation' in s) || (s.rotation is number && s.rotation >= -180 && s.rotation <= 180)) && (!('z' in s) || s.z is int && s.z >= 0 && s.z <= 7); }
     function validFrameMode(d) { return (!('preserveAspect' in d) || (d.kind == 'frame' && d.preserveAspect is bool)) && (!('clearPhotoSlots' in d) || (d.kind == 'frame' && d.clearPhotoSlots is bool)) && (!('layoutCount' in d) || d.layoutCount != 0 || ('preserveAspect' in d && d.preserveAspect == true)); }
     function validPhotoSlots(d) { return !('photoSlots' in d) || (d.kind == 'frame' && d.photoSlots is list && d.photoSlots.size() == d.layoutCount && d.photoSlots.size() in [2,4,6,8] && (d.photoSlots.size() <= 0 || validPhotoRect(d.photoSlots[0])) && (d.photoSlots.size() <= 1 || validPhotoRect(d.photoSlots[1])) && (d.photoSlots.size() <= 2 || validPhotoRect(d.photoSlots[2])) && (d.photoSlots.size() <= 3 || validPhotoRect(d.photoSlots[3])) && (d.photoSlots.size() <= 4 || validPhotoRect(d.photoSlots[4])) && (d.photoSlots.size() <= 5 || validPhotoRect(d.photoSlots[5])) && (d.photoSlots.size() <= 6 || validPhotoRect(d.photoSlots[6])) && (d.photoSlots.size() <= 7 || validPhotoRect(d.photoSlots[7]))); }
     function validPhotoLayouts(d) { return !('photoLayouts' in d) || (d.kind == 'frame' && d.photoLayouts is string && d.photoLayouts.size() > 0 && d.photoLayouts.size() <= 16000 && d.layoutCount in [2,4,6,8]); }
@@ -144,6 +144,16 @@ service cloud.firestore {
       allow create: if owner() && validAsset(request.resource.data);
       allow delete: if owner();
       allow update: if false;
+    }
+    match /users/{uid}/frameDrafts/{draftId} {
+      function draftOwner(){return signedIn() && request.auth.uid == uid;}
+      function validDraft(d){return d.keys().hasOnly(['name','scope','config','updatedAt'])
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 60
+        && d.scope in ['private','shared'] && (d.scope != 'shared' || siteAdmin())
+        && d.config is string && d.config.size() > 0 && d.config.size() <= 16000
+        && d.updatedAt == request.time;}
+      allow read,delete: if draftOwner();
+      allow create,update: if draftOwner() && validDraft(request.resource.data);
     }
     match /users/{uid}/profile/school {
       allow read, delete: if signedIn() && request.auth.uid == uid;
