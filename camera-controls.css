@@ -1,0 +1,10 @@
+/* Controls overlay the live video; exported photos still come from the video alone. */
+body.booth-app #camera-shell .camera-progress{position:absolute;z-index:2;top:8px;right:8px;padding:3px 9px;border-radius:20px;background:#152010b8;color:#fff;font-size:12px;line-height:1.5;pointer-events:none}
+body.booth-app #camera-shell .camera-controls{position:absolute;z-index:3;inset:auto 0 0;display:flex;align-items:center;justify-content:center;min-height:76px;padding:8px 4px;background:linear-gradient(transparent,#0008);pointer-events:none}
+body.booth-app #camera-shell .camera-controls>button{pointer-events:auto;flex:none}
+body.booth-app #camera-shell .shutter{width:58px;height:58px;border:2px solid #fff;background:#1c281c66;box-shadow:0 2px 8px #0005;touch-action:manipulation}
+body.booth-app #camera-shell .shutter:disabled{opacity:.55}
+body.booth-app #camera-shell #cancel-capture{min-height:48px;min-width:80px;margin:0;background:#fffefa;color:#252820;border-color:#fff;font-size:12px;padding:8px}
+body.booth-app #camera-shell .camera-live{top:10px;left:8px;z-index:2;padding:2px 5px;border-radius:4px;background:#152010b8}
+body.booth-app #camera-shell .countdown{z-index:2}
+body.booth-app #camera-shell .camera-flash{z-index:4}

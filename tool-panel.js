@@ -1,4 +1,4 @@
-// Mobile tools open above the tabs so the canvas does not resize during a gesture.
+// Mobile tools reserve a compact dock below the canvas, with no image overlap.
 export function createToolPanel(editor,{onSelect}){
  const media=matchMedia('(max-width: 700px), (pointer: coarse) and (max-width: 1100px) and (max-height: 550px)'),panel=document.getElementById('expanded-tools'),closeButton=document.getElementById('close-mobile-tools'),tabs=[...editor.querySelectorAll('[data-editor-tool]')];
  let open=!media.matches;
@@ -11,5 +11,6 @@ export function createToolPanel(editor,{onSelect}){
  closeButton.onclick=close;
  for(const tab of tabs)tab.onclick=()=>{if(media.matches&&open&&tab.dataset.editorTool===editor.dataset.tool)close();else onSelect(tab.dataset.editorTool,{openPanel:true});};
  media.addEventListener('change',()=>{if(media.matches)close();else onSelect(editor.dataset.tool,{openPanel:true});});
+ new ResizeObserver(()=>editor.style.setProperty('--tool-panel-height',panel.hidden?'0px':panel.offsetHeight+'px')).observe(panel);
  sync();return{get compact(){return media.matches;},setOpen,close,reset(){if(media.matches&&editor.dataset.tool==='photo')onSelect('stickers',{openPanel:false});else setOpen(!media.matches);}};
 }

@@ -1,5 +1,5 @@
 body.booth-app .mobile-tool-header{display:none}
-/* The frame owns the available space; tool content overlays its lower edge only on demand. */
+/* Collapsed tools maximize the photo; open tools reserve space without covering it. */
 @media(max-width:700px),(pointer:coarse) and (max-width:1100px) and (max-height:550px){
  body.booth-app #decoration-editor:not([hidden]){position:relative;display:flex;flex-direction:column;height:100%;min-height:0;overflow:hidden}
  body.booth-app #decoration-editor .edit-header{position:static;flex:0 0 44px;min-height:44px;padding:4px 8px;gap:5px}
@@ -15,8 +15,8 @@ body.booth-app .mobile-tool-header{display:none}
  body.booth-app #decoration-editor .editor-selection-actions .icon-button{height:30px;width:34px}
  body.booth-app #decoration-editor .edit-tool-tabs{position:relative;z-index:5;flex:0 0 48px;min-height:48px;background:#fffefa;box-shadow:0 -2px 8px #263b1710}
  body.booth-app #decoration-editor .edit-tool-tabs button{min-height:48px;font-size:11px;padding:7px 3px;line-height:1.4}
- body.booth-app #decoration-editor .expanded-tools{position:absolute;z-index:4;left:0;right:0;bottom:48px;height:auto;max-height:min(38dvh,300px);min-height:0;flex:none;padding:0 12px 12px;background:#fffefa;border-top:1px solid #b9c9a5;border-radius:16px 16px 0 0;box-shadow:0 -8px 24px #24321c25;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;scroll-padding-top:44px}
- body.booth-app #decoration-editor[data-tool="text"] .expanded-tools{height:auto;max-height:min(44dvh,360px);flex:none;min-height:0}
+ body.booth-app #decoration-editor .expanded-tools{position:relative;z-index:4;inset:auto;height:auto;max-height:min(26dvh,210px);min-height:0;flex:0 0 auto;padding:0 12px 8px;background:#fffefa;border-top:1px solid #d8dfcf;border-radius:0;box-shadow:none;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;scroll-padding-top:44px}
+ body.booth-app #decoration-editor[data-tool="text"] .expanded-tools{height:auto;max-height:min(32dvh,260px);flex:none;min-height:0}
  body.booth-app #decoration-editor .mobile-tool-header{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:42px;margin:0 -2px 8px;background:#fffefa;border-bottom:1px solid var(--line);font-size:11px;color:#63764f}
  body.booth-app #decoration-editor #close-mobile-tools{min-height:40px;font-size:12px;white-space:nowrap;padding:6px 4px}
  body.booth-app #decoration-editor #mobile-tool-content{min-width:0}
@@ -28,5 +28,28 @@ body.booth-app .mobile-tool-header{display:none}
  body.booth-app #decoration-editor #preview,body.booth-app #decoration-editor #crop-preview{touch-action:none;user-select:none;-webkit-user-select:none}
 }
 @media(max-width:700px),(pointer:coarse) and (max-width:1100px) and (max-height:550px){
- body.booth-app #decoration-editor .editor-quick-row{position:absolute;z-index:2;right:8px;bottom:54px;flex:none;width:auto;height:34px;min-height:34px;padding:1px 4px;border:1px solid #d8dfcf;border-radius:10px;background:#fffefaf0;box-shadow:0 2px 8px #24321c12}
+ body.booth-app #decoration-editor .editor-quick-row{position:absolute;z-index:2;right:8px;bottom:calc(54px + var(--tool-panel-height,0px));flex:none;width:auto;height:34px;min-height:34px;padding:1px 4px;border:1px solid #d8dfcf;border-radius:10px;background:#fffefaf0;box-shadow:0 2px 8px #24321c12}
+}
+
+@media(max-width:700px),(pointer:coarse) and (max-width:1100px) and (max-height:550px){
+ body.booth-app #decoration-editor[data-tool="photo"] .expanded-tools{max-height:min(25dvh,160px)}
+ body.booth-app #decoration-editor[data-tool="photo"] .mobile-tool-header{display:none}
+ body.booth-app #decoration-editor .photo-picker{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;gap:6px;margin:0 0 5px;padding:6px 2px}
+ body.booth-app #decoration-editor .photo-picker button{width:42px;height:42px;flex:0 0 42px}
+ body.booth-app #decoration-editor .photo-actions{margin:0;gap:8px}
+ body.booth-app #decoration-editor .photo-actions .icon-button{width:36px;height:36px;min-height:36px}
+ body.booth-app #decoration-editor .photo-actions .text-button{min-height:36px}
+ body.booth-app #decoration-editor .edit-tool-tabs button[aria-expanded="true"]:after{content:'⌃';font-size:10px;margin-left:4px}
+}
+/* A short landscape phone has more usable room beside the photo than below it. */
+@media(orientation:landscape) and (pointer:coarse) and (max-width:1100px) and (max-height:550px){
+ body.booth-app #decoration-editor[data-tools-open="true"]:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,38%);grid-template-rows:44px 38px minmax(0,1fr)}
+ body.booth-app #decoration-editor[data-tools-open="true"] .edit-header{grid-column:1/-1;grid-row:1}
+ body.booth-app #decoration-editor[data-tools-open="true"] .editor-view-controls{grid-column:1;grid-row:2}
+ body.booth-app #decoration-editor[data-tools-open="true"] .expanded-stage{grid-column:1;grid-row:3;min-height:0;border-right:1px solid var(--line)}
+ body.booth-app #decoration-editor[data-tools-open="true"][data-tool="photo"] .expanded-stage{grid-row:2/4}
+ body.booth-app #decoration-editor[data-tools-open="true"] .edit-tool-tabs{grid-column:2;grid-row:2;min-height:38px;height:38px}
+ body.booth-app #decoration-editor[data-tools-open="true"] .edit-tool-tabs button{min-height:38px;font-size:10px;padding:3px}
+ body.booth-app #decoration-editor[data-tools-open="true"] .expanded-tools{grid-column:2;grid-row:3;max-height:none;height:100%;min-height:0;overflow:auto}
+ body.booth-app #decoration-editor[data-tools-open="true"] .editor-quick-row{bottom:8px;left:8px;right:auto}
 }

@@ -1,3 +1,4 @@
+import {createJourneyHeader} from './journey-header.js';
 import {createToolPanel} from './tool-panel.js';
 import {labelCollectionButton,renderCollectionBrand} from './collection-brand.js';
 import {renderFrameGroups} from './frame-groups.js';
@@ -35,6 +36,7 @@ const cropCanvas = $('crop-preview'), cropPointers = new Map();
 let cropGesture = null;
 const editorView=createEditorView(decorationEditor,canvas,{isDecorationTarget:e=>pointers.size>0||decorationAt(e)!==null});
 const toolPanel=createToolPanel(decorationEditor,{onSelect:selectEditorTool});
+const journeyHeader=createJourneyHeader({onResize:()=>{editorView.refresh();updateCameraGeometry();}});
 const saveCanvas=$('save-preview');
 for(const group of [...new Set(EXPORT_FORMATS.map(f=>f.group))]){const optgroup=document.createElement('optgroup');optgroup.label=group;for(const f of EXPORT_FORMATS.filter(f=>f.group===group))optgroup.append(Object.assign(document.createElement('option'),{value:f.id,textContent:f.name}));$('export-format').append(optgroup);}
 $('export-format').value='print-4x6';
@@ -138,10 +140,10 @@ function go(step) {
   if(step===2&&!$('web-capture-area').hidden&&!stream)startCamera();
   if(step===3)openEditorTool(decorationEditor.dataset.tool||'stickers');
   (step===3?$('edit-title'):$('step-title')).focus({ preventScroll: true });
-  window.scrollTo({ top: Math.max(0, document.querySelector('.steps').getBoundingClientRect().top + scrollY - 15), behavior: 'smooth' });
+  window.scrollTo({ top: Math.max(0, document.querySelector('.journey-header').getBoundingClientRect().top + scrollY - 15), behavior: 'smooth' });
 }
 function renderSteps() {
-  document.body.dataset.step = String(state.step);
+  document.body.dataset.step = String(state.step);journeyHeader.refresh(state.step);
   $('step-list').replaceChildren();
   [0,1,2,3,4].forEach((step,index)=>{const li=document.createElement('li');li.className=step===state.step?'active':step<state.step?'done':'';if(step===state.step)li.setAttribute('aria-current','step');const n=document.createElement('span');n.className='step-number';n.textContent=step<state.step?'✓':String(index+1).padStart(2,'0');const label=document.createElement('span');label.className='step-label';label.textContent=['프레임','용도·배치','촬영','꾸미기','저장·공유'][index];li.append(n,label);$('step-list').append(li);});
   document.querySelectorAll('.step-content').forEach(el => el.hidden = Number(el.dataset.step) !== state.step);
@@ -172,7 +174,7 @@ function updateButtons() {
   $('camera-flip').disabled = busy || starting; $('photo-upload').disabled = busy; $('native-capture').disabled=busy; $('native-photo').disabled=busy; $('demo').disabled = busy;
   updateCameraGeometry();
   $('native-capture-status').textContent=(state.selectedPhoto+1)+'번 컷 '+(state.photos[state.selectedPhoto]?'다시 찍기':'촬영 준비')+' · '+state.photos.filter(Boolean).length+'/'+state.count+'장 등록';
-  $('cancel-capture').hidden = !busy; $('capture-progress').textContent = `${state.photos.filter(Boolean).length} / ${state.count}`;
+  $('capture').hidden = busy; $('cancel-capture').hidden = !busy; $('capture-progress').textContent = `${state.photos.filter(Boolean).length} / ${state.count}`;
 }
 function renderThumbnails() {
   $('thumbnails').replaceChildren();
@@ -303,6 +305,7 @@ function renderPhotoPicker() {
   });
 }
 function selectEditorTool(tool,{openPanel=true}={}) {
+  if(toolPanel.compact&&openPanel)editorView.reset();
   decorationEditor.dataset.tool = tool;pointers.clear();gesture=null;cropPointers.clear();cropGesture=null;if(!canEditDecoration(state.decorations[state.selectedDeco]))state.selectedDeco=null;if(tool==='filter')renderFilterChoices();
   canvas.hidden = tool === 'photo'; cropCanvas.hidden = tool !== 'photo';
   $('edit-title').textContent = { stickers: '스티커로 꾸미기', text: '마음을 적어요', photo: '사진을 크게 보고 조정해요', filter: '오늘의 분위기' }[tool];
@@ -475,7 +478,7 @@ async function bootEvent() {
 }
 
 $('next').addEventListener('click', () => go(state.step+1)); $('back').addEventListener('click', () => go(state.step-1));
-$('show-date').addEventListener('change', () => render());
+$('show-date').addEventListener('change', () => {render();editorView.refresh();});
 $('camera-start').addEventListener('click', startCamera); $('camera-flip').addEventListener('click', () => { facing = facing === 'user' ? 'environment' : 'user'; startCamera(); });
 $('capture').setAttribute('aria-label','남은 컷 연속 촬영');$('capture').addEventListener('click', () => capture(true)); $('auto-capture').addEventListener('click', () => capture(true));
 $('cancel-capture').addEventListener('click', () => { captureEpoch++; busy = false; $('countdown').textContent = ''; renderThumbnails(); });
