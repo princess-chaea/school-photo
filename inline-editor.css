@@ -62,3 +62,7 @@ body.booth-app #decoration-editor .stickers{max-height:none;overflow:visible}
  body.booth-app #decoration-editor .editor-quick-row,body.booth-app #decoration-editor .edit-tool-tabs{flex-shrink:0}
  body.booth-app #decoration-editor .expanded-tools,body.booth-app #decoration-editor[data-tool="text"] .expanded-tools{flex:0 0 190px;height:190px;min-height:190px}
 }
+/* A centered flex parent puts enlarged content at negative, unreachable offsets. */
+body.booth-app #decoration-editor .expanded-stage{display:block;padding:0;touch-action:none;overscroll-behavior:contain}
+body.booth-app #decoration-editor #preview{flex:none}
+body.booth-app #decoration-editor #crop-preview{width:auto;height:auto;max-width:100%;max-height:100%}
