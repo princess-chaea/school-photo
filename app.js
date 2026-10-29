@@ -1,3 +1,4 @@
+import {observeFrameChoices,paintFrameChoice} from './frame-choice-preview.js';
 import {createJourneyHeader} from './journey-header.js';
 import {createToolPanel} from './tool-panel.js';
 import {labelCollectionButton,renderCollectionBrand} from './collection-brand.js';
@@ -37,6 +38,7 @@ let cropGesture = null;
 const editorView=createEditorView(decorationEditor,canvas,{isDecorationTarget:e=>pointers.size>0||decorationAt(e)!==null});
 const toolPanel=createToolPanel(decorationEditor,{onSelect:selectEditorTool});
 const journeyHeader=createJourneyHeader({onResize:()=>{editorView.refresh();updateCameraGeometry();}});
+observeFrameChoices($('frame-options'));
 const saveCanvas=$('save-preview');
 for(const group of [...new Set(EXPORT_FORMATS.map(f=>f.group))]){const optgroup=document.createElement('optgroup');optgroup.label=group;for(const f of EXPORT_FORMATS.filter(f=>f.group===group))optgroup.append(Object.assign(document.createElement('option'),{value:f.id,textContent:f.name}));$('export-format').append(optgroup);}
 $('export-format').value='print-4x6';
@@ -81,17 +83,15 @@ function renderChoices() {
   $('orientation-options').replaceChildren(...[['portrait','세로 구성'],['landscape','가로 구성']].map(([value,label]) => { const b = createButton(state.orientation === value ? 'selected' : '',label,()=>{state.orientation=value;state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}});renderChoices();renderThumbnails();render();});b.setAttribute('aria-pressed',String(state.orientation===value));b.disabled=!compatibleFrame(selectedFrame,state.count,value,EXPORT_FORMATS.find(f=>f.id===$('export-format').value));return b; }));
   renderFrameGroups($('frame-options'),state.event.frames,{student:true,renderCard:(frame,index,group)=>{
     const button=createButton(`frame-option ${state.frame===index?'selected':''}`,'',async()=>{if(frame.layoutCount&&frame.layoutCount!==state.count&&state.photos.some(Boolean)&&!await confirmAction('다른 컷 수의 프레임을 선택하면 촬영한 사진과 꾸미기가 초기화돼요. 바꿀까요?'))return;if(frame.layoutCount&&frame.layoutCount!==state.count){state.decorations=[];state.selectedDeco=null;deletedDecoration=null;}state.frame=index;state.photos.forEach(p=>{if(p){p.zoom=1;p.panX=0;p.panY=0;}});renderChoices();renderThumbnails();render();});button.setAttribute('aria-pressed',String(state.frame===index));button.setAttribute('aria-label',frame.name+' 프레임 선택');
-    if(group==='base'){const dot=document.createElement('span');dot.className='palette-dot';dot.style.background=frame.bg;button.append(dot);}
-    else{
-      const sample=document.createElement('span');sample.className='color-sample frame-layout-sample';sample.style.background=frame.bg;
-      const guide=document.createElement('canvas');guide.width=160;guide.height=120;
+    let preview,repaint=()=>{};
+    if(group!=='base'){
+      const guide=document.createElement('canvas');preview=guide;guide.width=160;guide.height=120;
       const geometry=layout(frame.layoutCount||4,state.event,{frame,orientation:frame.orientation||'portrait'});
-      const paint=image=>{drawLayoutGuide(guide,geometry,{background:frame.bg,ink:frame.ink});if(image){const scale=Math.min(guide.width/geometry.width,guide.height/geometry.height),small={width:geometry.width*scale,height:geometry.height*scale,slots:geometry.slots.map(s=>({x:s.x*scale,y:s.y*scale,w:s.w*scale,h:s.h*scale}))},context=guide.getContext('2d');context.save();context.translate((guide.width-small.width)/2,(guide.height-small.height)/2);drawFrameOverlay(context,image,frame,small);context.restore();}};
-      paint(assetImages.get(frame.overlay));sample.append(guide);
-      if(frame.overlay&&!assetImages.has(frame.overlay))imageFromURL(frame.overlay).then(image=>{if(guide.isConnected)paint(image);}).catch(()=>{});
-      button.append(sample);
+      const paint=image=>{drawLayoutGuide(guide,geometry,{background:frame.bg,ink:frame.ink});if(image){const scale=Math.min(guide.width/geometry.width,guide.height/geometry.height),small={width:geometry.width*scale,height:geometry.height*scale,slots:geometry.slots.map(s=>({x:s.x*scale,y:s.y*scale,w:s.w*scale,h:s.h*scale}))},context=guide.getContext('2d');context.save();context.translate((guide.width-small.width)/2,(guide.height-small.height)/2);drawFrameOverlay(context,image,frame,small);context.restore();}repaint();};
+      paint(assetImages.get(frame.overlay));
+      if(frame.overlay&&!assetImages.has(frame.overlay))imageFromURL(frame.overlay).then(image=>{if(button.isConnected)paint(image);}).catch(()=>{});
     }
-    const label=document.createElement('span');label.textContent=frame.name;button.append(label);if(frame.layoutCount){const scope=document.createElement('small');scope.textContent=frame.layoutCount+'컷 · '+(frame.orientation==='landscape'?'가로':'세로');button.append(scope);}return button;
+    repaint=paintFrameChoice(button,frame,{selected:state.frame===index,preview});return button;
   }});
   $('frame-name').textContent = state.event.frames[state.frame].name;
   $('chosen-purpose').textContent='선택한 프레임: '+selectedFrame.name+' · '+(selectedFrame.layoutCount?selectedFrame.layoutCount+'컷 · '+(selectedFrame.orientation==='landscape'?'가로 배치':'세로 배치'):'컷 수와 배치는 다음 단계에서 선택해요.');

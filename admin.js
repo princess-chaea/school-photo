@@ -1,3 +1,4 @@
+import {observeFrameChoices,paintFrameChoice} from './frame-choice-preview.js';
 import {renderFrameGroups} from './frame-groups.js';
 import './frame-groups.css';
 import {createStickerSelector} from './sticker-selector.js';
@@ -17,6 +18,7 @@ import { paintFramePreview } from './frame-preview.js';
 import { createLibraries } from './libraries.js';
 
 const $ = id => document.getElementById(id);
+observeFrameChoices($('event-frames'));
 let user = null, events = [], assets = [], editing = null, dirty = false, locked = false, qrEvent = null, toastTimer, previewEpoch = 0, authEpoch = 0;
 let school = { school: '', logo: '' }, profileDirty = false;
 let frameEditor, libraries, extraTextEditor, sharedAssets = [];
@@ -80,9 +82,10 @@ function renderEditorChoices() {
       dirty=true;renderEditorChoices();updatePreview();
     },`design-choice ${selected?'selected':''}`);
     card.setAttribute('aria-pressed',String(selected));card.setAttribute('aria-label',design.name+(selected?' 선택 해제':' 선택'));
-    if(design.overlay){const image=new Image();image.src=design.overlay;image.alt='';card.append(image);}
-    else{const swatch=text('span','','swatch');swatch.style.background=design.bg;card.append(swatch);}
-    card.append(text('span',design.name+(design.layoutCount?' · '+design.layoutCount+'컷':'')));return card;
+    const image=design.overlay?new Image():undefined;
+    const repaint=paintFrameChoice(card,design,{selected,preview:image});
+    if(image){image.onload=repaint;image.src=design.overlay;}
+    return card;
   }});
   const availableStickers=stickersAvailable();stickerSelector.render([...availableStickers,...editing.stickers.filter(s=>!availableStickers.some(a=>a.id===s.id))],editing.stickers);
   $('publication-state').textContent = editing.published ? '● 게시 중 · 저장하면 기존 QR에도 반영됩니다' : '○ 비공개 · 게시 후 QR을 발급할 수 있어요';

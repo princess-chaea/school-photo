@@ -3,3 +3,10 @@
 @container(max-width:440px){.frame-group--base>.frame-group-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.frame-group--base :is(.design-choice,.frame-option){padding-inline:3px}}
 body.booth-app .frame-group-grid .frame-option{align-items:center;text-align:center}
 body.booth-app .frame-group-grid .frame-option .palette-dot{align-self:center;margin-inline:auto}
+/* Pair the preview, label and selected border in the same image for forced dark browsers. */
+.frame-group-grid :is(.frame-option,.design-choice).color-safe-frame{display:block;position:relative;padding:0;gap:0;border:0;outline:none;background:transparent;overflow:hidden;border-radius:12px;min-height:96px}
+.color-safe-frame .frame-choice-bitmap{display:block;width:100%;height:96px;pointer-events:none}
+.frame-group:not(.frame-group--base) .color-safe-frame .frame-choice-bitmap{height:150px}
+.color-safe-frame .frame-choice-accessible{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.frame-group-grid :is(.frame-option,.design-choice).color-safe-frame:focus-visible{outline:3px solid #607f40;outline-offset:2px}
+@media(forced-colors:active){.frame-group-grid :is(.frame-option,.design-choice).color-safe-frame{outline:1px solid ButtonText}.frame-group-grid :is(.frame-option,.design-choice).color-safe-frame[aria-pressed="true"]{outline:3px solid Highlight}}
