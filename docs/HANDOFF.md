@@ -256,3 +256,9 @@ GitHub에 push하는 것만으로는 Firebase에 자동 배포되지 않습니�
 ## Google 로그인 버튼 브랜드 (2026-10-30)
 
 문자 G 대신 Google Identity 공식 가이드에서 받은 변경 없는 `public/branding/google-g.png`를 사용합니다. 버튼은 공식 light 테마의 흰 배경/1px #747775 테두리/#1f1f1f 글자, 40px 높이, 12px 바깥 여백과 10px 로고·문구 간격 및 한국어 ‘Google로 로그인’을 사용합니다. 로고 비율은 object-fit:contain으로 유지하며 로그인 이벤트와 Firebase 인증은 그대로입니다. 출처/상표 사용 안내는 THIRD_PARTY_NOTICES.md에 기록했습니다. 1440/768/390/320px에서 이미지 로드·색상·넘침·체험 모드 비활성을 확인하고 단위 51개·빌드·Hosting 분리 검사를 통과했습니다. 인증 팝업에서 계정 로그인은 자동 실행하지 않았습니다.
+
+## 꾸미기 기본 보기 무한 떨림 수정 (2026-11-09)
+
+- 원격 main 최신 `e5f4202`에서 재현했습니다. 네이티브 스크롤바를 표시하고 1170×941/문서 확대 125%, 1755×1412/150% 조건을 만들면 90프레임 중 크기 변경이 89회 발생했습니다. 정수로 반올림한 clientWidth/clientHeight를 래퍼 크기와 fit 계산에 재사용하면서, 스크롤바 표시→영역 축소→fit 축소→스크롤바 숨김→영역 확대가 반복되는 피드백입니다. 기본 headless Chromium의 숨긴 스크롤바로는 드러나지 않습니다.
+- `editor-view.js`의 fit 기준은 스크롤바 상태와 독립적인 computed border box 내부 크기로 바꿨습니다. 분수 픽셀을 내림하고 1px 여유를 두며, 100% 래퍼는 정확한 백분율 크기를 사용합니다. 확대 래퍼는 `max(100%, 사진 크기+여백)`으로 모든 가장자리에 접근할 수 있습니다. 사진 구도도 같은 측정 기준을 씁니다. Observer를 지연하거나 제거하지 않고 계산의 순환 의존을 끊었습니다. 사진/장식/출력 좌표는 바꾸지 않습니다.
+- Playwright 회귀 검사 `scripts/check-editor-view.mjs`와 `npm run test:editor-view`를 추가했습니다. 일반 설치에서는 `npx playwright install chromium`으로 브라우저를 한 번 설치합니다. 시스템 Chromium을 쓸 때는 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:editor-view`로 실행합니다. 네이티브 스크롤바를 켜고 5개 화면/문서 확대 조건에서 기본 보기, 125/200/400% 보기 확대, 네 모서리 스크롤, 전체 복귀, 사진 구도 왕복, 출력 Canvas 픽셀 유지를 확인합니다. 원본 main 모듈로 검사하면 크기 진동으로 실패하며 수정 모듈은 통과합니다.

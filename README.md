@@ -111,6 +111,8 @@ Firebase 규칙 통합 테스트는 Java 21 및 Firebase CLI가 필요합니다.
 npx --yes --package firebase-tools firebase emulators:exec --project demo-school-photo --only firestore,storage "node --test tests/security.rules.test.mjs"
 ```
 
+꾸미기 보기의 스크롤바·확대 떨림은 `npx playwright install chromium` 후 `npm run test:editor-view`로 브라우저 회귀 검사를 실행할 수 있습니다. 시스템 Chromium 경로는 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`로 지정합니다.
+
 기본 테스트는 2·4·6·8컷 배치/경계, 사진 크롭 경계, QR 참가자 경로, 외부 행사 URL 정제를 검사합니다. 규칙 테스트는 소유자 격리, 공개 행사 단건 읽기, 비공개 읽기 차단, 학교 설정 격리, 참가자 쓰기 차단, 디자인 업로드 형식·용량을 검사합니다.
 
 UI 검수용 주소는 `/?demo=1`(실제 클라우드 저장 없는 운영자 체험), `/booth.html?demo=1`(일반 샘플 촬영)입니다. `/?demo=1&wasm=1`은 WebP 폴백 인코더 검수용입니다. 운영자 화면에는 이 검수 경로를 참가자에게 배포하는 버튼이 없습니다.

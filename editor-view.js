@@ -1,18 +1,27 @@
 import { clamp } from './core.js';
 export function createEditorView(editor,canvas,{isDecorationTarget=()=>false}={}){
  const stage=document.getElementById('expanded-stage'),wrap=document.getElementById('editor-viewport'),bar=document.getElementById('editor-view-controls'),output=document.getElementById('editor-view-value');let zoom=1,drag=null;const points=new Map();
+ function viewportSize(){
+  // clientWidth/clientHeight shrink when a scrollbar appears. Using them for
+  // fit can toggle the other scrollbar forever at fractional browser zoom.
+  const style=getComputedStyle(stage),borderBox=style.boxSizing==='border-box';
+  return {width:Math.floor(parseFloat(style.width)-(borderBox?parseFloat(style.borderLeftWidth)+parseFloat(style.borderRightWidth):0)),height:Math.floor(parseFloat(style.height)-(borderBox?parseFloat(style.borderTopWidth)+parseFloat(style.borderBottomWidth):0))};
+ }
  function refresh(){
   if(editor.hidden)return;
   const photo=editor.dataset.tool==='photo';bar.hidden=photo;
+  const viewport=viewportSize();
   if(photo){
    const cropCanvas=document.getElementById('crop-preview'),inset=12;
-   wrap.style.width=stage.clientWidth+'px';wrap.style.height=stage.clientHeight+'px';
-   const fit=Math.max(.01,Math.min((stage.clientWidth-inset)/cropCanvas.width,(stage.clientHeight-inset)/cropCanvas.height));
+   wrap.style.width='100%';wrap.style.height='100%';
+   const fit=Math.max(.01,Math.min((viewport.width-inset-1)/cropCanvas.width,(viewport.height-inset-1)/cropCanvas.height));
    cropCanvas.style.width=cropCanvas.width*fit+'px';cropCanvas.style.height=cropCanvas.height*fit+'px';
    stage.scrollLeft=0;stage.scrollTop=0;
   }else{
-   const fit=Math.max(.01,Math.min((stage.clientWidth-24)/canvas.width,(stage.clientHeight-24)/canvas.height));
-   wrap.style.width=Math.max(stage.clientWidth,canvas.width*fit*zoom+24)+'px';wrap.style.height=Math.max(stage.clientHeight,canvas.height*fit*zoom+24)+'px';
+   const fit=Math.max(.01,Math.min((viewport.width-25)/canvas.width,(viewport.height-25)/canvas.height));
+   // Percentages preserve fractional layout sizes at fit; rounding client sizes
+   // up to integer pixels can otherwise introduce a scrollbar at 100%.
+   wrap.style.width=zoom===1?'100%':`max(100%, ${Math.ceil(canvas.width*fit*zoom+24)}px)`;wrap.style.height=zoom===1?'100%':`max(100%, ${Math.ceil(canvas.height*fit*zoom+24)}px)`;
    canvas.style.width=canvas.width*fit*zoom+'px';canvas.style.height=canvas.height*fit*zoom+'px';
   }
   output.textContent=Math.round(zoom*100)+'%';stage.classList.toggle('view-pan',points.size>0);
